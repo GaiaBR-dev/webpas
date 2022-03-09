@@ -4,7 +4,6 @@ const Schema = mongoose.Schema
 
 const configSchema = new Schema({
     horarios: [{type:Number, required:true}],
-    periodos:[{type:String, required:true }],
     diasDaSemana:[{type:String, required:true }],
     creditos:[{type:Number,required:true}]
 })

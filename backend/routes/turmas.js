@@ -60,7 +60,10 @@ router.route('/add').post((req,res) =>{
     })
     novaTurma.save()
         .then(()=> res.json('Turma adicionada'))
-        .catch(err =>res.status(400).json('Error: '+ err))
+        .catch(err =>{
+            console.log(err)
+            res.status(400).json('Error: '+ err)
+        })
 })
 
 router.route('/:id').get((req,res)=>{
@@ -120,9 +123,15 @@ router.route('/update/:id').post((req,res)=>{
 
             turma.save()
                 .then(()=> res.json('Turma atualizada'))
-                .catch(err =>res.status(400).json('Error: '+err))
+                .catch(err =>{
+                    console.log(err)
+                    res.status(400).json('Error: '+ err)
+                })
         })
-        .catch(err => res.status(400).json('Error: '+ err))
+        .catch(err =>{
+            console.log(err)
+            res.status(400).json('Error: '+ err)
+        })
 })
 
 module.exports = router

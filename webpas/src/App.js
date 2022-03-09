@@ -1,6 +1,6 @@
 import React from "react";
 import {BrowserRouter, Routes, Route} from "react-router-dom";
-import { styled, useTheme } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import Navbar from "./components/navbar.component";
 import HomePage from "./components/pages/homepage.component";
 import PrediosList from "./components/pages/predios-list.component";
@@ -8,6 +8,7 @@ import TurmasList from "./components/pages/turmas-list.component";
 import DistanciasMatriz from "./components/pages/distancias-matriz.component";
 import Solver from "./components/pages/solver.component";
 import Agenda from "./components/pages/agenda.component";
+import Salas from "./components/pages/salas-list.component";
 import { Container } from "@mui/material";
 import { CssBaseline } from "@mui/material";
 import { Box } from "@mui/system";
@@ -67,6 +68,7 @@ function App() {
                 <Route path="/distancias" element={<DistanciasMatriz/>} />
                 <Route path="/solver" element={<Solver/>} />
                 <Route path="/agenda" element={<Agenda/>} />
+                <Route path="/predios/:predio" element={<Salas/>}/>
               </Routes>
               </Container>
           </Box>

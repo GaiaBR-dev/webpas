@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link as RouterLink } from 'react-router-dom';
 import { Container, Typography } from "@mui/material";
 import { useState, useEffect } from "react";
 import SalasDataService from '../../services/salas'
@@ -77,7 +77,15 @@ const PrediosList = props =>{
                                     <CardActions>
                                         <Grid container spacing={1} rowSpacing={1}>
                                             <Grid item xs ={12}>
-                                                <Button size="small" variant='outlined' sx={{width:'100%'}}>Ver Salas</Button>
+                                                <Button 
+                                                    size="small" 
+                                                    variant='outlined' 
+                                                    sx={{width:'100%'}}
+                                                    component={RouterLink}
+                                                    to={"/predios/"+predio}
+                                                >
+                                                    Ver Salas
+                                                </Button>
                                             </Grid>
                                             <Grid item xs ={6}>
                                                 <Button size="small" variant='outlined' sx={{width:'100%'}}>Editar</Button>

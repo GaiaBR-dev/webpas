@@ -18,6 +18,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import Mensagem from "../mensagem.component";
 import ConfirmDialog from "../confirmDialog.component";
+import handleServerResponses from "../../services/response-handler";
 
 const configTemp={
     horarios:[800,1000,1200,1400,1600,1800,1900,2100,2300],
@@ -25,21 +26,6 @@ const configTemp={
     creditos:[10,6,5,4,3,2,1,0],
     anos:[2019,2020,2021,2022,2023],
     semestres:[1,2]
-}
-const modalStyleForm = {
-    '& .MuiPaper-root':{
-            width: '95%',
-    p: 4,
-    '@media (min-width: 900px)': {
-          width: '65%'
-    }
-    }
-
-};
-
-const inicialValues ={
-    ano : 2019,
-    semestre: 1
 }
 
 const tableRowCss ={
@@ -130,42 +116,16 @@ const TurmasList = props =>{
         })
     }
 
-    const handleServerResponses = (type,response) =>{
-        if (response.status == 200){
-            if (type == 'add' || type =='update' || type == 'delete'){
-                setNotify({
-                    isOpen:true,
-                    message: response.data,
-                    type:'success'
-                })
-            }else if(type =='err'){
-                console.log(response)
-                setNotify({
-                    isOpen:true,
-                    message: 'Erro bizarro',
-                    type:'error'
-                })
-            }
-        }else{
-            console.log(response)
-            setNotify({
-                isOpen:true,
-                message: 'Erro bizarro',
-                type:'error'
-            })
-        }
-    }
-
     const addOrEdit = (updating,turma,resetForm) =>{
         let data= {...turma}
         if (updating){
             TurmasDataService.updateTurma(turma._id,data)
-                .then(res =>handleServerResponses('update',res))
-                .catch(err=>handleServerResponses('error',err))
+                .then(res =>handleServerResponses('update',res,setNotify))
+                .catch(err=>handleServerResponses('error',err,setNotify))
         }else{
             TurmasDataService.addTurma(data)
-                .then(res =>handleServerResponses('add',res))
-                .catch(err=>handleServerResponses('error',err))
+                .then(res =>handleServerResponses('add',res,setNotify))
+                .catch(err=>handleServerResponses('error',err,setNotify))
         }
         resetForm()
         setOpenModalForm(false)
@@ -177,10 +137,9 @@ const TurmasList = props =>{
             ...confirmDialog,
             isOpen:false
         })
-        
         TurmasDataService.deleteTurma(id)
-            .then(res =>handleServerResponses('delete',res))
-            .catch(err=>handleServerResponses('error',err))
+            .then(res =>handleServerResponses('delete',res,setNotify))
+            .catch(err=>handleServerResponses('error',err,setNotify))
         retornaTurmas(anoTable,semestreTable)
 
     }
