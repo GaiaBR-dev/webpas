@@ -14,6 +14,9 @@ import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import handleServerResponses from "../../services/response-handler";
+import { Dialog, DialogContent } from "@mui/material";
+import SalaForm from '../forms/salaForm.component'  
 
 const headCells =[
     {id:'actions',label:"Ações", disableSorting:true},
@@ -30,12 +33,30 @@ const tableRowCss ={
     }
 }
 
+const tableStyle ={
+    marginTop:1.5,
+    '& thead th':{
+        fontWeight: '600',
+        fontSize:'0.7rem',
+        color: '#fff',
+        backgroundColor: 'secondary.main'
+    },
+    '& tbody td': {
+        fontSize:'0.7rem',
+    },
+    '& tbody tr:hover':{
+        backgroundColor: "#ddd",
+        cursor: 'pointer'
+    }
+}
+
+
 const Salas = ()=>{
     let params = useParams()
     const [salas,setSalas]=useState([])
     const [salaEdit,setSalaEdit] = useState(null)
-    const [openModalForm, setOpenModalForm] = React.useState(false);
-    const [openModalFile, setOpenModalFile] = React.useState(false);
+    const [openModalForm, setOpenModalForm] = useState(false);
+    const [openModalFile, setOpenModalFile] = useState(false);
     const [updatingS,setUpdatingS] = useState(false)
     const [filterFn,setFilterFn] = useState({fn:items=>{return items;}})
     const [notify,setNotify] = useState({isOpen:false,message:'',type:''})
@@ -55,20 +76,16 @@ const Salas = ()=>{
 
     useEffect(()=>{
         getSalas(params.predio)
-    },[params.predio])
-
-    const handleUpdatingS= isUpdating => {
-        isUpdating? setUpdatingS(true): setUpdatingS(false)
-    }
+    },[params.predios,notify])
 
     const openInModalEdit = sala =>{
-        handleUpdatingS(true)
+        setUpdatingS(true)
         setSalaEdit(sala)
         setOpenModalForm(true)
     }
 
     const openInModalNew = () =>{
-        handleUpdatingS(false)
+        setUpdatingS(false)
         setSalaEdit(null)
         setOpenModalForm(true)
     }
@@ -90,6 +107,34 @@ const Salas = ()=>{
                 }
             }
         })
+    }
+
+    const addOrEdit = (updating,sala,predio,resetForm) =>{
+        let data= {...sala}
+        if (updating){
+            SalasDataService.updateSala(sala._id,data)
+                .then(res =>handleServerResponses('update',res,setNotify))
+                .catch(err=>handleServerResponses('error',err,setNotify))
+        }else{
+            SalasDataService.addSala(predio,data)
+                .then(res =>handleServerResponses('add',res,setNotify))
+                .catch(err=>handleServerResponses('error',err,setNotify))
+        }
+        resetForm()
+        setOpenModalForm(false)
+        getSalas(params.predio)
+    }
+
+    const onDelete =(id)=>{
+        setConfirmDialog({
+            ...confirmDialog,
+            isOpen:false
+        })
+        SalasDataService.deleteSala(id)
+            .then(res =>handleServerResponses('delete',res,setNotify))
+            .catch(err=>handleServerResponses('error',err,setNotify))
+        getSalas(params.predio)
+
     }
 
     const{
@@ -114,6 +159,23 @@ const Salas = ()=>{
                 setConfirmDialog={setConfirmDialog}
             />
             <TableContainer component={Paper}>
+                <Dialog maxWidth="sm"
+                    id='modalForm'
+                    scroll='body'
+                    open={openModalForm}
+                    onClose={handleCloseModalForm}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
+                ><DialogContent >
+                    <SalaForm
+                        predio={params.predio}
+                        addOrEdit={addOrEdit}
+                        salaEdit = {salaEdit}
+                        updating={updatingS}
+                        closeModalForm ={handleCloseModalForm}
+                    /></DialogContent>
+                </Dialog>
+                
                 <Toolbar>
                     <Grid container 
                         spacing={2} 
@@ -175,7 +237,7 @@ const Salas = ()=>{
                                     <IconButton 
                                         sx={{padding:'4px'}} 
                                         color="primary"
-                                        
+                                        onClick={()=>{openInModalEdit(sala)}}   
                                     >
                                          <EditOutlinedIcon fontSize="small"/> 
                                     </IconButton>
@@ -187,7 +249,7 @@ const Salas = ()=>{
                                                 isOpen:true,
                                                 title:'Deletar Sala',
                                                 subtitle:'Tem certeza que deseja deletar? Você não pode desfazer esta operação.',
-                                                /*onConfirm: () =>{onDelete(sala._id)}*/
+                                                onConfirm: () =>{onDelete(sala._id)}
                                             })
                                         }}
                                     > <DeleteIcon fontSize="small"/> </IconButton>

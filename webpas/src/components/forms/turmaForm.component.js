@@ -37,7 +37,7 @@ const formCssClass ={
 
 const TurmaForm = props =>{
     const {dias,horarios,anos, creditos , closeModalForm, updating,addOrEdit,turmaEdit} = props
-    const [formTitle,setFormTitle] = useState('Adicionar turmas')
+    const [formTitle,setFormTitle] = useState('Adicionar turma')
 
     const handleFormTitle = updatingT =>{
         updatingT ? setFormTitle('Atualizar turmas'):setFormTitle('Adicionar Turmas')

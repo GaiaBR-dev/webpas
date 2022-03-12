@@ -4,20 +4,14 @@ import React, { useState } from "react";
 const tableStyle ={
     marginTop:1.5,
     '& thead th':{
-        fontWeight: '600',
-        fontSize:'0.7rem',
         color: '#fff',
         backgroundColor: 'secondary.main'
-    },
-    '& tbody td': {
-        fontSize:'0.7rem',
     },
     '& tbody tr:hover':{
         backgroundColor: "#ddd",
         cursor: 'pointer'
     }
 }
-
 
 export default function useTable(records, headCells,filterFn){
     
@@ -27,11 +21,19 @@ export default function useTable(records, headCells,filterFn){
     const [order,setOrder] = useState()
     const [orderBy,setOrderBy] = useState()
 
-    const TblContainer = props =>(
-        <Table sx ={tableStyle}>
-            {props.children}
-        </Table>
-    )
+    const TblContainer = props =>{
+        const {style} = props
+        let tStyle ={
+            ...style,
+            ...tableStyle
+        }
+        console.log(tStyle)
+        return(
+            <Table sx ={tStyle}>
+                {props.children}
+            </Table>
+        )
+    }
     
     const TblHead = props =>{
 

@@ -34,6 +34,16 @@ const tableRowCss ={
     }
 }
 
+const tableStyle ={
+    '& thead th span':{
+        fontWeight: '600',
+        fontSize:'0.7rem',
+    },
+    '& tbody td': {
+        fontSize:'0.7rem',
+    }
+}
+
 const headCells =[
     {id:'actions',label:"Ações", disableSorting:true},
     {id:'idTurma', label:'idTurma'},
@@ -72,7 +82,7 @@ const TurmasList = props =>{
 
     useEffect(()=>{
         retornaTurmas(anoTable,semestreTable)
-    }, [anoTable,semestreTable])
+    }, [anoTable,semestreTable,notify])
 
     const retornaTurmas = (ano,semestre) =>{
         TurmasDataService.getByAnoSemestre(ano,semestre)
@@ -277,7 +287,7 @@ const TurmasList = props =>{
                     </Grid>
                 </Grid>
                 </Toolbar>
-                <TblContainer>
+                <TblContainer sx={tableStyle} style={tableStyle}>
                     <TblHead />
                     <TableBody>
                         {recordsAfterPagingAndSorting().map(turma=>(
