@@ -25,7 +25,7 @@ router.route('/addPredio').post((req,res)=>{
     Sala.find({predio:predio})
         .then(salas =>{
             if (salas.length > 0) {
-                res.json('Um prédio com o nome '+ predio + ' já existe')
+                res.status(400).json('Um prédio com o nome '+ predio + ' já existe')
             } else{
                 const novasSalas = new Array(nSalas)
                 for (let i = 0; i < nSalas; i++) {  
@@ -91,7 +91,7 @@ router.route('/:predio/addSala').post((req,res)=>{
     })
     novaSala.save()
         .then(()=> res.json('Sala adicionada'))
-        .catch(err =>res.status(400).json('Error: '+ err))
+        .catch(err =>{res.status(400).json('Error: '+ err); console.log(err)})
 })
 
 router.route('/update/:id').post((req,res)=>{

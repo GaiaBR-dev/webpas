@@ -9,7 +9,6 @@ router.route('/').get((req,res)=>{ // filtros e classificação no cliente ? div
 })
 
 router.route('/:ano/:semestre').get((req,res)=>{
-    console.log('ano : '+ req.params.ano + '  semestre: ' + req.params.semestre)
     Turma.find({ano:req.params.ano,semestre:req.params.semestre})
         .then(turmas => res.json(turmas))
         .catch(err => res.json(err))

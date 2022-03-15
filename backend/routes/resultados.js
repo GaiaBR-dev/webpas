@@ -18,21 +18,14 @@ router.route('/diaperiodo').post(async (req, res) => {
     const diaDaSemana = req.body.diaDaSemana
     const delta = req.body.delta
 
-    const modelo = await dbtomodel(periodo,diaDaSemana)
+    const modelo = await dbtomodel(ano,semestre,periodo,diaDaSemana)
     const produto = await resolve(modelo,delta)
-    const alocacoes = trataresultado(modelo,produto)
+    const alocacoes = await trataresultado(modelo,produto)
     
-    novoResultado = new Resultado({
-        ano,
-        semestre,
-        diaDaSemana,
-        periodo,
-        alocacoes
-    })
 
-    novoResultado.save()
-        .then(()=> res.json(novoResultado))
-        .catch(err =>res.status(400).json('Error: '+ err)) 
+    res.json(alocacoes)
+    
+ 
 })
 
 router.route('/calculatudo').post(async (req, res) => {
@@ -59,6 +52,18 @@ router.route('/calculatudo').post(async (req, res) => {
             })
 
             novoResultado.save()
+
+            novoResultado = new Resultado({
+                ano,
+                semestre,
+                diaDaSemana,
+                periodo,
+                alocacoes
+            })
+        
+            novoResultado.save()
+                .then(()=> res.json(novoResultado))
+                .catch(err =>res.status(400).json('Error: '+ err)) 
         })
     })
 })

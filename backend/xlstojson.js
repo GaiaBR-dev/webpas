@@ -23,9 +23,9 @@ function xlstojson(){
                 K: 'horarioInicio',
                 L: 'horarioFim',
                 M: 'alocadoChefia',
-                N: 'creditoAula',
+                N: 'creditosAula',
                 O: 'creditoPratico',
-                Q: 'docente'
+                Q: 'docentes'
             }
         },{
             name: 'Salas',

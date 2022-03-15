@@ -6,19 +6,19 @@ const handleServerResponses = (type,response,setNotify) =>{
                 message: response.data,
                 type:'success'
             })
-        }else if(type =='err'){
+        }else if(type =='error'){
             console.log(response)
             setNotify({
                 isOpen:true,
-                message: 'erro bizarro',
+                message: response?.response?.data,
                 type:'error'
             })
         }
     }else{
-        console.log(response)
+        console.log(response.response)
         setNotify({
             isOpen:true,
-            message: 'erro bizarro',
+            message: response?.response?.data,
             type:'error'
         })
     }

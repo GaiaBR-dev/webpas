@@ -16,7 +16,9 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import handleServerResponses from "../../services/response-handler";
 import { Dialog, DialogContent } from "@mui/material";
-import SalaForm from '../forms/salaForm.component'  
+import SalaForm from '../forms/salaForm.component';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { Link as RouterLink } from 'react-router-dom';
 
 const headCells =[
     {id:'actions',label:"Ações", disableSorting:true},
@@ -147,10 +149,10 @@ const Salas = ()=>{
     return(
         <>
             <PageHeader 
-                title="Salas"
+                title={"Salas - " +params.predio}
                 subtitle="teste 123"
             />
-                <Mensagem 
+            <Mensagem 
                 notify={notify}
                 setNotify={setNotify}
             />
@@ -183,11 +185,21 @@ const Salas = ()=>{
                         alignItems="center" 
                         justifyContent="space-between"
                         columns={20}
-                    > 
+                    >   
+                        <Grid item xs ={2} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}}>Voltar</Grid>
                         <Grid item xs ={5} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}}>Adicionar</Grid>
-                        <Grid item xs ={9} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}}>Buscar</Grid>
-                        <Grid item xs ={4} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}}>Mostrar</Grid>
+                        <Grid item xs ={11} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}}>Buscar</Grid>
+
                         <Grid item xs ={1} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}}>Ajuda</Grid>
+                        <Grid item xs={6} sm={2}> 
+                            <Button 
+                                startIcon={<ArrowBackIcon/>}
+                                component={RouterLink}
+                                to={"/predios"}
+                                variant="contained"  
+                                sx={{fontSize:'12px',paddingTop:'12px',paddingBottom:'12px'}} >Prédios
+                            </Button>
+                        </Grid>
                         <Grid item xs={6} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}} sm={2}>
                             <Button 
                                 startIcon={<AddIcon/>} 
@@ -213,8 +225,6 @@ const Salas = ()=>{
                                 }}
                                 onChange={handleSearch}
                             />
-                        </Grid>
-                        <Grid item xs={6} sm={2}> 
                         </Grid>
                         <Grid item xs={6} sm={2}>
                         </Grid>

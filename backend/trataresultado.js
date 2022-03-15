@@ -1,4 +1,4 @@
-function trataresultado(modelo,resultado){
+async function trataresultado(modelo,resultado){
 
     const turmasF1 = modelo.turmasf1 
     const turmasF12 = modelo.turmasf12

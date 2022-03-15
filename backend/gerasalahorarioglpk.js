@@ -1,7 +1,7 @@
 const GLPK = require('glpk.js');
 const glpk = GLPK();
 
-function resolve(modelo,delta) {
+async function resolve(modelo,delta) {
 
     const turmasF1 = modelo.turmasf1 
     const turmasF12 = modelo.turmasf12
@@ -184,6 +184,7 @@ function resolve(modelo,delta) {
         varsPAS = getVariables()
         constraintsPAS = getConstraints()
         binariesPAS = getBinaries()
+        console.log(varsPAS)
 
         result = {
             name: 'ModeloPAS',
@@ -211,7 +212,6 @@ function resolve(modelo,delta) {
     }
 
     removeZeros(res)
-    console.log(res)
     return res
 
 }

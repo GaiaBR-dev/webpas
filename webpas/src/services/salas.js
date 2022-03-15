@@ -9,6 +9,10 @@ class SalasDataService {
         return http.get('salas/p/')
     }
 
+    addPredio(predio){
+        return http.post('salas/addPredio',predio)
+    }
+
     getSalas(predio){
         return http.get('salas/' + predio)
     }

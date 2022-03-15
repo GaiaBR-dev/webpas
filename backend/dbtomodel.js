@@ -2,7 +2,7 @@ let Sala = require('./models/sala.model')
 let Turma = require('./models/turma.model')
 let Distancia = require('./models/distancia.model')
 
-async function dbtomodel(periodo,diaSemana){
+async function dbtomodel(ano,semestre,periodo,diaSemana){
     let horario1
     let horario2
     let horario3
@@ -23,29 +23,31 @@ async function dbtomodel(periodo,diaSemana){
         horario3 = 2300
         salas = await Sala.find({"disponivelNoite":true}).exec()
     }
-    
     const turmasf1 = await Turma.find({
+        ano:ano,
+        semestre:semestre,
         diaDaSemana:diaSemana,
         horarioInicio:horario1,
         horarioFim:horario2,
-        creditoAula: 2, //           tratar dados, arrumar creditos nos dados de entrada
-        alocadoChefia: 'f'
+        //creditosAula: 2, //           tratar dados, arrumar creditos nos dados de entrada
         }).exec()
     
     const turmasf12 = await Turma.find({
+        ano:ano,
+        semestre:semestre,
         diaDaSemana:diaSemana,
         horarioInicio:horario1,
         horarioFim:horario3,
-        creditoAula: 4,
-        alocadoChefia: 'f'
+        //creditosAula: 4,
         }).exec()
 
     const turmasf2 = await Turma.find({
+        ano:ano,
+        semestre:semestre,
         diaDaSemana:diaSemana,
         horarioInicio:horario2,
         horarioFim:horario3,
-        creditoAula: 2,
-        alocadoChefia: 'f'
+        //creditosAula: 2,
         }).exec()
     
     const distancias = await Distancia.find().exec()
@@ -58,7 +60,6 @@ async function dbtomodel(periodo,diaSemana){
         salas: salas,
         distancias: distancias
     }
-
     return result
 }
 
