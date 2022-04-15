@@ -21,8 +21,8 @@ class TurmasDataService {
         return http.post(`turmas/update/${turmaId}`,turma)
     }
 
-    deleteTurma(turmaId){
-        return http.delete(`turmas/${turmaId}`)
+    deleteTurmas(turmas){
+        return http.post(`turmas/deleteMany`,turmas)
     }
 }
 

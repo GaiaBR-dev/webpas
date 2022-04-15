@@ -1,8 +1,11 @@
 import { Table, TableCell, TableHead, TablePagination, TableRow, TableSortLabel } from "@mui/material";
+import { Checkbox, Typography, Toolbar, Tooltip, IconButton } from "@mui/material";
+import DeleteIcon from '@mui/icons-material/Delete'
 import React, { useState } from "react";
+import { alpha } from '@mui/material/styles';
 
 const tableStyle ={
-    marginTop:1.5,
+
     '& thead th':{
         color: '#fff',
         backgroundColor: 'secondary.main'
@@ -15,27 +18,63 @@ const tableStyle ={
 
 export default function useTable(records, headCells,filterFn){
     
-    const pages = [5, 10, 25, 50]
+    const pages = [10, 25, 100, 500]
     const [page,setPage] = useState(0)
     const [rowsPerPage,setRowsPerPage] = useState(pages[page])
     const [order,setOrder] = useState()
     const [orderBy,setOrderBy] = useState()
 
     const TblContainer = props =>{
-        const {style} = props
+        const {style, numSelected, tableTitle, deleteSelected} = props
         let tStyle ={
             ...style,
             ...tableStyle
         }
-        console.log(tStyle)
         return(
-            <Table sx ={tStyle}>
-                {props.children}
-            </Table>
+            <>
+                <Toolbar
+                    sx={{
+                        ...(numSelected > 0 && {
+                        bgcolor: (theme) =>
+                            alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
+                        }),
+                    }}
+                >
+                    {numSelected > 0 ? (<>
+                        <Typography
+                            sx={{ flex: '1 1 100%',fontSize:'17px',fontWeight:'510',color:"#666" }}
+                            color="inherit"
+                            variant="subtitle1"
+                            component="p"
+                        >
+                            {numSelected} selecionado(s)
+                        </Typography>
+                        <Tooltip title="Deletar">
+                        <IconButton color="error" onClick={deleteSelected}>
+                            <DeleteIcon />
+                        </IconButton>
+                    </Tooltip>
+                    </>) : (<>
+                        <Typography
+                            sx={{ flex: '1 1 100%',fontSize:'17px',fontWeight:'510',color:"#666" }}
+                            variant="h6"
+                            id="tableTitle"
+                            component="p"
+                        >
+                            {tableTitle}
+                        </Typography>
+                        
+                    </>)}
+                </Toolbar>
+                <Table sx ={tStyle}>
+                    {props.children}
+                </Table>
+            </>
         )
     }
     
     const TblHead = props =>{
+        const {onSelectAllClick, numSelected, rowCount} = props
 
         const handleSortRequest = cellId =>{
             const isAsc = orderBy === cellId && order === "asc";
@@ -45,20 +84,27 @@ export default function useTable(records, headCells,filterFn){
 
         return (<TableHead>
             <TableRow>
-                {
-                    headCells.map(headCell =>(
-                        <TableCell key={headCell.id} sx={{padding:1}} sortDirection={orderBy===headCell.id?order:false}>
-                            <TableSortLabel
-                                active={orderBy===headCell.id}
-                                direction={orderBy === headCell.id ? order : 'asc'}
-                                onClick={() =>{handleSortRequest(headCell.id)}}
-                            >
-                                {headCell.label}
-                            </TableSortLabel>
-                        </TableCell>)
-                    )
-                }
+                <TableCell padding="checkbox">
+                    <Checkbox
+                        color="primary"
+                        indeterminate={numSelected > 0 && numSelected < rowCount}
+                        checked={rowCount > 0 && numSelected === rowCount}
+                        onChange={onSelectAllClick}
+                    />
+                </TableCell>
+                {headCells.map(headCell =>(
+                    <TableCell key={headCell.id} sx={{padding:1}} sortDirection={orderBy===headCell.id?order:false}>
+                        <TableSortLabel
+                            active={orderBy===headCell.id}
+                            direction={orderBy === headCell.id ? order : 'asc'}
+                            onClick={() =>{handleSortRequest(headCell.id)}}
+                        >
+                            {headCell.label}
+                        </TableSortLabel>
+                        </TableCell>
+                ))}
             </TableRow>
+            
         </TableHead>)
     }
 

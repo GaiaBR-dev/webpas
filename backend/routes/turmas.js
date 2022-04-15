@@ -93,12 +93,18 @@ router.route('/insereturmas321').post((req, res) => {// Hard Coded - >deletar de
     
 })
 
-router.route('/:id').delete((req,res)=>{
+router.route('/delete/:id').delete((req,res)=>{
     Turma.findByIdAndDelete(req.params.id)
         .then(()=> res.json('Turma deletada'))
         .catch(err => res.status(400).json('Error: '+ err))
 })
-//Delete many a partir de filtros
+
+router.route('/deleteMany').post((req,res)=>{
+    const turmasIds = req.body.turmasID
+    Turma.deleteMany({_id:{$in:turmasIds}})
+        .then(()=> res.json('Turmas deletadas'))
+        .catch(err => res.status(400).json('Error: '+ err))
+})
 
 router.route('/update/:id').post((req,res)=>{
     Turma.findById(req.params.id)

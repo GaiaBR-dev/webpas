@@ -18,7 +18,7 @@ export default function Mensagem(props){
         <Snackbar
             sx={{marginTop:'50px'}}
             open={notify.isOpen}
-            autoHideDuration={3000}
+            autoHideDuration={4000}
             anchorOrigin={{vertical:'top',horizontal:'right'}}
             onClose={handleClose}
         >

@@ -33,7 +33,7 @@ const modalStyleFile = {
     p: 4,
     '@media (min-width: 900px)': {
         width: '50%'
-  }
+    }
 };
 
 const inicialValues ={

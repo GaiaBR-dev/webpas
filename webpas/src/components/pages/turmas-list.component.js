@@ -19,6 +19,7 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import Mensagem from "../mensagem.component";
 import ConfirmDialog from "../confirmDialog.component";
 import handleServerResponses from "../../services/response-handler";
+import { Checkbox } from "@mui/material";
 
 const configTemp={
     horarios:[800,1000,1200,1400,1600,1800,1900,2100,2300],
@@ -45,7 +46,7 @@ const tableStyle ={
 }
 
 const headCells =[
-    {id:'actions',label:"Ações", disableSorting:true},
+    {id:'actions',label:"Editar", disableSorting:true},
     {id:'idTurma', label:'idTurma'},
     {id:'nomeDisciplina', label:'Nome da Disciplina'},
     {id:'turma', label:'Turma'},
@@ -75,6 +76,7 @@ const TurmasList = props =>{
     const [semestreTable,setSemestreTable] = useState(1)
     const [notify,setNotify] = useState({isOpen:false,message:'',type:''})
     const [confirmDialog,setConfirmDialog] = useState({isOpen:false,title:'',subtitle:''})
+    const [selected, setSelected] = React.useState([]);
 
     const handleCloseModalForm = () => setOpenModalForm(false);
     const handleOpenModalFile = () => setOpenModalFile(true);
@@ -125,6 +127,37 @@ const TurmasList = props =>{
             }
         })
     }
+    const handleSelectAllClick = (event) => {
+        if (event.target.checked) {
+          const newSelecteds = recordsAfterPagingAndSorting().map((turma) => turma._id);
+          setSelected(newSelecteds);
+          return;
+        }
+        setSelected([]);
+    };
+
+    const isSelected = (name) => selected.indexOf(name) !== -1;
+
+    const handleClick = (event, name) => {
+        const selectedIndex = selected.indexOf(name);
+        let newSelected = [];
+    
+        if (selectedIndex === -1) {
+          newSelected = newSelected.concat(selected, name);
+        } else if (selectedIndex === 0) {
+          newSelected = newSelected.concat(selected.slice(1));
+        } else if (selectedIndex === selected.length - 1) {
+          newSelected = newSelected.concat(selected.slice(0, -1));
+        } else if (selectedIndex > 0) {
+          newSelected = newSelected.concat(
+            selected.slice(0, selectedIndex),
+            selected.slice(selectedIndex + 1),
+          );
+        }
+    
+        setSelected(newSelected);
+      };
+    
 
     const addOrEdit = (updating,turma,resetForm) =>{
         let data= {...turma}
@@ -132,6 +165,7 @@ const TurmasList = props =>{
             TurmasDataService.updateTurma(turma._id,data)
                 .then(res =>handleServerResponses('update',res,setNotify))
                 .catch(err=>handleServerResponses('error',err,setNotify))
+            setSelected([]);
         }else{
             TurmasDataService.addTurma(data)
                 .then(res =>handleServerResponses('add',res,setNotify))
@@ -142,16 +176,18 @@ const TurmasList = props =>{
         retornaTurmas(anoTable,semestreTable)
     }
 
-    const onDelete =(id)=>{
+    const onDelete =(turmas)=>{
         setConfirmDialog({
             ...confirmDialog,
             isOpen:false
         })
-        TurmasDataService.deleteTurma(id)
+        console.log(turmas)
+        let data={turmasID:turmas}
+        TurmasDataService.deleteTurmas(data)
             .then(res =>handleServerResponses('delete',res,setNotify))
             .catch(err=>handleServerResponses('error',err,setNotify))
         retornaTurmas(anoTable,semestreTable)
-
+        setSelected([]);
     }
 
     const{
@@ -287,48 +323,73 @@ const TurmasList = props =>{
                     </Grid>
                 </Grid>
                 </Toolbar>
-                <TblContainer sx={tableStyle} style={tableStyle}>
-                    <TblHead />
+                <TblContainer 
+                    sx={tableStyle} 
+                    style={tableStyle} 
+                    tableTitle="Lista de Turmas"
+                    numSelected={selected.length}
+                    deleteSelected={()=>{
+                        setConfirmDialog({
+                            isOpen:true,
+                            title:'Deletar Turma',
+                            subtitle:'Tem certeza que deseja deletar? Você não pode desfazer esta operação.',
+                            onConfirm: () =>{onDelete(selected)}
+                        })
+                    }}
+                >
+                    <TblHead
+                        onSelectAllClick={handleSelectAllClick}
+                        numSelected={selected.length}
+                        rowCount={recordsAfterPagingAndSorting().length}
+                    />
                     <TableBody>
-                        {recordsAfterPagingAndSorting().map(turma=>(
-                            <TableRow key={turma._id} sx ={tableRowCss}>
-                                <TableCell>
-                                    <IconButton 
-                                        sx={{padding:'4px'}} 
+                        {recordsAfterPagingAndSorting().map((turma,index)=>{
+                            const isItemSelected = isSelected(turma._id);
+                            const labelId = `turmas-table-checkbox-${index}`;
+                            return(
+                                <TableRow 
+                                    key={turma._id} 
+                                    sx ={tableRowCss}
+                                    selected={isItemSelected}
+                                    aria-checked={isItemSelected}
+                                    role="checkbox"
+                                    onClick={(event) => handleClick(event, turma._id)}
+                                >
+                                    <TableCell padding="checkbox">
+                                    <Checkbox
                                         color="primary"
-                                        onClick={()=>{openInModalEdit(turma)}}
-                                    >
-                                         <EditOutlinedIcon fontSize="small"/> 
-                                    </IconButton>
-                                    <IconButton 
-                                        sx={{padding:'4px'}} 
-                                        color="error"
-                                        onClick={()=>{
-                                            setConfirmDialog({
-                                                isOpen:true,
-                                                title:'Deletar Turma',
-                                                subtitle:'Tem certeza que deseja deletar? Você não pode desfazer esta operação.',
-                                                onConfirm: () =>{onDelete(turma._id)}
-                                            })
+                                        checked={isItemSelected}
+                                        inputProps={{
+                                            'aria-labelledby': labelId,
                                         }}
-                                    > <DeleteIcon fontSize="small"/> </IconButton>
+                                    />
                                 </TableCell>
-                                <TableCell>{turma.idTurma}</TableCell>
-                                <TableCell>{turma.nomeDisciplina}</TableCell>
-                                <TableCell>{turma.turma}</TableCell>
-                                <TableCell>{turma.totalTurma}</TableCell>
-                                <TableCell>{turma.diaDaSemana}</TableCell>
-                                <TableCell>{turma.horarioInicio}</TableCell>
-                                <TableCell>{turma.horarioFim}</TableCell>
-                                <TableCell>{turma.creditosAula}</TableCell>
-                                <TableCell>{turma.departamentoOferta}</TableCell>
-                                <TableCell>{turma.departamentoTurma}</TableCell>
-                                <TableCell>{turma.campus}</TableCell>
-                                <TableCell>{turma.docentes}</TableCell>
-                                <TableCell>{turma.codDisciplina}</TableCell>
+                                    <TableCell>
+                                        <IconButton 
+                                            sx={{padding:'4px'}} 
+                                            color="primary"
+                                            onClick={()=>{openInModalEdit(turma)}}
+                                        >
+                                            <EditOutlinedIcon fontSize="small"/> 
+                                        </IconButton>
+                                    </TableCell>
+                                    <TableCell>{turma.idTurma}</TableCell>
+                                    <TableCell>{turma.nomeDisciplina}</TableCell>
+                                    <TableCell>{turma.turma}</TableCell>
+                                    <TableCell>{turma.totalTurma}</TableCell>
+                                    <TableCell>{turma.diaDaSemana}</TableCell>
+                                    <TableCell>{turma.horarioInicio}</TableCell>
+                                    <TableCell>{turma.horarioFim}</TableCell>
+                                    <TableCell>{turma.creditosAula}</TableCell>
+                                    <TableCell>{turma.departamentoOferta}</TableCell>
+                                    <TableCell>{turma.departamentoTurma}</TableCell>
+                                    <TableCell>{turma.campus}</TableCell>
+                                    <TableCell>{turma.docentes}</TableCell>
+                                    <TableCell>{turma.codDisciplina}</TableCell>
 
-                            </TableRow>
-                        ))}
+                                </TableRow>
+                            )
+                        })}
                     </TableBody>
                 </TblContainer>
                 <TblPagination/>

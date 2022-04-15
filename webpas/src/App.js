@@ -11,7 +11,7 @@ import Agenda from "./components/pages/agenda.component";
 import Salas from "./components/pages/salas-list.component";
 import { Container } from "@mui/material";
 import { CssBaseline } from "@mui/material";
-import { Box } from "@mui/system";
+import { Box, minWidth } from "@mui/system";
 import { createTheme } from '@mui/material/styles';
 import { ThemeProvider } from "@emotion/react";
 
@@ -28,7 +28,7 @@ const theme = createTheme({
   palette: {
     type: 'light',
     primary: {
-      main: 'rgba(33,33,33,0.97)',
+      main: 'rgba(33,33,33)',
     },
     secondary: {
       main: '#ff7d11',
@@ -50,6 +50,12 @@ const theme = createTheme({
   },
 })
 
+const containerStyle = {
+  '@media (min-width: 1400px)': {
+    maxWidth: '1400px'
+  }
+}
+
 function App() {
     return (
 
@@ -60,7 +66,7 @@ function App() {
           <Navbar />
           <Box component="main" sx={{ flexGrow: 1, p: 3 , backgroundColor:'#F5F5F5' }}>
               <DrawerHeader />
-              <Container >
+              <Container sx={containerStyle} >
               <Routes>
                 <Route path="/" element={<HomePage/>} />  
                 <Route path="/predios" element={<PrediosList/>} />
