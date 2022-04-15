@@ -14,7 +14,6 @@ import Select from "../forms/select.component";
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import InputAdornment from '@mui/material/InputAdornment';
-import DeleteIcon from '@mui/icons-material/Delete'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import Mensagem from "../mensagem.component";
 import ConfirmDialog from "../confirmDialog.component";
@@ -78,7 +77,10 @@ const TurmasList = props =>{
     const [confirmDialog,setConfirmDialog] = useState({isOpen:false,title:'',subtitle:''})
     const [selected, setSelected] = React.useState([]);
 
-    const handleCloseModalForm = () => setOpenModalForm(false);
+    const handleCloseModalForm = () => {
+        setOpenModalForm(false)
+        setSelected([])
+    };
     const handleOpenModalFile = () => setOpenModalFile(true);
     const handleCloseModalFile = () => setOpenModalFile(false);
 
@@ -156,20 +158,26 @@ const TurmasList = props =>{
         }
     
         setSelected(newSelected);
-      };
+    };
+
+    const fileHandleResponse = res =>{
+        setOpenModalFile(false)
+        handleServerResponses(res,setNotify)
+        retornaTurmas(anoTable,semestreTable)
+    }
     
 
     const addOrEdit = (updating,turma,resetForm) =>{
         let data= {...turma}
         if (updating){
             TurmasDataService.updateTurma(turma._id,data)
-                .then(res =>handleServerResponses('update',res,setNotify))
-                .catch(err=>handleServerResponses('error',err,setNotify))
+                .then(res =>handleServerResponses(res,setNotify))
+                .catch(err=>handleServerResponses(err,setNotify))
             setSelected([]);
         }else{
             TurmasDataService.addTurma(data)
-                .then(res =>handleServerResponses('add',res,setNotify))
-                .catch(err=>handleServerResponses('error',err,setNotify))
+                .then(res =>handleServerResponses(res,setNotify))
+                .catch(err=>handleServerResponses(err,setNotify))
         }
         resetForm()
         setOpenModalForm(false)
@@ -184,8 +192,8 @@ const TurmasList = props =>{
         console.log(turmas)
         let data={turmasID:turmas}
         TurmasDataService.deleteTurmas(data)
-            .then(res =>handleServerResponses('delete',res,setNotify))
-            .catch(err=>handleServerResponses('error',err,setNotify))
+            .then(res =>handleServerResponses(res,setNotify))
+            .catch(err=>handleServerResponses(err,setNotify))
         retornaTurmas(anoTable,semestreTable)
         setSelected([]);
     }
@@ -237,6 +245,7 @@ const TurmasList = props =>{
                         closeButton={handleCloseModalFile}
                         anos={configTemp.anos}
                         config={configTemp}
+                        handleResponse={fileHandleResponse}
                     />
                 </Modal>
                 <Dialog maxWidth="md"

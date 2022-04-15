@@ -6,8 +6,9 @@ class ExcelValidator{
         let erroDia = false
         let erroCreditos = false
         let res ={
+            status:200,
             erro: false,
-            msg: 'Tabela dentro dos padrões',
+            data: 'Tabela dentro dos padrões',
         }
         rowsTurmas.map(row =>{
 
@@ -38,17 +39,21 @@ class ExcelValidator{
 
         })
         if (erroPreenchido){
+            res.status = 400
             res.erro = true 
-            res.msg = 'A Tabela possui uma ou mais linhas com campos obrigatórios não preenchidos'
+            res.data = 'A Tabela possui uma ou mais linhas com campos obrigatórios não preenchidos'
         }else if (erroHorarioF || erroHorarioI){
+            res.status = 400
             res.erro = true 
-            res.msg = 'Um ou mais horários estão fora do padrão da universidade'
+            res.data = 'Um ou mais horários estão fora do padrão da universidade'
         }else if (erroCreditos){
+            res.status = 400
             res.erro = true 
-            res.msg = 'Uma ou mais turmas estão com os créditos fora do padrão da universidade'
+            res.data = 'Uma ou mais turmas estão com os créditos fora do padrão da universidade'
         }else if (erroDia){
+            res.status = 400
             res.erro = true 
-            res.msg = 'Uma ou mais turmas estão com o dia fora do padrão da universidade'
+            res.data = 'Uma ou mais turmas estão com o dia fora do padrão da universidade'
         }
         return res
     }

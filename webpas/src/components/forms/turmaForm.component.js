@@ -67,7 +67,7 @@ const TurmaForm = props =>{
         let temp ={}
         temp.nomeDisciplina = values.nomeDisciplina ? "" :"O nome da disciplina é obrigatório"
         temp.turma = values.turma ? "" : "O identificador da turma é obrigatório"
-        //temp.departamentoOferta = values.departamentoOferta ? "" : "O departamento de oferta é obrigatório"
+        temp.departamentoOferta = values.departamentoOferta ? "" : "O departamento de oferta é obrigatório"
         temp.diaDaSemana = values.diaDaSemana ? "" : "O dia em que a turma é ministrada é obrigatório"
         temp.horarioInicio = values.horarioInicio? "" : "O horário de ínicio da turma é obrigatório"
         temp.horarioFim = values.horarioFim? "" : "O horário de término da turma é obrigatório"
@@ -112,8 +112,8 @@ const TurmaForm = props =>{
                     <Typography variant="caption" mb={1}>Campos com * são obrigatórios</Typography>
                 </Grid>
                 <Grid item xs={1}>
-                    <IconButton >
-                        <CloseIcon onClick={closeModalForm}/>
+                    <IconButton onClick={closeModalForm} >
+                        <CloseIcon />
                     </IconButton>
                 </Grid>
                 <Grid item xs={12}><Divider/></Grid> 

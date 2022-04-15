@@ -39,28 +39,36 @@ router.route('/add').post((req,res) =>{
     const ano = req.body.ano
     const semestre = req.body.semestre
 
-    const novaTurma = new Turma({
-        idTurma,
-        campus,
-        departamentoTurma,
-        codDisciplina,
-        turma,
-        nomeDisciplina,
-        totalTurma,
-        departamentoOferta,
-        diaDaSemana,
-        horarioInicio,
-        horarioFim,
-        creditosAula,
-        creditosPratico,
-        docente,
-        ano,
-        semestre
-    })
-    novaTurma.save()
-        .then(()=> res.json('Turma adicionada'))
-        .catch(err =>{
-            console.log(err)
+    Turma.find({turma:turma,nomeDisciplina:nomeDisciplina,diaDaSemana:diaDaSemana,horarioInicio:horarioInicio,ano:ano,semestre:semestre})
+        .then(turmas =>{
+            if (turmas.length > 0){
+                res.status(400).json('Esta turma ja está cadastrada')
+            }else{
+                const novaTurma = new Turma({
+                    idTurma,
+                    campus,
+                    departamentoTurma,
+                    codDisciplina,
+                    turma,
+                    nomeDisciplina,
+                    totalTurma,
+                    departamentoOferta,
+                    diaDaSemana,
+                    horarioInicio,
+                    horarioFim,
+                    creditosAula,
+                    creditosPratico,
+                    docente,
+                    ano,
+                    semestre
+                })
+                novaTurma.save()
+                    .then(()=> res.json('Turma adicionada'))
+                    .catch(err =>{
+                        res.status(400).json('Error: '+ err)
+                    })
+            }
+        }).catch(err =>{
             res.status(400).json('Error: '+ err)
         })
 })
@@ -107,36 +115,54 @@ router.route('/deleteMany').post((req,res)=>{
 })
 
 router.route('/update/:id').post((req,res)=>{
-    Turma.findById(req.params.id)
-        .then(turma=> {
-            turma.idTurma = req.body.idTurma
-            turma.campus = req.body.campus
-            turma.departamentoTurma = req.body.departamentoTurma
-            turma.codDisciplina = req.body.codDisciplina
-            turma.turma = req.body.turma
-            turma.nomeDisciplina = req.body.nomeDisciplina
-            turma.totalTurma = req.body.totalTurma
-            turma.departamentoOferta = req.body.departamentoOferta
-            turma.diaDaSemana = req.body.diaDaSemana
-            turma.horarioInicio = req.body.horarioInicio
-            turma.horarioFim = req.body.horarioFim
-            turma.creditoAula = req.body.creditoAula
-            turma.creditoPratico = req.body.creditoPratico
-            turma.docentes = req.body.docentes
-            turma.ano = req.body.ano
-            turma.semestre = req.body.semestre
+    const turma = req.body.turma
+    const nomeDisciplina = req.body.nomeDisciplina
+    const diaDaSemana = req.body.diaDaSemana
+    const horarioInicio = req.body.horarioInicio
+    const ano = req.body.ano
+    const semestre = req.body.semestre
 
-            turma.save()
-                .then(()=> res.json('Turma atualizada'))
-                .catch(err =>{
-                    console.log(err)
-                    res.status(400).json('Error: '+ err)
-                })
-        })
-        .catch(err =>{
-            console.log(err)
+    Turma.find({turma:turma,nomeDisciplina:nomeDisciplina,diaDaSemana:diaDaSemana,horarioInicio:horarioInicio,ano:ano,semestre:semestre})
+        .then(turmas =>{
+            if (turmas.length > 1){
+                res.status(400).json('Esta turma ja está cadastrada')
+            }else if(turmas.length == 0 || req.params.id == turmas[0]._id){
+                Turma.findById(req.params.id)
+                    .then(turma=> {
+                        turma.idTurma = req.body.idTurma
+                        turma.campus = req.body.campus
+                        turma.departamentoTurma = req.body.departamentoTurma
+                        turma.codDisciplina = req.body.codDisciplina
+                        turma.turma = req.body.turma
+                        turma.nomeDisciplina = req.body.nomeDisciplina
+                        turma.totalTurma = req.body.totalTurma
+                        turma.departamentoOferta = req.body.departamentoOferta
+                        turma.diaDaSemana = req.body.diaDaSemana
+                        turma.horarioInicio = req.body.horarioInicio
+                        turma.horarioFim = req.body.horarioFim
+                        turma.creditoAula = req.body.creditoAula
+                        turma.creditoPratico = req.body.creditoPratico
+                        turma.docentes = req.body.docentes
+                        turma.ano = req.body.ano
+                        turma.semestre = req.body.semestre
+
+                        turma.save()
+                            .then(()=> res.json('Turma atualizada'))
+                            .catch(err =>{
+                                res.status(400).json('Error: '+ err)
+                            })
+                    })
+                    .catch(err =>{
+                        res.status(400).json('Error: '+ err)
+                    })
+            }else{
+                res.status(400).json('Esta turma ja está cadastrada')
+            }
+        }).catch(err =>{
             res.status(400).json('Error: '+ err)
         })
+    
+    
 })
 
 module.exports = router
