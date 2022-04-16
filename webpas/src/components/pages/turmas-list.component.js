@@ -65,9 +65,9 @@ const headCells =[
 const thisYear =  2019//new Date().getFullYear()
 
 const TurmasList = props =>{
+    const [turmas,setTurmas] = useState([]);
     const [openModalForm, setOpenModalForm] = React.useState(false);
     const [openModalFile, setOpenModalFile] = React.useState(false);
-    const [turmas,setTurmas] = useState([]);
     const [turmaEdit,setTurmaEdit] = useState(null)
     const [updatingT,setUpdatingT] = useState(false)
     const [filterFn,setFilterFn] = useState({fn:items=>{return items;}})
@@ -93,7 +93,7 @@ const TurmasList = props =>{
             .then(response => {
                 setTurmas(response.data)
             })
-            .catch(err => console.log(err))
+            .catch(err => handleServerResponses(err,setNotify))
     }
 
     const handleAnoTableSelect = e =>{
@@ -162,7 +162,7 @@ const TurmasList = props =>{
 
     const fileHandleResponse = res =>{
         setOpenModalFile(false)
-        handleServerResponses(res,setNotify)
+        handleServerResponses('turmas',res,setNotify)
         retornaTurmas(anoTable,semestreTable)
     }
     
@@ -171,13 +171,13 @@ const TurmasList = props =>{
         let data= {...turma}
         if (updating){
             TurmasDataService.updateTurma(turma._id,data)
-                .then(res =>handleServerResponses(res,setNotify))
-                .catch(err=>handleServerResponses(err,setNotify))
+                .then(res =>handleServerResponses('turmas',res,setNotify))
+                .catch(err=>handleServerResponses('turmas',err,setNotify))
             setSelected([]);
         }else{
             TurmasDataService.addTurma(data)
-                .then(res =>handleServerResponses(res,setNotify))
-                .catch(err=>handleServerResponses(err,setNotify))
+                .then(res =>handleServerResponses('turmas',res,setNotify))
+                .catch(err=>handleServerResponses('turmas',err,setNotify))
         }
         resetForm()
         setOpenModalForm(false)
@@ -189,11 +189,10 @@ const TurmasList = props =>{
             ...confirmDialog,
             isOpen:false
         })
-        console.log(turmas)
         let data={turmasID:turmas}
         TurmasDataService.deleteTurmas(data)
-            .then(res =>handleServerResponses(res,setNotify))
-            .catch(err=>handleServerResponses(err,setNotify))
+            .then(res =>handleServerResponses('turmas',res,setNotify))
+            .catch(err=>handleServerResponses('turmas',err,setNotify))
         retornaTurmas(anoTable,semestreTable)
         setSelected([]);
     }

@@ -5,7 +5,7 @@ let Turma = require('../models/turma.model')
 router.route('/').get((req,res)=>{ // filtros e classificação no cliente ? divisão em paginas ?
     Turma.find()
         .then(turmas => res.json(turmas))
-        .catch(err => res.status(400).json('Error: '+ err))
+        .catch(err => res.status(400).json(err))
 })
 
 router.route('/:ano/:semestre').get((req,res)=>{
@@ -17,7 +17,7 @@ router.route('/:ano/:semestre').get((req,res)=>{
 router.route('/dep/').get((req,res)=>{ 
     Turma.find().distinct('departamentoOferta')
         .then(turmas => res.json(turmas))
-        .catch(err => res.status(400).json('Error: '+ err))
+        .catch(err => res.status(400).json(err))
 })
 
 router.route('/add').post((req,res) =>{
@@ -42,7 +42,8 @@ router.route('/add').post((req,res) =>{
     Turma.find({turma:turma,nomeDisciplina:nomeDisciplina,diaDaSemana:diaDaSemana,horarioInicio:horarioInicio,ano:ano,semestre:semestre})
         .then(turmas =>{
             if (turmas.length > 0){
-                res.status(400).json('Esta turma ja está cadastrada')
+                let err = {code:1,msg:"Esta turma ja está cadastrada"}
+                res.status(400).json(err)
             }else{
                 const novaTurma = new Turma({
                     idTurma,
@@ -65,27 +66,28 @@ router.route('/add').post((req,res) =>{
                 novaTurma.save()
                     .then(()=> res.json('Turma adicionada'))
                     .catch(err =>{
-                        res.status(400).json('Error: '+ err)
+                        res.status(400).json(err)
                     })
             }
         }).catch(err =>{
-            res.status(400).json('Error: '+ err)
+            res.status(400).json(err)
         })
 })
 
 router.route('/:id').get((req,res)=>{
     Turma.findById(req.params.id)
         .then(turma => res.json(turma))
-        .catch(err => res.status(400).json('Error: '+ err))
+        .catch(err => res.status(400).json(err))
 })
 
-router.route('/arquivoturma').post((req,res) =>{ // salvar a partir de arquivo vindo do cliente 
+router.route('/arquivoturma').post(async (req,res) =>{ // salvar a partir de arquivo vindo do cliente 
     const novasTurmas = req.body.novasTurmas
-
-    Turma.insertMany(novasTurmas)
+    Turma.insertMany(novasTurmas,{ordered:false})
         .then(()=> res.json('Turmas adicionadas'))
         .catch(err =>{
-            res.json(err)})  
+            console.log(err)
+            res.status(400).json(err)})  
+
 })
 
 router.route('/insereturmas321').post((req, res) => {// Hard Coded - >deletar depois
@@ -97,21 +99,21 @@ router.route('/insereturmas321').post((req, res) => {// Hard Coded - >deletar de
 
     Turma.insertMany(novasTurmas)
         .then(()=> res.json('Turmas adicionadas'))
-        .catch(err =>res.status(400).json('Error: '+ err))
+        .catch(err =>res.status(400).json(err))
     
 })
 
 router.route('/delete/:id').delete((req,res)=>{
     Turma.findByIdAndDelete(req.params.id)
         .then(()=> res.json('Turma deletada'))
-        .catch(err => res.status(400).json('Error: '+ err))
+        .catch(err => res.status(400).json(err))
 })
 
 router.route('/deleteMany').post((req,res)=>{
     const turmasIds = req.body.turmasID
     Turma.deleteMany({_id:{$in:turmasIds}})
         .then(()=> res.json('Turmas deletadas'))
-        .catch(err => res.status(400).json('Error: '+ err))
+        .catch(err => res.status(400).json(err))
 })
 
 router.route('/update/:id').post((req,res)=>{
@@ -125,7 +127,8 @@ router.route('/update/:id').post((req,res)=>{
     Turma.find({turma:turma,nomeDisciplina:nomeDisciplina,diaDaSemana:diaDaSemana,horarioInicio:horarioInicio,ano:ano,semestre:semestre})
         .then(turmas =>{
             if (turmas.length > 1){
-                res.status(400).json('Esta turma ja está cadastrada')
+                let err = {code:1,msg:"Esta turma ja está cadastrada"}
+                res.status(400).json(err)
             }else if(turmas.length == 0 || req.params.id == turmas[0]._id){
                 Turma.findById(req.params.id)
                     .then(turma=> {
@@ -149,17 +152,18 @@ router.route('/update/:id').post((req,res)=>{
                         turma.save()
                             .then(()=> res.json('Turma atualizada'))
                             .catch(err =>{
-                                res.status(400).json('Error: '+ err)
+                                res.status(400).json(err)
                             })
                     })
                     .catch(err =>{
-                        res.status(400).json('Error: '+ err)
+                        res.status(400).json(err)
                     })
             }else{
-                res.status(400).json('Esta turma ja está cadastrada')
+                let err = {code:1,msg:"Esta turma ja está cadastrada"}
+                res.status(400).json(err)
             }
         }).catch(err =>{
-            res.status(400).json('Error: '+ err)
+            res.status(400).json(err)
         })
     
     

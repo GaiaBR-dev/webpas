@@ -85,7 +85,7 @@ export default function FileForm(props){
                     }
                     TurmasDataService.addManyTurmas(data)
                         .then(res => handleResponse(res))
-                        .catch(err => console.log(err))
+                        .catch(err => handleResponse(err))
                 }else{
                     handleResponse(res)
                 }

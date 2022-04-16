@@ -5,11 +5,20 @@ class ExcelValidator{
         let erroHorarioF = false
         let erroDia = false
         let erroCreditos = false
+        let erroDuplicatas = false
         let res ={
             status:200,
             erro: false,
-            data: 'Tabela dentro dos padrões',
+            response:{
+                data:{
+                    code: 0,
+                    msg:'Tabela dentro dos padrões'
+                }
+            } 
         }
+        let turmaDup =''
+        let disciplinaDup =''
+        
         rowsTurmas.map(row =>{
 
             if (row['Nome da Disciplina'] == null) {erroPreenchido = true}
@@ -37,23 +46,43 @@ class ExcelValidator{
                 console.log(dia)
             }
 
+            let contadorDup = 0
+            rowsTurmas.map(innerRow =>{
+                if (row['Dia'] === innerRow['Dia'] &&
+                    row['Horário de Ínicio'] === innerRow['Horário de Ínicio'] &&
+                    row['Turma'] === innerRow['Turma'] &&
+                    row['Nome da Disciplina'] === innerRow['Nome da Disciplina']
+                ){
+                    contadorDup++
+                }
+            })
+            if (contadorDup>1){
+                erroDuplicatas = true
+                turmaDup = row['Turma']
+                disciplinaDup = row['Nome da Disciplina']
+            }
+        
         })
         if (erroPreenchido){
             res.status = 400
             res.erro = true 
-            res.data = 'A Tabela possui uma ou mais linhas com campos obrigatórios não preenchidos'
+            res.response.data = {code:3,msg:'A Tabela possui uma ou mais linhas com campos obrigatórios não preenchidos'}
         }else if (erroHorarioF || erroHorarioI){
             res.status = 400
             res.erro = true 
-            res.data = 'Um ou mais horários estão fora do padrão da universidade'
+            res.response.data = {code:3,msg:'Um ou mais horários estão fora do padrão da universidade'}
         }else if (erroCreditos){
             res.status = 400
             res.erro = true 
-            res.data = 'Uma ou mais turmas estão com os créditos fora do padrão da universidade'
+            res.response.data = {code:3,msg:'Uma ou mais turmas estão com os créditos fora do padrão da universidade'}
         }else if (erroDia){
             res.status = 400
             res.erro = true 
-            res.data = 'Uma ou mais turmas estão com o dia fora do padrão da universidade'
+            res.response.data = {code:3,msg:'Uma ou mais turmas estão com o dia fora do padrão da universidade'}
+        }else if (erroDuplicatas){
+            res.status = 400
+            res.erro = true
+            res.response.data = {code:3,msg:`A turma "${turmaDup}" da disciplina "${disciplinaDup}" está duplicada na tabela`}
         }
         return res
     }
