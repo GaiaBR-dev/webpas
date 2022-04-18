@@ -3,9 +3,13 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const configSchema = new Schema({
-    horarios: [{type:Number, required:true}],
+    horariosInicio: [{type:Number, required:true}],
+    horariosFim: [{type:Number, required:true}],
     diasDaSemana:[{type:String, required:true }],
-    creditos:[{type:Number,required:true}]
+    creditos:[{type:Number,required:true}],
+    manha:{type:Boolean,required:true},
+    tarde:{type:Boolean,required:true},
+    noite:{type:Boolean,required:true},
 })
 
 const Config = mongoose.model('Config',configSchema)

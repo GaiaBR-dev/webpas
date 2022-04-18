@@ -5,13 +5,13 @@ let Sala = require('../models/sala.model')
 router.route('/').get((req,res)=>{
     Sala.find()
         .then(salas => res.json(salas))
-        .catch(err => res.status(400).json('Error: '+ err))
+        .catch(err => res.status(400).json(err))
 })
 
 router.route('/p/').get((req,res)=>{
     Sala.find().distinct('predio')
         .then(predios => res.json(predios))
-        .catch(err => res.status(400).json('Error: '+ err))
+        .catch(err => res.status(400).json(err))
 })
 
 router.route('/addPredio').post((req,res)=>{

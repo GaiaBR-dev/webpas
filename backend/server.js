@@ -23,11 +23,13 @@ const salasRouter = require('./routes/salas')
 const turmasRouter = require('./routes/turmas')
 const distanciasRouter = require('./routes/distancias')
 const resultadosRouter = require('./routes/resultados')
+const configsRouter = require('./routes/config')
 
 app.use('/salas',salasRouter)
 app.use('/turmas',turmasRouter)
 app.use('/distancias',distanciasRouter)
 app.use('/resultados',resultadosRouter)
+app.use('/configs',configsRouter)
 
 app.listen(port,()=>{
     console.log(`Server running on port : ${port}`)
