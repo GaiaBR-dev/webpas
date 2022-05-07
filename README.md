@@ -26,3 +26,5 @@ Software web para resolução do problema de alocação de salas
 - Centralizar upload de arquivos (talvez)
 - Terminar handler de arquivos
 - Implementar filtro e tratamento de dados para UFSCar
+
+more text
