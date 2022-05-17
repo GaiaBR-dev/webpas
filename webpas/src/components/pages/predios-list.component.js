@@ -21,6 +21,11 @@ import { Dialog, DialogContent } from "@mui/material";
 import handleServerResponses from "../../services/response-handler";
 import Mensagem from "../mensagem.component";
 
+const configTemp={
+    dias:['Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
+    periodos:['Manhã','Tarde','Noite']
+}
+
 const PrediosList = props =>{
     const [predios,setPredios] = React.useState([])
     const [salas,setSalas] = React.useState([])
@@ -196,6 +201,7 @@ const PrediosList = props =>{
                     ><DialogContent >
                         <PredioForm
                             add ={add}
+                            config={configTemp}
                             closeModalForm ={handleCloseModalForm}
                         /></DialogContent>
                     </Dialog>

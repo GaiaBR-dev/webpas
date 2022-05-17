@@ -27,4 +27,4 @@ Software web para resolução do problema de alocação de salas
 - Terminar handler de arquivos
 - Implementar filtro e tratamento de dados para UFSCar
 
-more text
+

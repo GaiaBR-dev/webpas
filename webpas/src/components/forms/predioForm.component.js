@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import useForm from "./useForm";
-import { Button, Divider, FormControl, FormControlLabel, FormLabel, RadioGroup, TextField } from "@mui/material";
+import { Button, Checkbox, Divider, FormControl, FormControlLabel, FormLabel, RadioGroup, TextField } from "@mui/material";
 import { Radio } from "@mui/material";
 import { Grid } from "@mui/material";
 import { Box } from "@mui/system";
@@ -8,14 +8,10 @@ import { Typography } from "@mui/material";
 import { IconButton } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 
-
 const inicialValues ={
     predio: '',
     nSalas: '',
     capacidade: '',
-    disponivelManha: true,
-    disponivelTarde: true,
-    disponivelNoite: true,
 }
 
 const formCssClass ={
@@ -27,7 +23,17 @@ const formCssClass ={
 }
 
 const PredioForm = props =>{
-    const {closeModalForm, add} = props
+    const {closeModalForm, add, config} = props
+    const [dispCheckBoxList,setDispCheckBoxList] = useState(() =>{
+        let result = {}
+        config.dias.map(dia=>{
+            result[dia] = {}
+            config.periodos.map(periodo=>{
+                result[dia][periodo] = false
+            })
+        })
+        return result
+    })
 
     useEffect(()=>{
     },[])
@@ -68,6 +74,20 @@ const PredioForm = props =>{
         })
 
         return Object.values(temp).every(errorValues => errorValues == "")
+    }
+
+    const handleCheckBox = e =>{
+        const {name} = e.target
+        let dia = name.slice(0,name.search("-"))
+        let periodo = name.slice(name.search("-")+1)
+        let changeCB = !dispCheckBoxList[dia][periodo]
+        setDispCheckBoxList({
+            ...dispCheckBoxList,
+            [dia]:{
+                ...dispCheckBoxList[dia],
+                [periodo]:changeCB
+            }
+        })
     }
 
     const handleSubmit = e =>{
@@ -135,42 +155,41 @@ const PredioForm = props =>{
                         })}
                     />
                 </Grid>
-                <Grid item xs={12} >
-                    <FormControl>
-                        <FormLabel>Disponível de Manhã</FormLabel>
-                        <RadioGroup row
-                        name="disponivelManha"
-                        value={values.disponivelManha}
-                        onChange={handleInputChange}>
-                            <FormControlLabel value={true} control={<Radio />} label="Sim" />
-                            <FormControlLabel value={false} control={<Radio />} label="Não" />
-                        </RadioGroup>
-                    </FormControl>
+                <Grid item xs={12}>
                 </Grid>
-                <Grid item xs={12} >
-                    <FormControl>
-                        <FormLabel>Disponível de Tarde</FormLabel>
-                        <RadioGroup row
-                        name="disponivelTarde"
-                        value={values.disponivelTarde}
-                        onChange={handleInputChange}>
-                            <FormControlLabel value={true} control={<Radio />} label="Sim" />
-                            <FormControlLabel value={false} control={<Radio />} label="Não" />
-                        </RadioGroup>
-                    </FormControl>
-                </Grid>
-                <Grid item xs={12} >
-                    <FormControl>
-                        <FormLabel>Disponível de Noite</FormLabel>
-                        <RadioGroup row
-                        name="disponivelNoite"
-                        value={values.disponivelNoite}
-                        onChange={handleInputChange}>
-                            <FormControlLabel value={true} control={<Radio />} label="Sim" />
-                            <FormControlLabel value={false} control={<Radio />} label="Não" />
-                        </RadioGroup>
-                    </FormControl>
-                </Grid>
+                <Grid item xs={5}><Typography fontWeight={420}>Disponibilidade</Typography></Grid>
+                {
+                    config.periodos.map((periodo,index)=>{
+                        return(
+                            <Grid item xs={2} key={index}><Typography fontWeight={450}>{periodo}</Typography></Grid>
+                        )
+                    })
+                }
+
+                {
+                    config.dias.map((dia,index)=>{
+                        return(
+                            <Grid item xs ={12}>
+                                <FormControl key={index} sx={{width:'100%'}}>
+                                <Grid container alignItems="center"  justifyContent="space-around">
+                                    <Grid item xs={5}><FormLabel>{dia}</FormLabel></Grid>
+                                    {config.periodos.map((periodo,indexp)=>{
+                                        return(
+                                            <Grid item xs={2} key={indexp}> 
+                                                <Checkbox 
+                                                    name={`${dia}-${periodo}`}
+                                                    onChange={handleCheckBox}
+                                                    checked={dispCheckBoxList[dia][periodo]} /> 
+                                            </Grid>
+                                        )
+                                    })}
+                                </Grid>
+                                </FormControl>
+                            </Grid>
+                        )
+                    })
+                }
+
                 <Grid item xs={6} ></Grid>
                 <Grid item xs={12} sx={{marginY:2}}>
                     <Button variant='outlined' size="large" color='primary' onClick={resetForm} sx={{marginRight:2}}>Resetar</Button>
