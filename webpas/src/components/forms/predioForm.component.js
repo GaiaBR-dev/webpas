@@ -90,10 +90,26 @@ const PredioForm = props =>{
         })
     }
 
+    const createDispArray = () =>{
+        let dispArray = []
+        config.dias.map((dia,indexd)=>{
+            config.periodos.map((periodo,indexp)=>{
+                let dispUnit = {
+                    dia:dia,
+                    periodo:periodo,
+                    disponivel:dispCheckBoxList[dia][periodo]
+                }
+                dispArray.push(dispUnit)
+            })
+        })
+        return dispArray
+    }
+
     const handleSubmit = e =>{
         e.preventDefault()
+        let disponibilidade = createDispArray()
         if (validate()){
-            add(values,resetForm)
+            add(values,disponibilidade,resetForm)
         }
     }
 
@@ -111,8 +127,8 @@ const PredioForm = props =>{
                     <Typography variant="caption" mb={1}>Campos com * são obrigatórios</Typography>
                 </Grid>
                 <Grid item xs={1}>
-                    <IconButton >
-                        <CloseIcon onClick={closeModalForm}/>
+                    <IconButton onClick={closeModalForm}>
+                        <CloseIcon />
                     </IconButton>
                 </Grid>
                 <Grid item xs={12}><Divider/></Grid> 

@@ -2,6 +2,8 @@ const router = require('express').Router()
 const { xlstojson } = require('../xlstojson')
 let Sala = require('../models/sala.model')
 
+diasTemp = ['Segunda','Terça','Quarta','Quinta','Sexta','Sábado']
+
 router.route('/').get((req,res)=>{
     Sala.find()
         .then(salas => res.json(salas))
@@ -18,14 +20,13 @@ router.route('/addPredio').post((req,res)=>{
     const predio = req.body.predio
     const capacidade = req.body.capacidade
     const nSalas = req.body.nSalas
-    const disponivelManha = req.body.disponivelManha
-    const disponivelTarde = req.body.disponivelTarde
-    const disponivelNoite = req.body.disponivelNoite
+    const disponibilidade = req.body.disponibilidade
 
     Sala.find({predio:predio})
         .then(salas =>{
             if (salas.length > 0) {
-                res.status(400).json('Um prédio com o nome '+ predio + ' já existe')
+                let err = {code:1,msg:'Um prédio com o nome '+ predio + ' já existe'}
+                res.status(400).json(err)
             } else{
                 const novasSalas = new Array(nSalas)
                 for (let i = 0; i < nSalas; i++) {  
@@ -33,9 +34,7 @@ router.route('/addPredio').post((req,res)=>{
                         predio:predio,
                         numeroSala: 'Sala ' + i,
                         capacidade:capacidade,
-                        disponivelManha: disponivelManha,
-                        disponivelTarde: disponivelTarde,
-                        disponivelNoite: disponivelNoite
+                        disponibilidade:disponibilidade
                     }
                 }
                 Sala.insertMany(novasSalas)
@@ -53,12 +52,13 @@ router.route('/:predio').get((req,res)=>{
 
 router.route('/:predio/update').post((req,res)=>{
     const predioVelho = req.params.predio
-    const predioNovo = req.body.predio
+    const predioNovo = req.body.predioNovo
             
     Sala.find({predio:predioNovo})
         .then(salasN =>{
             if (salasN.length > 0) {
-                res.status(409).json('Um prédio com o nome '+ predioNovo + ' já existe')
+                let err = {code:1,msg:'Um prédio com o nome '+ predioNovo + ' já existe'}+
+                res.status(400).json(err)
             }else{
                 Sala.updateMany({predio:predioVelho},{predio:predioNovo})
                     .then(()=> res.json('Predio Atualizado'))
@@ -133,8 +133,40 @@ router.route('/arquivosala').post((req, res) => { // salvar a partir de arquivo 
 router.route('/inseresalas321').post((req, res) => { // Hard Coded -> deletar depois
     const result = xlstojson()
     novasSalas = result.Salas
-    Sala.insertMany(novasSalas)
-        .then(()=> res.json('Salas adicionadas'))
+
+    const novasSalasTratado = novasSalas.map(sala=>{
+        let ns = {
+            predio: sala.predio,
+            numeroSala: sala.numeroSala,
+            capacidade: sala.capacidade
+        }
+        let disponibilidade = []
+        diasTemp.map(dia=>{
+            let dispUnitM = {
+                dia: dia,
+                periodo: 'Manhã',
+                disponivel: sala.disponivelManha == 1 
+            }
+            disponibilidade.push(dispUnitM)
+            let dispUnitT = {
+                dia: dia,
+                periodo: 'Tarde',
+                disponivel: sala.disponivelTarde == 1
+            }
+            disponibilidade.push(dispUnitT)
+            let dispUnitN = {
+                dia: dia,
+                periodo: 'Noite',
+                disponivel: sala.disponivelNoite == 1
+            }
+            disponibilidade.push(dispUnitN)
+        })
+        ns.disponibilidade  = disponibilidade
+        return ns
+    })
+
+    Sala.insertMany(novasSalasTratado)
+        .then(()=> res.json(novasSalasTratado))
         .catch(err =>res.status(400).json('Error: '+ err))
 })
 

@@ -31,6 +31,13 @@ const handleServerResponses = (collection,response,setNotify) =>{
                 type:'error'
             })}
         }else if (collection === 'salas'){
+            if (response.response.data.code == 1){
+                setNotify({
+                    isOpen:true,
+                    message: response.response.data.msg,
+                    type:'error'
+                })
+            }
 
         }
     }

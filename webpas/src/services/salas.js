@@ -13,6 +13,14 @@ class SalasDataService {
         return http.post('salas/addPredio',predio)
     }
 
+    editPredio(data,predioEdit){
+        return http.post(`salas/${predioEdit}/update`,data)
+    }
+
+    deletePredio(predio){
+        return http.delete(`salas/${predio}/delete`)
+    }
+
     getSalas(predio){
         return http.get('salas/' + predio)
     }
