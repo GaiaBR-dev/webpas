@@ -88,7 +88,7 @@ class ExcelValidator{
     }
 
 
-    mapColumnKeys(rowsTurmas,ano,semestre){
+    mapColumnKeysTurmas(rowsTurmas,ano,semestre){
         let turmas = new Array()
         rowsTurmas.map(row =>{
             let str = row['Dia']
@@ -115,6 +115,96 @@ class ExcelValidator{
             turmas.push(turma)
         })
         return turmas
+    }
+
+    firstValidateSalas(rowsSalas,config){
+        let erroPreenchido = false
+        let erroDuplicatas = false
+        let erroPeriodos = false
+        let res ={
+            status:200,
+            erro: false,
+            response:{
+                data:{
+                    code: 0,
+                    msg:'Tabela dentro dos padrões'
+                }
+            } 
+        }
+        let salaDup =''
+        let predioDup =''
+
+        if (config.periodos.includes('Manhã')){
+            if(!'Disponivel de Manhã' in rowsSalas[0]){
+                erroPeriodos = true
+            }
+        }
+        if (config.periodos.includes('Tarde')){
+            if(!'Disponivel de Tarde' in rowsSalas[0]){
+                erroPeriodos = true
+            }
+        }
+        if (config.periodos.includes('Noite')){
+            if(!'Disponivel de Noite' in rowsSalas[0]){
+                erroPeriodos = true
+            }
+        }
+        if (erroPeriodos){
+            res.status = 400
+            res.erro = true 
+            res.response.data = {code:3,msg:'O número de períodos cadastrados no sistema não correspode às colunas da tabela'}
+            return res
+        }
+
+        rowsSalas.map(row =>{
+
+            if (row['Predio'] == null) {erroPreenchido = true}
+            if (row['Sala'] == null)  {erroPreenchido = true}
+            if (row['Capacidade'] == null)  {erroPreenchido = true}
+            
+            if (config.periodos.includes('Manhã')){
+                if(row['Disponível de Manhã'] == null){
+                    erroPreenchido = true
+                }
+            }
+            if (config.periodos.includes('Tarde')){
+                if(row['Disponível de Tarde'] == null){
+                    erroPreenchido = true
+                }
+            }
+            if (config.periodos.includes('Noite')){
+                if(row['Disponível de Noite'] == null){
+                    erroPreenchido = true
+                }
+            }
+
+            let contadorDup = 0
+            rowsSalas.map(innerRow =>{
+                if (row['Predio'] === innerRow['Predio'] &&
+                    row['Sala'] === innerRow['Sala'] 
+                ){
+                    contadorDup++
+                }
+            })
+            if (contadorDup>1){
+                erroDuplicatas = true
+                salaDup = row['Sala']
+                predioDup = row['Predio']
+            }
+        
+        })
+
+        if (erroPreenchido){
+            res.status = 400
+            res.erro = true 
+            res.response.data = {code:3,msg:'A Tabela possui uma ou mais linhas com campos obrigatórios não preenchidos'}
+        }else if (erroDuplicatas){
+            res.status = 400
+            res.erro = true
+            res.response.data = {code:3,msg:`A sala "${salaDup}" do prédio "${predioDup}" está duplicada na tabela`}
+        }
+        return res
+
     }
 }
 

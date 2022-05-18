@@ -57,7 +57,7 @@ router.route('/:predio/update').post((req,res)=>{
     Sala.find({predio:predioNovo})
         .then(salasN =>{
             if (salasN.length > 0) {
-                let err = {code:1,msg:'Um prédio com o nome '+ predioNovo + ' já existe'}+
+                let err = {code:1,msg:'Um prédio com o nome '+ predioNovo + ' já existe'}
                 res.status(400).json(err)
             }else{
                 Sala.updateMany({predio:predioVelho},{predio:predioNovo})

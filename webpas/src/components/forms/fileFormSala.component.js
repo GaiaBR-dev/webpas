@@ -1,16 +1,12 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import Select from "./select.component";
 import { Grid, Typography, IconButton, Button } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 import styled from "@emotion/styled";
 import { Box } from "@mui/system";
-import useForm from "./useForm";
-import { FormControl,FormLabel,RadioGroup,Radio,FormControlLabel } from "@mui/material";
 import * as XLSX from 'xlsx/xlsx.mjs';
-import TurmasDataService from "../../services/turmas"
+import SalasDataService from "../../services/salas"
 import ExcelValidator from "../../services/excel-validator";
-import CircularProgress from '@mui/material/CircularProgress';
 import { LinearProgress } from "@mui/material";
 
 const Input = styled('input')({
@@ -50,12 +46,7 @@ const modalStyleFile = {
     },
 };
 
-const inicialValues ={
-    ano: new Date().getFullYear(),
-    semestre: 1
-}
-
-export default function FileForm(props){
+export default function FileFormSalas(props){
     const [working,setWorking] = useState(false)
 
     useEffect(()=>{
@@ -68,58 +59,24 @@ export default function FileForm(props){
         reader.onload = function(e) {
             setWorking(true)
             const workbook = XLSX.read(e.target.result);
-            let temTurma = false
+            let temSala = false
             let rowObject
             workbook.SheetNames.forEach(sheet => {
-                if (sheet === 'Turmas'){
-                    temTurma = true
+                if (sheet === 'Salas'){
+                    temSala = true
                     rowObject = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheet])
                 }
             });
-            if (temTurma){
-                let res = ExcelValidator.firstValidateTurmas(rowObject,config)
-                if (!res.erro){
-                    const nturmas = ExcelValidator.mapColumnKeys(rowObject,values.ano,values.semestre)
-                    let data ={
-                        novasTurmas:nturmas
-                    }
-                    TurmasDataService.addManyTurmas(data)
-                        .then(res => handleResponse(res))
-                        .catch(err => handleResponse(err))
-                }else{
-                    handleResponse(res)
-                }
+            if (temSala){
+                ExcelValidator.firstValidateSalas(rowObject,config)
             }else{
-                console.log('Não tem turma')
+                console.log('Não tem sala')
             }
         };
         reader.readAsArrayBuffer(file);
     }
 
-    const validateAndSubmit = (e) => {
-        if (validate()){
-            handleFileSubmit(e)
-        }
-    }
-
-    const validate = () =>{
-        let temp ={}
-        temp.ano = values.ano ? "" :"O ano em que as turmas serão adicionadas é obrigatório"
-        setErros({
-            ...temp
-        })
-        return Object.values(temp).every(errorValues => errorValues == "")
-    }
-
-
     const{title, closeButton,anos,  config, handleResponse } = props
-    const{
-        values,
-        setValues,
-        handleInputChange,
-        erros,
-        setErros,
-    }=useForm(inicialValues)
     
     return (
         <Box component="form" sx = {modalStyleFile}>
@@ -146,34 +103,8 @@ export default function FileForm(props){
                     variant='body1'
                 />
             </Grid>
-            <Grid item xs={12} >
-                <Typography variant='body1'> Adicionar ao ano e semestre de</Typography>
-            </Grid>
-            <Grid item xs={12} sm={11} md={5}>
-                <Select
-                    name="ano"
-                    label="Ano"
-                    value={values.ano}
-                    onChange={handleInputChange}
-                    options ={anos}
-                    error={erros.ano}
-                />
-            </Grid>
-            <Grid item xs={12} sm={12} md={6}>
-                <FormControl>
-                    <FormLabel>Semestre</FormLabel>
-                        <RadioGroup row
-                            name="semestre"
-                            value={values.semestre}
-                            onChange={handleInputChange}>
-                        <FormControlLabel value={1} control={<Radio />} label="1º Semestre" />
-                        <FormControlLabel value={2} control={<Radio />} label="2º Semestre" />
-                        </RadioGroup>
-                    </FormControl>
-            </Grid>
-
             <Grid item xs={6} alignContent='center'>
-                <Button variant='contained' onClick={validateAndSubmit}>Enviar</Button>
+                <Button variant='contained' onClick={handleFileSubmit}>Enviar</Button>
             </Grid>
             <Grid item xs ={12}>
                 {working ==true?  (

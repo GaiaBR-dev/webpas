@@ -13,7 +13,7 @@ import { Button } from "@mui/material";
 import { IconButton } from "@mui/material";
 import PageHeader from '../page-header.component'
 import HomeWorkIcon from '@mui/icons-material/HomeWork';
-import { Paper, Toolbar, TextField, InputAdornment } from "@mui/material";
+import { Paper, Toolbar, TextField, InputAdornment, Modal } from "@mui/material";
 import HelpIcon from '@mui/icons-material/Help';
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
@@ -22,6 +22,7 @@ import PredioEditForm from "../forms/predioEditForm.component";
 import { Dialog, DialogContent } from "@mui/material";
 import handleServerResponses from "../../services/response-handler";
 import Mensagem from "../mensagem.component";
+import FileFormSalas from "../forms/fileFormSala.component";
 
 const configTemp={
     dias:['Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
@@ -150,6 +151,11 @@ const PrediosList = props =>{
         })
     }
 
+    const fileHandleResponse = res =>{
+        setOpenModalFile(false)
+        handleServerResponses('salas',res,setNotify)
+    }
+
     return(
         <React.Fragment>
             <PageHeader 
@@ -165,6 +171,20 @@ const PrediosList = props =>{
                 confirmDialog={confirmDialog}
                 setConfirmDialog={setConfirmDialog}
             />
+            <Modal
+                    id='modalFile'
+                    open={openModalFile}
+                    onClose={handleCloseModalFile}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
+                >
+                    <FileFormSalas
+                        title="Adicionar Arquivo"
+                        closeButton={handleCloseModalFile}
+                        config={configTemp}
+                        handleResponse={fileHandleResponse}
+                    />
+                </Modal>
             <Paper>
                 <Toolbar>
                     <Grid container 

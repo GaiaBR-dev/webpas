@@ -1,6 +1,6 @@
 import React from "react";
 import TurmaForm from '../forms/turmaForm.component'
-import FileForm from "../forms/fileForm.component";
+import FileFormTurma from "../forms/fileFormTurma.component";
 import PageHeader from '../page-header.component';
 import SchoolIcon from '@mui/icons-material/School';
 import { Modal, TableBody, TableCell, TableRow, Grid, Toolbar, TextField, DialogContent } from "@mui/material";
@@ -239,7 +239,7 @@ const TurmasList = props =>{
                     aria-labelledby="modal-modal-title"
                     aria-describedby="modal-modal-description"
                 >
-                    <FileForm 
+                    <FileFormTurma
                         title="Adicionar Arquivo"
                         closeButton={handleCloseModalFile}
                         anos={configTemp.anos}
