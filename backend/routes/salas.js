@@ -118,15 +118,11 @@ router.route('/:id').delete((req,res)=>{
 
 router.route('/arquivosala').post((req, res) => { // salvar a partir de arquivo vindo do cliente
     novasSalas = req.body.novasSalas// considera que o cliente organizou tudo bunitin
-
-    Sala.insertMany(novasSalas)
+    Sala.insertMany(novasSalas,{ordered:false})
         .then(()=> res.json('Salas adicionadas'))
         .catch(err =>{
-            // tratar erros
-            if(err.code === 11000){
-                let msg = 'O arquivo contem uma sala que já está cadastrada no banco de dados'
-                res.status(400).json(msg)
-            }else{res.status(400).json(err)}
+            console.log(err)
+            res.status(400).json(err)
         })
 })
 

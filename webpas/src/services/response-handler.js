@@ -37,6 +37,15 @@ const handleServerResponses = (collection,response,setNotify) =>{
                     message: response.response.data.msg,
                     type:'error'
                 })
+            }else if (response.response.data.code == 11000){
+                let salaError = response.response.data.writeErrors[0].op.numeroSala
+                let predioError = response.response.data.writeErrors[0].op.predio
+                setNotify({
+                    isOpen:true,
+                    message: `A sala "${salaError}" do prédio "${predioError}" já está cadastrada no banco de dados.
+                    As demais salas foram inseridas com sucesso`,
+                    type:'warning'
+                })
             }
 
         }

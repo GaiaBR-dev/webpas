@@ -163,17 +163,17 @@ class ExcelValidator{
             if (row['Capacidade'] == null)  {erroPreenchido = true}
             
             if (config.periodos.includes('Manhã')){
-                if(row['Disponível de Manhã'] == null){
+                if(row['Disponivel de Manhã'] == null){
                     erroPreenchido = true
                 }
             }
             if (config.periodos.includes('Tarde')){
-                if(row['Disponível de Tarde'] == null){
+                if(row['Disponivel de Tarde'] == null){
                     erroPreenchido = true
                 }
             }
             if (config.periodos.includes('Noite')){
-                if(row['Disponível de Noite'] == null){
+                if(row['Disponivel de Noite'] == null){
                     erroPreenchido = true
                 }
             }
@@ -204,7 +204,47 @@ class ExcelValidator{
             res.response.data = {code:3,msg:`A sala "${salaDup}" do prédio "${predioDup}" está duplicada na tabela`}
         }
         return res
+    }
 
+    mapColumnKeysSalas(rowsSalas,config){
+        const salas = rowsSalas.map(row =>{
+
+            let sala = {
+                predio: row['Predio'],
+                numeroSala: row['Sala'],
+                capacidade: row['Capacidade']
+            }
+            let disponibilidade = []
+            config.dias.map(dia=>{
+                if (config.periodos.includes('Manhã')){
+                    let dispUnitM = {
+                        dia: dia,
+                        periodo: 'Manhã',
+                        disponivel: row['Disponvel de Manhã'] == 1 
+                    }
+                    disponibilidade.push(dispUnitM)
+                }
+                if (config.periodos.includes('Tarde')){
+                    let dispUnitT = {
+                        dia: dia,
+                        periodo: 'Tarde',
+                        disponivel: row['Disponivel de Tarde'] == 1
+                    }
+                    disponibilidade.push(dispUnitT)
+                }
+                if (config.periodos.includes('Noite')){
+                    let dispUnitN = {
+                        dia: dia,
+                        periodo: 'Noite',
+                        disponivel: row['Disponivel de Noite'] == 1
+                    }
+                    disponibilidade.push(dispUnitN)
+                }
+            })
+            sala.disponibilidade  = disponibilidade
+            return sala
+        })
+        return salas
     }
 }
 

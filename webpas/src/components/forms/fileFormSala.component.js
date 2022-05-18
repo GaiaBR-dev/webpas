@@ -68,7 +68,18 @@ export default function FileFormSalas(props){
                 }
             });
             if (temSala){
-                ExcelValidator.firstValidateSalas(rowObject,config)
+                let res = ExcelValidator.firstValidateSalas(rowObject,config)
+                if (!res.erro){
+                    const nsalas = ExcelValidator.mapColumnKeysSalas(rowObject,config)
+                    let data ={
+                        novasSalas:nsalas
+                    }
+                    SalasDataService.addManySalas(data)
+                        .then(res => handleResponse(res))
+                        .catch(err => handleResponse(err))
+                }else{
+                    handleResponse(res)
+                }
             }else{
                 console.log('Não tem sala')
             }

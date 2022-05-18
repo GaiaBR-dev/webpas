@@ -21,6 +21,10 @@ class SalasDataService {
         return http.delete(`salas/${predio}/delete`)
     }
 
+    addManySalas(salas){
+        return http.post(`salas/arquivosala`,salas)
+    }
+
     getSalas(predio){
         return http.get('salas/' + predio)
     }

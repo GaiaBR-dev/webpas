@@ -194,9 +194,9 @@ const PrediosList = props =>{
                         justifyContent="space-between"
                         columns={20}
                     > 
-                        <Grid item xs ={5} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}}>Adicionar</Grid>
+                        <Grid item xs ={6} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}}>Adicionar</Grid>
                         <Grid item xs ={9} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}}>Buscar</Grid>
-                        <Grid item xs ={4} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}}>Mostrar</Grid>
+                        <Grid item xs ={4} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}}></Grid>
                         <Grid item xs ={1} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}}>Ajuda</Grid>
                         <Grid item xs={6} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}} sm={2}>
                             <Button 
