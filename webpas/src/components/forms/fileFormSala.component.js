@@ -27,22 +27,22 @@ const modalStyleFile = {
     overflow:'auto',
     display:'block',
     transform: 'translate(-50%, -50%)',
-    width: '90%',
+    width: '75%',
     p: 4,
     '@media (min-width: 900px)': {
-        width: '80%'
+        width: '65%'
     },
     '@media (min-width: 1050px)': {
-        width: '70%'
+        width: '55%'
     },
     '@media (min-width: 1400px)': {
-        width: '60%'
+        width: '45%'
     },
     '@media (min-width: 1600px)': {
-        width: '50%'
+        width: '35%'
     },
     '@media (min-width: 1800px)': {
-        width: '40%'
+        width: '25%'
     },
 };
 

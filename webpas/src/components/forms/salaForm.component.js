@@ -7,14 +7,12 @@ import { Box } from "@mui/system";
 import { Typography } from "@mui/material";
 import { IconButton } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
+import { Checkbox } from "@mui/material";
 
 
 const inicialValues ={
     numeroSala: '',
     capacidade: '',
-    disponivelManha: true,
-    disponivelTarde: true,
-    disponivelNoite: true,
 }
 
 const formCssClass ={
@@ -26,8 +24,18 @@ const formCssClass ={
 }
 
 const SalaForm = props =>{
-    const {closeModalForm, updating,addOrEdit,salaEdit,predio} = props
+    const {closeModalForm, updating,addOrEdit,salaEdit,predio,config} = props
     const [formTitle,setFormTitle] = useState('Adicionar sala')
+    const [dispCheckBoxList,setDispCheckBoxList] = useState(() =>{
+        let result = {}
+        config.dias.map(dia=>{
+            result[dia] = {}
+            config.periodos.map(periodo=>{
+                result[dia][periodo] = false
+            })
+        })
+        return result
+    })
 
     const handleFormTitle = updatingS =>{
         updatingS ? setFormTitle('Atualizar sala'):setFormTitle('Adicionar sala')
@@ -39,6 +47,12 @@ const SalaForm = props =>{
             setValues({
                 ...salaEdit
             })
+            let dispCheckBoxObj = {}
+            salaEdit.disponibilidade.map(dispUnit=>{
+                if (dispCheckBoxObj[dispUnit.dia] == undefined) {dispCheckBoxObj[dispUnit.dia] = {}}
+                dispCheckBoxObj[dispUnit.dia][dispUnit.periodo] = dispUnit.disponivel
+            })
+            setDispCheckBoxList(dispCheckBoxObj) 
         }else{
 
         }
@@ -65,7 +79,6 @@ const SalaForm = props =>{
                 temp.capacidade = "Este campo deve conter um número"
             }
         }
-
         setErros({
             ...temp
         })
@@ -75,9 +88,39 @@ const SalaForm = props =>{
 
     const handleSubmit = e =>{
         e.preventDefault()
+        let disponibilidade = createDispArray()
         if (validate()){
-            addOrEdit(updating,values,predio,resetForm)
+            addOrEdit(updating,values,predio,disponibilidade,resetForm)
         }
+    }
+
+    const handleCheckBox = e =>{
+        const {name} = e.target
+        let dia = name.slice(0,name.search("-"))
+        let periodo = name.slice(name.search("-")+1)
+        let changeCB = !dispCheckBoxList[dia][periodo]
+        setDispCheckBoxList({
+            ...dispCheckBoxList,
+            [dia]:{
+                ...dispCheckBoxList[dia],
+                [periodo]:changeCB
+            }
+        })
+    }
+
+    const createDispArray = () =>{
+        let dispArray = []
+        config.dias.map((dia,indexd)=>{
+            config.periodos.map((periodo,indexp)=>{
+                let dispUnit = {
+                    dia:dia,
+                    periodo:periodo,
+                    disponivel:dispCheckBoxList[dia][periodo]
+                }
+                dispArray.push(dispUnit)
+            })
+        })
+        return dispArray
     }
 
     return (
@@ -85,17 +128,18 @@ const SalaForm = props =>{
         <Box component="form"  onSubmit={handleSubmit}>
             <Grid container
                 columns={12}
-                spacing={2}
+                rowSpacing={2}
+                columnSpacing={3}
                 sx = {formCssClass} 
-                justifyContent="space-between"
+                justifyContent="flex-start"
                 alignItems="flex-start">
                 <Grid item xs={11}>
                     <Typography variant="h5">{formTitle}</Typography>
                     <Typography variant="caption" mb={1}>Campos com * são obrigatórios</Typography>
                 </Grid>
                 <Grid item xs={1}>
-                    <IconButton >
-                        <CloseIcon onClick={closeModalForm}/>
+                    <IconButton onClick={closeModalForm}>
+                        <CloseIcon />
                     </IconButton>
                 </Grid>
                 <Grid item xs={12}><Divider/></Grid> 
@@ -125,42 +169,41 @@ const SalaForm = props =>{
                         })}
                     />
                 </Grid>
-                <Grid item xs={12} >
-                    <FormControl>
-                        <FormLabel>Disponível de Manhã</FormLabel>
-                        <RadioGroup row
-                        name="disponivelManha"
-                        value={values.disponivelManha}
-                        onChange={handleInputChange}>
-                            <FormControlLabel value={true} control={<Radio />} label="Sim" />
-                            <FormControlLabel value={false} control={<Radio />} label="Não" />
-                        </RadioGroup>
-                    </FormControl>
+                <Grid item xs={12}>
                 </Grid>
-                <Grid item xs={12} >
-                    <FormControl>
-                        <FormLabel>Disponível de Tarde</FormLabel>
-                        <RadioGroup row
-                        name="disponivelTarde"
-                        value={values.disponivelTarde}
-                        onChange={handleInputChange}>
-                            <FormControlLabel value={true} control={<Radio />} label="Sim" />
-                            <FormControlLabel value={false} control={<Radio />} label="Não" />
-                        </RadioGroup>
-                    </FormControl>
-                </Grid>
-                <Grid item xs={12} >
-                    <FormControl>
-                        <FormLabel>Disponível de Noite</FormLabel>
-                        <RadioGroup row
-                        name="disponivelNoite"
-                        value={values.disponivelNoite}
-                        onChange={handleInputChange}>
-                            <FormControlLabel value={true} control={<Radio />} label="Sim" />
-                            <FormControlLabel value={false} control={<Radio />} label="Não" />
-                        </RadioGroup>
-                    </FormControl>
-                </Grid>
+                <Grid item xs={5}><Typography fontWeight={420}>Disponibilidade</Typography></Grid>
+                {
+                    config.periodos.map((periodo,index)=>{
+                        return(
+                            <Grid item xs={2} key={index}><Typography fontWeight={450}>{periodo}</Typography></Grid>
+                        )
+                    })
+                }
+
+                {
+                    config.dias.map((dia,index)=>{
+                        return(
+                            <Grid item xs ={12} key={index}>
+                                <FormControl  sx={{width:'100%'}}>
+                                <Grid container columnSpacing={3} alignItems="center"  justifyContent="flex-start">
+                                    <Grid item xs={5}><FormLabel>{dia}</FormLabel></Grid>
+                                    {config.periodos.map((periodo,indexp)=>{
+                                        return(
+                                            <Grid item xs={2} key={indexp}> 
+                                                <Checkbox 
+                                                    name={`${dia}-${periodo}`}
+                                                    onChange={handleCheckBox}
+                                                    checked={dispCheckBoxList[dia][periodo]} /> 
+                                            </Grid>
+                                        )
+                                    })}
+                                </Grid>
+                                </FormControl>
+                            </Grid>
+                        )
+                    })
+                }
+               
                 <Grid item xs={6} ></Grid>
                 <Grid item xs={12} sx={{marginY:2}}>
                     <Button variant='outlined' size="large" color='primary' onClick={resetForm} sx={{marginRight:2}}>Resetar</Button>

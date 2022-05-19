@@ -19,14 +19,13 @@ import { Dialog, DialogContent } from "@mui/material";
 import SalaForm from '../forms/salaForm.component';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Link as RouterLink } from 'react-router-dom';
+import { Checkbox } from "@mui/material";
 
 const headCells =[
     {id:'actions',label:"Ações", disableSorting:true},
     {id:'numeroSala', label:'Sala'},
     {id:'capacidade', label:'Capacidade'},
-    {id:'disponivelManha', label:'Disponível de Manhã'},
-    {id:'disponivelTarde', label:'Disponível de Tarde'},
-    {id:'disponivelNoite', label:'Disponível de Noite'},
+    {id:'disponibilidade', label:'Disponibilidade'},
 ]
 
 const tableRowCss ={
@@ -52,6 +51,10 @@ const tableStyle ={
     }
 }
 
+const configTemp={
+    dias:['Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
+    periodos:['Manhã','Tarde','Noite']
+}
 
 const Salas = ()=>{
     let params = useParams()
@@ -63,8 +66,12 @@ const Salas = ()=>{
     const [filterFn,setFilterFn] = useState({fn:items=>{return items;}})
     const [notify,setNotify] = useState({isOpen:false,message:'',type:''})
     const [confirmDialog,setConfirmDialog] = useState({isOpen:false,title:'',subtitle:''})
+    const [selected, setSelected] = React.useState([]);
 
-    const handleCloseModalForm = () => setOpenModalForm(false);
+    const handleCloseModalForm = () => {
+        setOpenModalForm(false)
+        setSelected([])
+    };
     const handleOpenModalFile = () => setOpenModalFile(true);
     const handleCloseModalFile = () => setOpenModalFile(false);
 
@@ -111,30 +118,62 @@ const Salas = ()=>{
         })
     }
 
-    const addOrEdit = (updating,sala,predio,resetForm) =>{
-        let data= {...sala}
+    const handleSelectAllClick = (event) => {
+        if (event.target.checked) {
+          const newSelecteds = recordsAfterPagingAndSorting().map((sala) => sala._id);
+          setSelected(newSelecteds);
+          return;
+        }
+        setSelected([]);
+    };
+
+    const isSelected = (name) => selected.indexOf(name) !== -1;
+
+    const handleClick = (event, name) => {
+        const selectedIndex = selected.indexOf(name);
+        let newSelected = [];
+    
+        if (selectedIndex === -1) {
+          newSelected = newSelected.concat(selected, name);
+        } else if (selectedIndex === 0) {
+          newSelected = newSelected.concat(selected.slice(1));
+        } else if (selectedIndex === selected.length - 1) {
+          newSelected = newSelected.concat(selected.slice(0, -1));
+        } else if (selectedIndex > 0) {
+          newSelected = newSelected.concat(
+            selected.slice(0, selectedIndex),
+            selected.slice(selectedIndex + 1),
+          );
+        }
+        setSelected(newSelected);
+    };
+
+    const addOrEdit = (updating,sala,predio,disponibilidade,resetForm) =>{
+        let data= {...sala,disponibilidade:disponibilidade}
         if (updating){
-            SalasDataService.updateSala(sala._id,data)
-                .then(res =>handleServerResponses('update',res,setNotify))
-                .catch(err=>handleServerResponses('error',err,setNotify))
+            SalasDataService.updateSala(predio,sala._id,data)
+                .then(res =>handleServerResponses('salas',res,setNotify))
+                .catch(err=>handleServerResponses('salas',err,setNotify))
         }else{
             SalasDataService.addSala(predio,data)
-                .then(res =>handleServerResponses('add',res,setNotify))
-                .catch(err=>handleServerResponses('error',err,setNotify))
+                .then(res =>handleServerResponses('salas',res,setNotify))
+                .catch(err=>handleServerResponses('salas',err,setNotify))
         }
         resetForm()
         setOpenModalForm(false)
+        setSelected([])
         getSalas(params.predio)
     }
 
-    const onDelete =(id)=>{
+    const onDelete =(salas)=>{
         setConfirmDialog({
             ...confirmDialog,
             isOpen:false
         })
-        SalasDataService.deleteSala(id)
-            .then(res =>handleServerResponses('delete',res,setNotify))
-            .catch(err=>handleServerResponses('error',err,setNotify))
+        let data={salasID:salas}
+        SalasDataService.deleteSalas(data)
+            .then(res =>handleServerResponses('salas',res,setNotify))
+            .catch(err=>handleServerResponses('salas',err,setNotify))
         getSalas(params.predio)
 
     }
@@ -170,6 +209,7 @@ const Salas = ()=>{
                     aria-describedby="modal-modal-description"
                 ><DialogContent >
                     <SalaForm
+                        config={configTemp}
                         predio={params.predio}
                         addOrEdit={addOrEdit}
                         salaEdit = {salaEdit}
@@ -238,40 +278,75 @@ const Salas = ()=>{
                         </Grid>
                     </Grid>
                 </Toolbar>
-                    <TblContainer>
-                    <TblHead />
+                    <TblContainer
+                        tableTitle="Lista de Salas"
+                        numSelected={selected.length}
+                        deleteSelected={()=>{
+                            setConfirmDialog({
+                                isOpen:true,
+                                title:'Deletar Turmas',
+                                subtitle:'Tem certeza que deseja deletar? Você não pode desfazer esta operação.',
+                                onConfirm: () =>{onDelete(selected)}
+                            })
+                        }}
+                    >
+                    <TblHead 
+                        onSelectAllClick={handleSelectAllClick}
+                        numSelected={selected.length}
+                        rowCount={recordsAfterPagingAndSorting().length}
+                    />
                     <TableBody>
-                        {recordsAfterPagingAndSorting().map(sala=>(
-                            <TableRow key={sala._id} sx ={tableRowCss}>
-                                <TableCell>
-                                    <IconButton 
-                                        sx={{padding:'4px'}} 
-                                        color="primary"
-                                        onClick={()=>{openInModalEdit(sala)}}   
-                                    >
-                                         <EditOutlinedIcon fontSize="small"/> 
-                                    </IconButton>
-                                    <IconButton 
-                                        sx={{padding:'4px'}} 
-                                        color="error"
-                                        onClick={()=>{
-                                            setConfirmDialog({
-                                                isOpen:true,
-                                                title:'Deletar Sala',
-                                                subtitle:'Tem certeza que deseja deletar? Você não pode desfazer esta operação.',
-                                                onConfirm: () =>{onDelete(sala._id)}
-                                            })
-                                        }}
-                                    > <DeleteIcon fontSize="small"/> </IconButton>
-                                </TableCell>
-                                <TableCell>{sala.numeroSala}</TableCell>
-                                <TableCell>{sala.capacidade}</TableCell>
-                                <TableCell>{sala.disponivelManha?"sim":"não"}</TableCell>
-                                <TableCell>{sala.disponivelTarde?"sim":"não"}</TableCell>
-                                <TableCell>{sala.disponivelNoite?"sim":"não"}</TableCell>
-                                
-                            </TableRow>
-                        ))}
+                        {recordsAfterPagingAndSorting().map((sala,index)=>{
+                            const isItemSelected = isSelected(sala._id);
+                            const labelId = `salas-table-checkbox-${index}`;
+                            const totalDisp = configTemp.dias.length*configTemp.periodos.length
+                            let dispCount = 0
+                            let disponibilidade = ''
+                            sala.disponibilidade.map(obj=>{
+                               obj.disponivel ?  dispCount++ : dispCount = dispCount
+                            })
+                            if (dispCount/totalDisp < 0.33){
+                                disponibilidade = 'Baixa'
+                            }else if (dispCount/totalDisp < 0.66){
+                                disponibilidade = 'Média'
+                            }else{
+                                disponibilidade = 'Alta'
+                            }
+
+                            return(
+                                <TableRow 
+                                    key={sala._id} 
+                                    sx ={tableRowCss}
+                                    selected={isItemSelected}
+                                    aria-checked={isItemSelected}
+                                    role="checkbox"
+                                    onClick={(event) => handleClick(event, sala._id)}
+                                >
+                                    <TableCell padding="checkbox">
+                                        <Checkbox
+                                            color="primary"
+                                            checked={isItemSelected}
+                                            inputProps={{
+                                                'aria-labelledby': labelId,
+                                            }}
+                                        />
+                                    </TableCell>
+                                    <TableCell>
+                                        <IconButton 
+                                            sx={{padding:'4px'}} 
+                                            color="primary"
+                                            onClick={()=>{openInModalEdit(sala)}}   
+                                        >
+                                            <EditOutlinedIcon fontSize="small"/> 
+                                        </IconButton>
+                                    </TableCell>
+                                    <TableCell>{sala.numeroSala}</TableCell>
+                                    <TableCell>{sala.capacidade}</TableCell>
+                                    <TableCell>{disponibilidade}</TableCell>
+
+                                    
+                                </TableRow>
+                        )})}
                     </TableBody>
                 </TblContainer>
                 <TblPagination/>

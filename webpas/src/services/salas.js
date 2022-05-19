@@ -29,16 +29,16 @@ class SalasDataService {
         return http.get('salas/' + predio)
     }
 
-    updateSala(salaId,sala){
-        return http.post('salas/update/'+salaId,sala)
+    updateSala(predio,salaId,sala){
+        return http.post(`salas/${predio}/update/${salaId}`,sala)
     }
 
     addSala(predio,sala){
         return http.post('salas/'+predio+'/addSala',sala)
     }
 
-    deleteSala(salaId){
-        return http.delete('salas/'+salaId)
+    deleteSalas(salas){
+        return http.post('salas/deleteMany',salas)
     }
 
 }

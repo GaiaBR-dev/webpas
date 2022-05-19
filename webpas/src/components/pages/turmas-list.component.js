@@ -156,7 +156,6 @@ const TurmasList = props =>{
             selected.slice(selectedIndex + 1),
           );
         }
-    
         setSelected(newSelected);
     };
 
@@ -333,7 +332,6 @@ const TurmasList = props =>{
                 </Toolbar>
                 <TblContainer 
                     sx={tableStyle} 
-                    style={tableStyle} 
                     tableTitle="Lista de Turmas"
                     numSelected={selected.length}
                     deleteSelected={()=>{
@@ -364,14 +362,14 @@ const TurmasList = props =>{
                                     onClick={(event) => handleClick(event, turma._id)}
                                 >
                                     <TableCell padding="checkbox">
-                                    <Checkbox
-                                        color="primary"
-                                        checked={isItemSelected}
-                                        inputProps={{
-                                            'aria-labelledby': labelId,
-                                        }}
-                                    />
-                                </TableCell>
+                                        <Checkbox
+                                            color="primary"
+                                            checked={isItemSelected}
+                                            inputProps={{
+                                                'aria-labelledby': labelId,
+                                            }}
+                                        />
+                                    </TableCell>
                                     <TableCell>
                                         <IconButton 
                                             sx={{padding:'4px'}} 

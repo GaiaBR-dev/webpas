@@ -77,43 +77,67 @@ router.route('/:predio/addSala').post((req,res)=>{
     const predio = req.params.predio
     const numeroSala = req.body.numeroSala
     const capacidade = req.body.capacidade
-    const disponivelManha = req.body.disponivelManha
-    const disponivelTarde = req.body.disponivelTarde
-    const disponivelNoite = req.body.disponivelNoite
+    const disponibilidade = req.body.disponibilidade
 
-    const novaSala = new Sala({
-        predio:predio,
-        numeroSala:numeroSala,
-        capacidade:capacidade,
-        disponivelManha:disponivelManha,
-        disponivelTarde:disponivelTarde,
-        disponivelNoite:disponivelNoite
-    })
-    novaSala.save()
-        .then(()=> res.json('Sala adicionada'))
-        .catch(err =>{res.status(400).json('Error: '+ err); console.log(err)})
+    Sala.find({predio:predio, numeroSala:numeroSala})
+        .then(salas=>{
+            if (salas.length > 0){
+                let err = {code:1,msg:"Uma sala com o mesmo nome já está cadastrada"}
+                res.status(400).json(err)
+            }else{
+                const novaSala = new Sala({
+                    predio:predio,
+                    numeroSala:numeroSala,
+                    capacidade:capacidade,
+                    disponibilidade:disponibilidade
+                })
+                novaSala.save()
+                    .then(()=> res.json('Sala adicionada'))
+                    .catch(err =>{res.status(400).json(err)})
+            }
+        })
 })
 
-router.route('/update/:id').post((req,res)=>{
-    Sala.findById(req.params.id)
-        .then(sala=> {
-            sala.numeroSala = req.body.numeroSala
-            sala.capacidade = req.body.capacidade
-            sala.disponivelManha = req.body.disponivelManha
-            sala.disponivelTarde = req.body.disponivelTarde
-            sala.disponivelNoite = req.body.disponivelNoite
-            
-            sala.save()
-                .then(()=> res.json('Sala atualizada'))
-                .catch(err =>res.status(400).json('Error: '+err))
+router.route('/:predio/update/:id').post((req,res)=>{
+    const predio = req.params.predio
+    const numeroSala = req.body.numeroSala
+
+    Sala.find({predio:predio, numeroSala:numeroSala})
+        .then(salas =>{
+            if (salas.length > 1){
+                let err = {code:1,msg:"Uma sala com o mesmo nome já está cadastrada"}
+                res.status(400).json(err)
+            }else if(salas.length == 0 || req.params.id == salas[0]._id){
+                Sala.findById(req.params.id)
+                    .then(sala=> {
+                        sala.numeroSala = req.body.numeroSala
+                        sala.capacidade = req.body.capacidade
+                        sala.disponibilidade = req.body.disponibilidade
+                        
+                        sala.save()
+                            .then(()=> res.json('Sala atualizada'))
+                            .catch(err =>res.status(400).json(err))
+                    })
+                    .catch(err => res.status(400).json(err))
+            }else{
+                let err = {code:1,msg:"Uma sala com o mesmo nome já está cadastrada"}
+                res.status(400).json(err)
+            }
         })
-        .catch(err => res.status(400).json('Error: '+ err))
+    
 })
 
 router.route('/:id').delete((req,res)=>{
     Sala.findByIdAndDelete(req.params.id)
         .then(()=> res.json('Sala deletada'))
-        .catch(err => res.status(400).json('Error: '+ err))
+        .catch(err => res.status(400).json(err))
+})
+
+router.route('/deleteMany').post((req,res)=>{
+    const salasIds = req.body.salasID
+    Sala.deleteMany({_id:{$in:salasIds}})
+        .then(()=> res.json('Salas deletadas'))
+        .catch(err => res.status(400).json(err))
 })
 
 router.route('/arquivosala').post((req, res) => { // salvar a partir de arquivo vindo do cliente

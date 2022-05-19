@@ -68,7 +68,6 @@ const PredioForm = props =>{
                 temp.nSalas = "Este campo deve conter um número"
             }
         }
-
         setErros({
             ...temp
         })
@@ -118,9 +117,10 @@ const PredioForm = props =>{
         <Box component="form"  onSubmit={handleSubmit}>
             <Grid container
                 columns={12}
-                spacing={2}
+                rowSpacing={2}
+                columnSpacing={3}
                 sx = {formCssClass} 
-                justifyContent="space-between"
+                justifyContent="flex-start"
                 alignItems="flex-start">
                 <Grid item xs={11}>
                     <Typography variant="h5">Adicionar prédio</Typography>
@@ -187,7 +187,7 @@ const PredioForm = props =>{
                         return(
                             <Grid item xs ={12}>
                                 <FormControl key={index} sx={{width:'100%'}}>
-                                <Grid container alignItems="center"  justifyContent="space-around">
+                                <Grid container columnSpacing={3} alignItems="center"  justifyContent="flex-start" >
                                     <Grid item xs={5}><FormLabel>{dia}</FormLabel></Grid>
                                     {config.periodos.map((periodo,indexp)=>{
                                         return(
