@@ -93,7 +93,7 @@ const TurmasList = props =>{
             .then(response => {
                 setTurmas(response.data)
             })
-            .catch(err => handleServerResponses(err,setNotify))
+            .catch(err => handleServerResponses('turmas',err,setNotify))
     }
 
     const handleAnoTableSelect = e =>{
@@ -102,10 +102,6 @@ const TurmasList = props =>{
 
     const handleSemestreTableSelect = e =>{
         setSemestreTable(e.target.value)
-    }
-
-    const handleUpdatingT= isUpdating => {
-        isUpdating? setUpdatingT(true): setUpdatingT(false)
     }
 
     const handleSearch = e =>{
@@ -120,15 +116,16 @@ const TurmasList = props =>{
                             turma.nomeDisciplina
                                 .toLowerCase()
                                 .includes(target.value.toLowerCase())
-                           // || turma.docentes
-                           //     .toLowerCase()
-                          //      .includes(target.value.toLowerCase()) 
+                            //|| turma.docentes
+                            //    .toLowerCase()
+                            //    .includes(target.value.toLowerCase()) 
                         )
                     }) 
                 }
             }
         })
     }
+    
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
           const newSelecteds = recordsAfterPagingAndSorting().map((turma) => turma._id);
@@ -204,13 +201,13 @@ const TurmasList = props =>{
     }=useTable(turmas,headCells,filterFn)
 
     const openInModalEdit = turma =>{
-        handleUpdatingT(true)
+        setUpdatingT(true)
         setTurmaEdit(turma)
         setOpenModalForm(true)
     }
 
     const openInModalNew = () =>{
-        handleUpdatingT(false)
+        setUpdatingT(false)
         setTurmaEdit(null)
         setOpenModalForm(true)
     }

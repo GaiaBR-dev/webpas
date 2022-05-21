@@ -1,6 +1,6 @@
 import React from "react";
 import { Link as RouterLink } from 'react-router-dom';
-import { Container, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import { useState, useEffect } from "react";
 import SalasDataService from '../../services/salas'
 import ConfirmDialog from "../confirmDialog.component";
@@ -32,18 +32,15 @@ const configTemp={
 const PrediosList = props =>{
     const [predios,setPredios] = React.useState([])
     const [predioEdit,setPredioEdit] = React.useState([])
-    const [salas,setSalas] = React.useState([])
     const [numeroSalas,setNumeroSalas] = useState([])
     const [openModalForm, setOpenModalForm] = useState(false);
     const [openModalFormEdit, setOpenModalFormEdit] = useState(false);
     const [openModalFile, setOpenModalFile] = useState(false);
-    const [updatingP,setUpdatingP] = useState(false)
     const [filterFn,setFilterFn] = useState({fn:items=>{return items;}})
     const [notify,setNotify] = useState({isOpen:false,message:'',type:''})
     const [confirmDialog,setConfirmDialog] = useState({isOpen:false,title:'',subtitle:''})
 
     const handleCloseModalForm = () => setOpenModalForm(false);
-    const handleOpenModalFormEdit = () => setOpenModalFormEdit(true);
     const handleCloseModalFormEdit = () => setOpenModalFormEdit(false);
     const handleOpenModalFile = () => setOpenModalFile(true);
     const handleCloseModalFile = () => setOpenModalFile(false);
@@ -63,7 +60,6 @@ const PrediosList = props =>{
         console.log('executando numerosalasx')
         SalasDataService.getAll()
             .then(response =>{
-                setSalas(response.data)
                 let arrayTemp = []
                 predios.map(predio=>{
                     let predioTemp ={}
@@ -93,13 +89,11 @@ const PrediosList = props =>{
     }
 
     const openInModalNew = () =>{
-        setUpdatingP(false)
         setPredioEdit(null)
         setOpenModalForm(true)
     }
 
     const openInModalEdit = predio =>{
-        setUpdatingP(true)
         setPredioEdit(predio)
         setOpenModalFormEdit(true)
     }
@@ -172,19 +166,19 @@ const PrediosList = props =>{
                 setConfirmDialog={setConfirmDialog}
             />
             <Modal
-                    id='modalFile'
-                    open={openModalFile}
-                    onClose={handleCloseModalFile}
-                    aria-labelledby="modal-modal-title"
-                    aria-describedby="modal-modal-description"
-                >
-                    <FileFormSalas
-                        title="Adicionar Arquivo"
-                        closeButton={handleCloseModalFile}
-                        config={configTemp}
-                        handleResponse={fileHandleResponse}
-                    />
-                </Modal>
+                id='modalFile'
+                open={openModalFile}
+                onClose={handleCloseModalFile}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <FileFormSalas
+                    title="Adicionar Arquivo"
+                    closeButton={handleCloseModalFile}
+                    config={configTemp}
+                    handleResponse={fileHandleResponse}
+                />
+            </Modal>
             <Paper>
                 <Toolbar>
                     <Grid container 

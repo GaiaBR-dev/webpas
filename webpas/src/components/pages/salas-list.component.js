@@ -6,13 +6,12 @@ import Mensagem from "../mensagem.component";
 import ConfirmDialog from "../confirmDialog.component";
 import { TableContainer, Paper, TableBody, TableCell, TableRow} from "@mui/material";
 import useTable from "../useTable";
-import { Toolbar, Grid, Button, TextField } from "@mui/material";
+import { Toolbar, Grid, Button, TextField, Modal } from "@mui/material";
 import { IconButton } from "@mui/material";
 import HelpIcon from '@mui/icons-material/Help';
 import { InputAdornment } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
-import DeleteIcon from '@mui/icons-material/Delete'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import handleServerResponses from "../../services/response-handler";
 import { Dialog, DialogContent } from "@mui/material";
@@ -20,6 +19,7 @@ import SalaForm from '../forms/salaForm.component';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Link as RouterLink } from 'react-router-dom';
 import { Checkbox } from "@mui/material";
+import FileFormSalas from "../forms/fileFormSala.component";
 
 const headCells =[
     {id:'actions',label:"Ações", disableSorting:true},
@@ -178,6 +178,11 @@ const Salas = ()=>{
 
     }
 
+    const fileHandleResponse = res =>{
+        setOpenModalFile(false)
+        handleServerResponses('salas',res,setNotify)
+    }
+
     const{
         TblContainer,
         TblHead,
@@ -189,7 +194,7 @@ const Salas = ()=>{
         <>
             <PageHeader 
                 title={"Salas - " +params.predio}
-                subtitle="teste 123"
+                subtitle="Cadastro, edição e visualização de salas"
             />
             <Mensagem 
                 notify={notify}
@@ -199,6 +204,20 @@ const Salas = ()=>{
                 confirmDialog={confirmDialog}
                 setConfirmDialog={setConfirmDialog}
             />
+            <Modal
+                id='modalFile'
+                open={openModalFile}
+                onClose={handleCloseModalFile}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <FileFormSalas
+                    title="Adicionar Arquivo"
+                    closeButton={handleCloseModalFile}
+                    config={configTemp}
+                    handleResponse={fileHandleResponse}
+                />
+            </Modal>
             <TableContainer component={Paper}>
                 <Dialog maxWidth="sm"
                     id='modalForm'

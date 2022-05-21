@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import useForm from "./useForm";
-import { Button, Divider, FormControl, FormControlLabel, FormLabel, RadioGroup, TextField } from "@mui/material";
-import { Radio } from "@mui/material";
+import { Button, Divider, FormControl, FormLabel, TextField } from "@mui/material";
 import { Grid } from "@mui/material";
 import { Box } from "@mui/system";
 import { Typography } from "@mui/material";
@@ -123,6 +122,20 @@ const SalaForm = props =>{
         return dispArray
     }
 
+    const resetFormandCB = () =>{
+        resetForm()
+        setDispCheckBoxList(()=>{
+            let result = {}
+            config.dias.map(dia=>{
+                result[dia] = {}
+                config.periodos.map(periodo=>{
+                    result[dia][periodo] = false
+                })
+            })
+            return result
+        })
+    }
+
     return (
         <>
         <Box component="form"  onSubmit={handleSubmit}>
@@ -206,7 +219,7 @@ const SalaForm = props =>{
                
                 <Grid item xs={6} ></Grid>
                 <Grid item xs={12} sx={{marginY:2}}>
-                    <Button variant='outlined' size="large" color='primary' onClick={resetForm} sx={{marginRight:2}}>Resetar</Button>
+                    <Button variant='outlined' size="large" color='primary' onClick={resetFormandCB} sx={{marginRight:2}}>Resetar</Button>
                     <Button variant='contained' type="submit"size="large" color='secondary'>Enviar</Button>
                 </Grid>
             </Grid>

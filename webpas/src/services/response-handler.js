@@ -1,6 +1,5 @@
 const handleServerResponses = (collection,response,setNotify) =>{
     if (response.status == 200){
-        console.log(response)
         setNotify({
             isOpen:true,
             message: response.data,

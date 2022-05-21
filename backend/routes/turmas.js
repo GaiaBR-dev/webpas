@@ -2,10 +2,32 @@ const router = require('express').Router()
 const { xlstojson } = require('../xlstojson')
 let Turma = require('../models/turma.model')
 
+const arrayUnique = array => {
+    var a = array.concat();
+    for(var i=0; i<a.length; ++i) {
+        for(var j=i+1; j<a.length; ++j) {
+            if(a[i] === a[j])
+                a.splice(j--, 1);
+        }
+    }
+    return a;
+}
+
 router.route('/').get((req,res)=>{ // filtros e classificação no cliente ? divisão em paginas ?
     Turma.find()
         .then(turmas => res.json(turmas))
         .catch(err => res.status(400).json(err))
+})
+
+router.route('/d/').get((req,res)=>{
+    Turma.find().distinct('departamentoOferta')
+        .then(departamentosOferta=>{
+            Turma.find().distinct('departamentoTurma')
+                .then(departamentosTurma =>{
+                    const departamentos = arrayUnique(departamentosOferta.concat(departamentosTurma))
+                    res.json(departamentos)
+                }).catch(err => res.status(400).json(err))
+        }).catch(err => res.status(400).json(err))
 })
 
 router.route('/:ano/:semestre').get((req,res)=>{

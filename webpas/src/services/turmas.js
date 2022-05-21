@@ -5,6 +5,10 @@ class TurmasDataService {
         return http.get('turmas')
     }
 
+    getDepartamentos(){
+        return http.get('turmas/d/')
+    }
+
     getByAnoSemestre(ano,semestre){
         return http.get(`turmas/${ano}/${semestre}`)
     }

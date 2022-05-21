@@ -8,6 +8,8 @@ const distanciaSchema = new Schema({
     valorDist: {type:Number, required:true}
 })
 
+distanciaSchema.index({predio: 1,departamento: 1}, {unique: true})
+
 const Distancia = mongoose.model('Distancia',distanciaSchema)
 
 module.exports = Distancia
