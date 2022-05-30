@@ -65,13 +65,11 @@ router.route('/add').post((req,res) =>{
 
 })
 
-router.route('/addmany').post((req,res) =>{//salvar a partir de arquivo vindo do cliente
+router.route('/arquivodistancia').post((req,res) =>{//salvar a partir de arquivo vindo do cliente
     novasDistancias = req.body.novasDistancias
-    Distancia.insertMany(novasTurmas,(err,docs)=>{
-        
-    })
+    Distancia.insertMany(novasDistancias,{ordered:false})
         .then(()=> res.json('Distancias adicionadas'))
-        .catch(err =>res.status(400).json('Error: '+ err))
+        .catch(err =>res.status(400).json(err))
 })
 
 router.route('/inseredistancias321').post((req, res) => { // Hard coded -> deletar depois
@@ -81,27 +79,6 @@ router.route('/inseredistancias321').post((req, res) => { // Hard coded -> delet
     Distancia.insertMany(novasDistancias)
         .then(()=> res.json('Distancias adicionadas'))
         .catch(err =>res.status(400).json('Error: '+ err))  
-})
-
-router.route('/todasdistancias').get((req,res)=>{ // verifica se para todos os predios e departamentos existe uma distancia
-    const predios = req.body.predios
-    const departamentos = req.body.departamentos
-    let todos = true
-
-    Distancia.find()
-        .then(distancias=>{
-                predios.forEach((predio)=>{ 
-                    departamentos.forEach((departamento)=>{
-                        let existe = distancias.find(dist =>{
-                            return dist.predio === predio && dist.departamento === departamento
-                        })
-                        if(typeof(existe) == "undefined"){
-                            todos = false
-                        }
-                    })
-                })
-           res.json(todos)
-        }).catch(err => res.status(400).json('Error: '+ err))
 })
 
 router.route('/:id').delete((req,res)=>{
@@ -158,6 +135,7 @@ router.route('/iscomplete').get(async (req,res)=>{
             predios.map((predio)=>{
                 departamentos.map((departamento)=>{
                     let dist = {}
+                    indiceDistancias[predio] = indiceDistancias[predio]? indiceDistancias[predio] : {}
                     if (indiceDistancias[predio][departamento] == undefined){
                         dist.predio = predio
                         dist.departamento = departamento

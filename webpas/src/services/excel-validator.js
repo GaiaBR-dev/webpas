@@ -6,6 +6,7 @@ class ExcelValidator{
         let erroDia = false
         let erroCreditos = false
         let erroDuplicatas = false
+        let erroTipo = false
         let res ={
             status:200,
             erro: false,
@@ -19,12 +20,20 @@ class ExcelValidator{
         let turmaDup =''
         let disciplinaDup =''
         
+        let turmaErroTipo =''
+        let disciplinaErroTipo =''
+
         rowsTurmas.map(row =>{
 
             if (row['Nome da Disciplina'] == null) {erroPreenchido = true}
             if (row['Turma'] == null)  {erroPreenchido = true}
             if (row['Departamento de Oferta'] == null)  {erroPreenchido = true}
             if (row['Total de Alunos'] == null)  {erroPreenchido = true}
+            if (isNaN(row['Total de Alunos']))  {
+                turmaErroTipo = row['Turma']
+                disciplinaErroTipo = row['Nome da Disciplina']
+                erroTipo = true    
+            }
             if (row['Dia'] == null)  {erroPreenchido = true}
             if (row['Horário de Ínicio'] == null)  {erroPreenchido = true}
             if (row['Horário de Término'] == null)  {erroPreenchido = true}
@@ -83,6 +92,10 @@ class ExcelValidator{
             res.status = 400
             res.erro = true
             res.response.data = {code:3,msg:`A turma "${turmaDup}" da disciplina "${disciplinaDup}" está duplicada na tabela`}
+        }else if (erroTipo){
+            res.status = 400
+            res.erro = true
+            res.response.data = {code:3,msg:`O Total de alunos da turma "${turmaErroTipo}" da disciplina "${disciplinaErroTipo}" não está em formato númerico`}
         }
         return res
     }
@@ -121,6 +134,7 @@ class ExcelValidator{
         let erroPreenchido = false
         let erroDuplicatas = false
         let erroPeriodos = false
+        let erroTipo = false
         let res ={
             status:200,
             erro: false,
@@ -165,16 +179,22 @@ class ExcelValidator{
             if (config.periodos.includes('Manhã')){
                 if(row['Disponivel de Manhã'] == null){
                     erroPreenchido = true
+                }else if(!(row['Disponivel de Manhã'] == 1 || row['Disponivel de Manhã'] == 0 )){
+                    erroTipo = true
                 }
             }
             if (config.periodos.includes('Tarde')){
                 if(row['Disponivel de Tarde'] == null){
                     erroPreenchido = true
+                }else if(!(row['Disponivel de Tarde'] == 1 || row['Disponivel de Tarde'] == 0 )){
+                    erroTipo = true
                 }
             }
             if (config.periodos.includes('Noite')){
                 if(row['Disponivel de Noite'] == null){
                     erroPreenchido = true
+                }else if(!(row['Disponivel de Noite'] == 1 || row['Disponivel de Noite'] == 0 )){
+                    erroTipo = true
                 }
             }
 
@@ -202,7 +222,12 @@ class ExcelValidator{
             res.status = 400
             res.erro = true
             res.response.data = {code:3,msg:`A sala "${salaDup}" do prédio "${predioDup}" está duplicada na tabela`}
+        }else if (erroTipo){
+            res.status = 400
+            res.erro = true
+            res.response.data = {code:3,msg:`A disponibilidade deve ser preenchida com 1 para disponível e 0 para indísponível no período`}
         }
+        
         return res
     }
 
@@ -220,7 +245,7 @@ class ExcelValidator{
                     let dispUnitM = {
                         dia: dia,
                         periodo: 'Manhã',
-                        disponivel: row['Disponvel de Manhã'] == 1 
+                        disponivel: row['Disponivel de Manhã'] == 1 
                     }
                     disponibilidade.push(dispUnitM)
                 }
@@ -245,6 +270,81 @@ class ExcelValidator{
             return sala
         })
         return salas
+    }
+
+    firstValidateDistancias(rowsDistancias){
+        let erroPreenchido = false
+        let erroDuplicatas = false
+        let erroTipo = false
+        let res ={
+            status:200,
+            erro: false,
+            response:{
+                data:{
+                    code: 0,
+                    msg:'Tabela dentro dos padrões'
+                }
+            } 
+        }
+        let predioDup =''
+        let departamentoDup =''
+        let predioErroTipo = ''
+        let departamentoErroTipo = ''
+
+        rowsDistancias.map(row =>{
+
+            if (row['Prédio'] == null) {erroPreenchido = true}
+            if (row['Departamento'] == null)  {erroPreenchido = true}
+            if (row['Distância'] == null)  {erroPreenchido = true}
+
+            if(isNaN(row['Distância'])){
+                predioErroTipo = row['Prédio']
+                departamentoErroTipo = row['Departamento']
+                erroTipo = true
+            }
+
+            let contadorDup = 0
+            rowsDistancias.map(innerRow =>{
+                if (row['Prédio'] === innerRow['Prédio'] &&
+                    row['Departamento'] === innerRow['Departamento'] 
+                ){
+                    contadorDup++
+                }
+            })
+            if (contadorDup>1){
+                erroDuplicatas = true
+                departamentoDup = row['Departamento']
+                predioDup = row['Prédio']
+            }
+        
+        })
+
+        if (erroPreenchido){
+            res.status = 400
+            res.erro = true 
+            res.response.data = {code:3,msg:'A Tabela possui uma ou mais linhas com campos obrigatórios não preenchidos'}
+        }else if (erroDuplicatas){
+            res.status = 400
+            res.erro = true
+            res.response.data = {code:3,msg:`A distância do prédio "${predioDup}" para o departamento "${departamentoDup}" está duplicada na tabela`}
+        }else if (erroTipo){
+            res.status = 400
+            res.erro = true
+            res.response.data = {code:3,msg:`A distância do prédio "${predioErroTipo}" para o departamento "${departamentoErroTipo}" não está em formato númerico`}
+        }
+        return res
+    }
+
+    mapColumnKeysDistancias(rowsDistancias){
+        const distancias = rowsDistancias.map(row =>{
+            let distancia = {
+                predio: row['Prédio'],
+                departamento: row['Departamento'],
+                valorDist: row['Distância']
+            }
+            return distancia
+        })
+        return distancias
     }
 }
 

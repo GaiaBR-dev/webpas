@@ -79,7 +79,6 @@ const Salas = ()=>{
         SalasDataService.getSalas(predio)
             .then(response=>{
                 setSalas(response.data)
-                console.log(response.data)
             }).catch(err => console.log(err))
     }
 

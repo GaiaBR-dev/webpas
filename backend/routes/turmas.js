@@ -107,7 +107,6 @@ router.route('/arquivoturma').post(async (req,res) =>{ // salvar a partir de arq
     Turma.insertMany(novasTurmas,{ordered:false})
         .then(()=> res.json('Turmas adicionadas'))
         .catch(err =>{
-            console.log(err)
             res.status(400).json(err)})  
 
 })

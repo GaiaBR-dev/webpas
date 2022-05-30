@@ -5,7 +5,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import styled from "@emotion/styled";
 import { Box } from "@mui/system";
 import * as XLSX from 'xlsx/xlsx.mjs';
-import SalasDataService from "../../services/salas"
+import DistanciasDataService from "../../services/distancias"
 import ExcelValidator from "../../services/excel-validator";
 import { LinearProgress } from "@mui/material";
 
@@ -46,7 +46,7 @@ const modalStyleFile = {
     },
 };
 
-const FileFormSalas = (props) =>{
+export default function FileFormDistancias(props){
     const [working,setWorking] = useState(false)
 
     useEffect(()=>{
@@ -59,35 +59,35 @@ const FileFormSalas = (props) =>{
         reader.onload = function(e) {
             setWorking(true)
             const workbook = XLSX.read(e.target.result);
-            let temSala = false
+            let temDistancia = false
             let rowObject
             workbook.SheetNames.forEach(sheet => {
-                if (sheet === 'Salas'){
-                    temSala = true
+                if (sheet === 'Distâncias'){
+                    temDistancia = true
                     rowObject = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheet])
                 }
             });
-            if (temSala){
-                let res = ExcelValidator.firstValidateSalas(rowObject,config)
+            if (temDistancia){
+                let res = ExcelValidator.firstValidateDistancias(rowObject)
                 if (!res.erro){
-                    const nsalas = ExcelValidator.mapColumnKeysSalas(rowObject,config)
+                    const ndistancias = ExcelValidator.mapColumnKeysDistancias(rowObject)
                     let data ={
-                        novasSalas:nsalas
+                        novasDistancias:ndistancias
                     }
-                    SalasDataService.addManySalas(data)
+                    DistanciasDataService.addManyDistancias(data)
                         .then(res => handleResponse(res))
                         .catch(err => handleResponse(err))
                 }else{
                     handleResponse(res)
                 }
             }else{
-                console.log('Não tem sala')
+                console.log('Não tem distância')
             }
         };
         reader.readAsArrayBuffer(file);
     }
 
-    const{title, closeButton,anos,  config, handleResponse } = props
+    const{title, closeButton, handleResponse } = props
     
     return (
         <Box component="form" sx = {modalStyleFile}>
@@ -118,7 +118,7 @@ const FileFormSalas = (props) =>{
                 <Button variant='contained' onClick={handleFileSubmit}>Enviar</Button>
             </Grid>
             <Grid item xs ={12}>
-                {working ==true?  (
+                {working ?  (
                         <LinearProgress></LinearProgress>
                     ):(
                         <div></div>
@@ -130,5 +130,3 @@ const FileFormSalas = (props) =>{
         </Box>
     )
 }
-
-export default FileFormSalas

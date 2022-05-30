@@ -18,6 +18,10 @@ router.route('/diaperiodo').post(async (req, res) => {
     const diaDaSemana = req.body.diaDaSemana
     const delta = req.body.delta
 
+    // checar se periodo está em config, se não retornar erro
+    // config = await Config.find({user:user})
+    // if (!config.periodos.includes(periodo)){res.status(400).json(err)}
+
     const modelo = await dbtomodel(ano,semestre,periodo,diaDaSemana)
     const produto = await resolve(modelo,delta)
     const alocacoes = await trataresultado(modelo,produto)
@@ -50,17 +54,7 @@ router.route('/calculatudo').post(async (req, res) => {
                 periodo,
                 alocacoes
             })
-
-            novoResultado.save()
-
-            novoResultado = new Resultado({
-                ano,
-                semestre,
-                diaDaSemana,
-                periodo,
-                alocacoes
-            })
-        
+  
             novoResultado.save()
                 .then(()=> res.json(novoResultado))
                 .catch(err =>res.status(400).json('Error: '+ err)) 

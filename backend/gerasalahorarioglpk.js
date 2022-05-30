@@ -11,20 +11,12 @@ async function resolve(modelo,delta) {
 
     const turmas = new Array().concat(turmasF1, turmasF12, turmasF2)
 
-    const indiceDistancias = modelo.distancias.reduce((acc, cur) => {
-        acc[cur.predio] = acc[cur.predio] ? acc[cur.predio] : {}
-        acc[cur.predio] = {
-            ...acc[cur.predio],
-            [cur.departamento]: cur.valorDist
-        }
-        return acc
-    }, {})
-
+    const indiceDistancias = modelo.distancias
     const distanciasCalculadas = turmas.map((turma) => {
         return salas.map((sala) => {
 
             let departamentoUsado = turma.departamentoOferta
-            if (turma.creditoAula == 2 && turma.departamentoTurma){
+            if ((turmasF1.includes(turma)||turmasF2.includes(turma)) && turma.departamentoTurma){
                 departamentoUsado = turma.departamentoTurma
             }
 
@@ -32,6 +24,7 @@ async function resolve(modelo,delta) {
  
         })
     })
+
 
     const options = {
         msglev: glpk.GLP_MSG_ALL,

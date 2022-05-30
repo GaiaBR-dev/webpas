@@ -9,7 +9,7 @@ class DistanciasDataService {
         return http.post('distancias/add',distancia)
     }
 
-    addManydistancia(novasDistancias){
+    addManyDistancias(novasDistancias){
         return http.post('distancias/arquivodistancia',novasDistancias)
     }
 
@@ -19,6 +19,10 @@ class DistanciasDataService {
 
     deleteDistancias(distancia){
         return http.post(`distancias/deleteMany`,distancia)
+    }
+
+    temTodos(){
+        return http.get('distancias/iscomplete')
     }
 }
 

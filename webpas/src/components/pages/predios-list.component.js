@@ -49,7 +49,6 @@ const PrediosList = props =>{
         if (predios.length > 0) {
             getNumeroSalas()
         }
-
     }, [predios])
 
     useEffect(()=>{

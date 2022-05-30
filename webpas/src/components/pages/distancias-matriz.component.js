@@ -1,6 +1,5 @@
 import React from "react";
 import DistanciaForm from '../forms/distanciaForm.component'
-import FileFormTurma from "../forms/fileFormTurma.component";
 import PageHeader from '../page-header.component';
 import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
 import { Modal, TableBody, TableCell, TableRow, Grid, Toolbar, TextField, DialogContent } from "@mui/material";
@@ -20,6 +19,8 @@ import Mensagem from "../mensagem.component";
 import ConfirmDialog from "../confirmDialog.component";
 import handleServerResponses from "../../services/response-handler";
 import { Checkbox } from "@mui/material";
+import FileFormDistancias from "../forms/fileFormDistancia.component";
+import { Alert } from "@mui/material";
 
 const tableRowCss ={
     '& .MuiTableCell-root':{
@@ -50,6 +51,7 @@ const DistanciasMatriz = props =>{
     const [distancias,setDistancias] = useState([]);
     const [predios,setPredios] = useState([]);
     const [departamentos,setDepartamentos] = useState([]);
+    const [temTodos,setTemTodos] = useState(true);
     const [indiceDistancias,setIndiceDistancias] = useState({});
     const [distanciaTableObjs,setDistanciaTableObjs] = useState([]);
     const [openModalForm, setOpenModalForm] = React.useState(false);
@@ -69,18 +71,19 @@ const DistanciasMatriz = props =>{
     const handleCloseModalFile = () => setOpenModalFile(false);
 
     useEffect(()=>{
-        retornaDistancias()
         retornaPredios()
         retornaDepartamentos()
+        retornaDistancias()
     }, [notify])
 
     useEffect(()=>{
         retornaIndiceDistancias()
+        retornaTemTodos()
     },[distancias])
 
     useEffect(()=>{
         retornaDistanciasTableObjs()
-    },[indiceDistancias])
+    },[indiceDistancias,predios,departamentos])
 
     const retornaDistancias = () =>{
         DistanciasDataService.getAll()
@@ -129,6 +132,7 @@ const DistanciasMatriz = props =>{
             departamentos.map((departamento,indexd)=>{
                 let strId =  `${indexp}${indexd}`
                 let missing = 12 - strId.length
+                indiceDistancias[predio] = indiceDistancias[predio]? indiceDistancias[predio]: {}
                 for(let i=0;i<missing;i++){
                     strId = strId + "0"
                 }
@@ -145,7 +149,12 @@ const DistanciasMatriz = props =>{
         setDistanciaTableObjs(distTableObjArray)
     }
 
-
+    const retornaTemTodos = () =>{
+        DistanciasDataService.temTodos()
+            .then(res => {
+                setTemTodos(res.data.isComplete)
+            }).catch(err => console.log(err))
+    }
 
     const handleSearch = e =>{
         let target = e.target
@@ -214,12 +223,12 @@ const DistanciasMatriz = props =>{
             DistanciasDataService.updateDistancia(distancia._id,data)
                 .then(res =>handleServerResponses('distancias',res,setNotify))
                 .catch(err=>handleServerResponses('distancias',err,setNotify))
-            setSelected([]);
         }else{
             DistanciasDataService.addDistancia(data)
                 .then(res =>handleServerResponses('distancias',res,setNotify))
                 .catch(err=>handleServerResponses('distancias',err,setNotify))
         }
+        setSelected([]);
         resetForm()
         setOpenModalForm(false)
         retornaDistancias()
@@ -264,6 +273,7 @@ const DistanciasMatriz = props =>{
                 subtitle="Cadastro, edição e visualização de distâncias"
                 icon={<DirectionsWalkIcon />}
             />
+            
             <Mensagem 
                 notify={notify}
                 setNotify={setNotify}
@@ -280,7 +290,11 @@ const DistanciasMatriz = props =>{
                     aria-labelledby="modal-modal-title"
                     aria-describedby="modal-modal-description"
                 >
-                    {/* Adicionar Modal File Aqui */}
+                    <FileFormDistancias
+                        title={'Adicionar arquivo'}
+                        closeButton={handleCloseModalFile}
+                        handleResponse={fileHandleResponse}
+                    />
                 </Modal>
                 <Dialog maxWidth="md"
                     id='modalForm'
@@ -302,6 +316,7 @@ const DistanciasMatriz = props =>{
                 </DialogContent>
                 </Dialog>
                 <Toolbar>
+                
                 <Grid container 
                     spacing={2} 
                     sx={{paddingTop:'12px'}} 
@@ -352,7 +367,12 @@ const DistanciasMatriz = props =>{
                         </IconButton>
                     </Grid>
                 </Grid>
-                </Toolbar>
+                </Toolbar>{temTodos ?(
+                <></>
+            ):(
+                <Alert severity="error" sx={{marginTop:'10px'}}>Existem distâncias entre prédios e departamentos 
+                não informadas. A otimização só podera ser executada com todas as distâncias cadastradas.</Alert>
+            )}
                 <TblContainer 
                     sx={tableStyle} 
                     tableTitle="Lista de distâncias"
@@ -416,6 +436,8 @@ const DistanciasMatriz = props =>{
                 </TblContainer>
                 <TblPagination/>
             </ TableContainer>
+
+
         </>
     )
 }
