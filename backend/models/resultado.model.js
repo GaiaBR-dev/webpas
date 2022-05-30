@@ -14,6 +14,8 @@ const resultadoSchema = new Schema({
     }]
 })
 
+resultadoSchema.index({ano:1,semestre:1,diaDaSemana:1,periodo:1},{unique:true})
+
 const Resultado = mongoose.model('Resultado',resultadoSchema)
 
 module.exports = Resultado

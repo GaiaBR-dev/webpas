@@ -110,7 +110,7 @@ class ExcelValidator{
             let turma = {
                 idTurma: row['idTurma'],
                 campus:row['Campus'],
-                departamentoTurma:row['Departamento Recomendado'],
+                departamentoTurma:row['Departamento Recomendado'] !== '' ?  row['Departamento Recomendado'] : row['Departamento de Oferta'],
                 codDisciplina:row['Código da Disciplina'],
                 turma:row['Turma'],
                 nomeDisciplina:row['Nome da Disciplina'],

@@ -94,7 +94,12 @@ const TurmaForm = props =>{
     const handleSubmit = e =>{
         e.preventDefault()
         if (validate()){
-            addOrEdit(updating,values,resetForm)
+            if (values.departamentoTurma === ''){
+                let {departamentoTurma,...upValues} = values
+                addOrEdit(updating,upValues,resetForm)
+            }else{
+                addOrEdit(updating,values,resetForm)
+            }
         }
     }
 

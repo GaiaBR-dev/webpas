@@ -4,7 +4,6 @@ const { dbtomodel } = require('../dbtomodel')
 const { resolve } = require('../gerasalahorarioglpk')
 const { trataresultado } = require('../trataresultado')
 
-
 router.route('/').get((req,res)=>{
     Resultado.find()
         .then(resultados => res.json(resultados))
@@ -26,38 +25,28 @@ router.route('/diaperiodo').post(async (req, res) => {
     const produto = await resolve(modelo,delta)
     const alocacoes = await trataresultado(modelo,produto)
     
-
     res.json(alocacoes)
     
- 
 })
 
 router.route('/calculatudo').post(async (req, res) => {
     const ano = req.body.ano
     const semestre = req.body.semestre
     const delta = req.body.delta
-    const periodos = ["manha","tarde","noite"]
+    const periodos = ["Manhã","Tarde","Noite"]
     const dias = ["Segunda","Terça","Quarta","Quinta","Sexta"]
 
     dias.forEach(async (dia) =>{
         periodos.forEach(async (periodo)=>{
-            console.log('dia: '+ dia)
-            console.log('periodo '+ periodo)
-            const modelo = await dbtomodel(periodo,dia)
+            const modelo = await dbtomodel(ano,semestre,periodo,dia)
             const produto = await resolve(modelo,delta)
-            const alocacoes = trataresultado(modelo,produto)
-            
-            novoResultado = new Resultado({
-                ano,
-                semestre,
-                diaDaSemana,
-                periodo,
-                alocacoes
-            })
-  
-            novoResultado.save()
-                .then(()=> res.json(novoResultado))
-                .catch(err =>res.status(400).json('Error: '+ err)) 
+            const alocacoes = await trataresultado(modelo,produto)
+    
+            let res = await Resultado.findOneAndUpdate({
+                ano:ano,
+                semestre:semestre,
+                diaDaSemana:dia,
+                periodo:periodo},{alocacoes:alocacoes},{upsert:true})
         })
     })
 })
