@@ -56,7 +56,6 @@ const PrediosList = props =>{
     }, [notify])
 
     const getNumeroSalas = () =>{
-        console.log('executando numerosalasx')
         SalasDataService.getAll()
             .then(response =>{
                 let arrayTemp = []
@@ -74,11 +73,7 @@ const PrediosList = props =>{
             })
     }
 
-    console.log(numeroSalas)
-
     const retornaPredios = () =>{
-        console.log('executando predios')
-
         SalasDataService.getPredios()
             .then(response =>{
                 setPredios(response.data)

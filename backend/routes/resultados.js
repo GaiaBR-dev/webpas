@@ -51,6 +51,42 @@ router.route('/calculatudo').post(async (req, res) => {
     })
 })
 
+router.route('/calculalista').post(async (req, res) => {
+    const ano = req.body.ano
+    const semestre = req.body.semestre
+    const delta = req.body.delta
+    const lista = req.body.lista
+
+    let resultObj = {}
+
+    const listaDePromises = lista.map(async (unidade)=>{
+        const modelo = await dbtomodel(ano,semestre,unidade.periodo,unidade.dia)
+        const produto = await resolve(modelo,delta)
+        const alocacoes = await trataresultado(modelo,produto)
+
+        resultObj[unidade.dia] = resultObj[unidade.dia]? resultObj[unidade.dia]: {}
+        if (produto.result.status == 4){
+            resultObj[unidade.dia][unidade.periodo] = false;
+        }else if (produto.result.status == 5){
+            resultObj[unidade.dia][unidade.periodo] = true;
+        }
+        console.log(produto)
+
+
+        return Resultado.findOneAndUpdate({
+            ano:ano,
+            semestre:semestre,
+            diaDaSemana:unidade.dia,
+            periodo:unidade.periodo},{alocacoes:alocacoes},{upsert:true})
+
+    })
+
+    await Promise.all(listaDePromises)
+    return res.json(resultObj)
+
+
+})
+
 
 
 router.route('/id/:id').get((req,res)=>{

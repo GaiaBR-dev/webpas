@@ -8,8 +8,12 @@ import DistanciasDataService from '../../services/distancias'
 import { Alert } from "@mui/material";
 import { IconButton } from "@mui/material";
 import HelpIcon from '@mui/icons-material/Help';
+import DoneIcon from '@mui/icons-material/Done';
 import { Checkbox } from "@mui/material";
-import { Button, Divider, FormControl, FormLabel, FormControlLabel} from "@mui/material";
+import { CircularProgress } from "@mui/material";
+import CloseIcon from '@mui/icons-material/Close';
+import ResultadosDataService from "../../services/resultados"
+import { Button, Divider, FormControl, FormLabel, FormControlLabel, TextField} from "@mui/material";
 
 const thisYear =  2019//new Date().getFullYear()
 
@@ -28,6 +32,10 @@ const Solver = props =>{
     const [temTodos,setTemTodos] = useState(true);
     const [selectAll,setSelectAll] = useState(false);
     const [delta,setDelta] = useState(0);
+    const [erroDelta,setErroDelta] = useState('')
+    const [working,setWorking] = useState(false);
+    const [executado,setExecutado] = useState(false);
+    const [resultObj,setResultObj] = useState({});
     const [dispCheckBoxList,setDispCheckBoxList] = useState(() =>{
         let result = {}
         configTemp.dias.map(dia=>{
@@ -56,6 +64,7 @@ const Solver = props =>{
             }
         })
         setSelectAll(false)
+        setExecutado(false)
     }
 
     const handleSelectAll = e =>{
@@ -68,15 +77,38 @@ const Solver = props =>{
         })
         setDispCheckBoxList(result)
         setSelectAll(!selectAll)
-
+        setExecutado(false)
     }
-    
+
+    const criarLista = config =>{
+        let lista = []
+        config.dias.map(dia=>{
+            config.periodos.map(periodo=>{
+                if (dispCheckBoxList[dia][periodo]){
+                    let unidade = {
+                        dia: dia,
+                        periodo: periodo
+                    }
+                    lista.push(unidade)
+                }
+            })
+        })
+        return lista
+    }
+ 
     const handleAnoSelect = e =>{
         setAno(e.target.value)
+        setExecutado(false)
+    }
+
+    const handleDeltaChange = e =>{
+        setDelta(e.target.value)
+        setExecutado(false)
     }
 
     const handleSemestreSelect = e =>{
         setSemestre(e.target.value)
+        setExecutado(false)
     }
 
     const retornaTemTodos = () =>{
@@ -84,6 +116,32 @@ const Solver = props =>{
             .then(res => {
                 setTemTodos(res.data.isComplete)
             }).catch(err => console.log(err))
+    }
+
+    const handleExecute = () =>{
+        setExecutado(false)
+        if(isNaN(delta)){
+            setErroDelta("Este campo deve conter um número")
+        }else{
+            setErroDelta('')
+            setWorking(true)
+            const lista = criarLista(configTemp)
+            let data = {
+                ano: ano,
+                semestre:semestre,
+                delta:delta,
+                lista:lista
+            }
+            ResultadosDataService.calculaLista(data)
+                .then(res=>{
+                    setWorking(false)
+                    setExecutado(true)
+                   setResultObj(res.data)
+                   console.log(resultObj)
+
+                })
+                .catch(err=>console.log(err))
+        }
     }
 
     return (
@@ -102,6 +160,7 @@ const Solver = props =>{
                 não informadas. A otimização só podera ser executada com todas as distâncias cadastradas.</Alert>
             )}
             <Grid container
+                alignItems="center"
                 columns={20}
                 spacing={2}
             >
@@ -137,7 +196,7 @@ const Solver = props =>{
                 <Grid item xs={20}></Grid>
 
                 <Grid item xs={20}>
-                    <Typography fontSize={'1.1rem'} fontWeight={'405'}> Escolher dias e periodos</Typography>
+                    <Typography fontSize={'1.1rem'} fontWeight={'405'}> Escolher dias e períodos</Typography>
                 </Grid>
                 <Grid item xs={20}></Grid>
                 
@@ -148,7 +207,7 @@ const Solver = props =>{
                 {
                     configTemp.periodos.map((periodo,index)=>{
                         return(
-                            <Grid item xs={3} key={index}><Typography fontWeight={450}>{periodo}</Typography></Grid>
+                            <Grid item xs={4} key={index}><Typography fontWeight={450}>{periodo}</Typography></Grid>
                         )
                     })
                 }
@@ -162,12 +221,35 @@ const Solver = props =>{
                                     <Grid item xs={4}><FormLabel fontWeight={450}>{dia}</FormLabel></Grid>
                                     {configTemp.periodos.map((periodo,indexp)=>{
                                         return(
-                                            <Grid item xs={3} key={indexp}> 
-                                                <Checkbox 
-                                                    name={`${dia}-${periodo}`}
-                                                    onChange={handleCheckBox}
-                                                    checked={dispCheckBoxList[dia][periodo]} /> 
-                                            </Grid>
+                                            <>
+                                                <Grid item xs={1} key={indexp} alignContent="center"> 
+                                                    <Checkbox 
+                                                        name={`${dia}-${periodo}`}
+                                                        onChange={handleCheckBox}
+                                                        checked={dispCheckBoxList[dia][periodo]} /> 
+                                                        
+                                                </Grid>
+                                                <Grid item xs={1}>
+                                                    {working && dispCheckBoxList[dia][periodo] ?(
+                                                        <CircularProgress size={16}/>
+                                                    ):(
+                                                       executado && dispCheckBoxList[dia][periodo] ?(
+                                                            resultObj[dia]?(
+                                                                resultObj[dia][periodo]?(
+                                                                    <DoneIcon color="success"/>
+                                                                ):(
+                                                                    <CloseIcon color="error" />
+                                                                )
+                                                            ):(<></>)
+                                                       ):(
+                                                            <></>
+                                                       )
+                                                    )}
+                                                    
+                                                    
+                                                </Grid>
+                                                <Grid item xs={2}></Grid>
+                                            </>
                                         )
                                     })}
                                 </Grid>
@@ -187,9 +269,26 @@ const Solver = props =>{
                     <Typography fontSize={'1.1rem'} fontWeight={'405'}> Escolher delta</Typography>
                 </Grid>
                 <Grid item xs={20}></Grid>
+                <Grid item xs={20}>
+                    <TextField
+                        variant="outlined"
+                        label="Delta*"
+                        name = "delta"
+                        onChange={handleDeltaChange}
+                        value ={delta}
+                        {...(erroDelta != null && erroDelta != "" && {
+                            error:true,
+                            helperText:erroDelta
+                        })}
+                    />
+                </Grid>
+                <Grid item xs={20}></Grid>
+                <Grid item xs={20}></Grid>
+                <Grid item xs={20}>
+                        <Button variant="contained" onClick={handleExecute}> Executar</Button>
 
-
-
+                </Grid>
+                
             </Grid>
             </Box>
         </Paper>
