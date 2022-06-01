@@ -4,7 +4,6 @@ class ExcelValidator{
         let erroHorarioI = false
         let erroHorarioF = false
         let erroDia = false
-        let erroCreditos = false
         let erroDuplicatas = false
         let erroTipo = false
         let res ={
@@ -37,15 +36,11 @@ class ExcelValidator{
             if (row['Dia'] == null)  {erroPreenchido = true}
             if (row['Horário de Ínicio'] == null)  {erroPreenchido = true}
             if (row['Horário de Término'] == null)  {erroPreenchido = true}
-            if (row['Créditos'] == null)  {erroPreenchido = true}
             if (!configProps.horarios.includes(row['Horário de Ínicio'])) {
                 erroHorarioI = true
             }
             if (!configProps.horarios.includes(row['Horário de Término'])) {
                 erroHorarioF = true
-            }
-            if (!configProps.creditos.includes(row['Créditos'])) {
-                erroCreditos = true
             }
             let str = row['Dia']
             let dia = str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
@@ -80,10 +75,6 @@ class ExcelValidator{
             res.status = 400
             res.erro = true 
             res.response.data = {code:3,msg:'Um ou mais horários estão fora do padrão da universidade'}
-        }else if (erroCreditos){
-            res.status = 400
-            res.erro = true 
-            res.response.data = {code:3,msg:'Uma ou mais turmas estão com os créditos fora do padrão da universidade'}
         }else if (erroDia){
             res.status = 400
             res.erro = true 

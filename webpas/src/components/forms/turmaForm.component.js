@@ -36,7 +36,7 @@ const formCssClass ={
 }
 
 const TurmaForm = props =>{
-    const {dias,horarios,anos, creditos , closeModalForm, updating,addOrEdit,turmaEdit} = props
+    const {dias,horarios,anos, closeModalForm, updating,addOrEdit,turmaEdit} = props
     const [formTitle,setFormTitle] = useState('Adicionar turma')
 
     const handleFormTitle = updatingT =>{
@@ -71,7 +71,6 @@ const TurmaForm = props =>{
         temp.diaDaSemana = values.diaDaSemana ? "" : "O dia em que a turma é ministrada é obrigatório"
         temp.horarioInicio = values.horarioInicio? "" : "O horário de ínicio da turma é obrigatório"
         temp.horarioFim = values.horarioFim? "" : "O horário de término da turma é obrigatório"
-        temp.creditosAula = values.creditosAula? "" : "O número de créditos da turma é obrigatório"
         temp.ano = values.ano? "" : "O ano da turma é obrigatório"
         temp.semestre = values.semestre? "" : "O semestre da turma é obrigatório"
         temp.totalTurma = "O numero de alunos total é obrigatório"
@@ -237,14 +236,12 @@ const TurmaForm = props =>{
                     />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                    <Select 
-                        name="creditosAula"
-                        label="Creditos*"
-                        value={values.creditosAula}
+                    <TextField 
+                        variant="outlined"
+                        name = "creditosAula"
                         onChange={handleInputChange}
-                        options ={creditos}
-                        error={erros.creditosAula}
-                    />
+                        label="Créditos"
+                        value ={values.creditosAula}></TextField>
                 </Grid>
                 <Grid item xs={12} sm={6}>
                     <TextField 

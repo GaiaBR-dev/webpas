@@ -19,9 +19,7 @@ async function resolve(modelo,delta) {
             if ((turmasF1.includes(turma)||turmasF2.includes(turma)) && turma.departamentoTurma){
                 departamentoUsado = turma.departamentoTurma
             }
-
             return  indiceDistancias[sala.predio][departamentoUsado]
- 
         })
     })
 

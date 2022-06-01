@@ -15,7 +15,7 @@ const turmaSchema = new Schema({
     horarioInicio: {type:Number, required:true, trim:true},
     horarioFim: {type:Number, required:true, trim:true},
     alocadoChefia: {type:String, trim:true}, // tratar dados - trocar para boolean
-    creditosAula: {type:Number, required:true, trim:true},
+    creditosAula: {type:Number,  trim:true},
     docentes: {type:String,trim:true},
     ano:{type:Number,required:true},
     semestre:{type:Number, required:true}

@@ -6,6 +6,7 @@ import HomePage from "./components/pages/homepage.component";
 import PrediosList from "./components/pages/predios-list.component";
 import TurmasList from "./components/pages/turmas-list.component";
 import DistanciasMatriz from "./components/pages/distancias-matriz.component";
+import ConfigForm from "./components/pages/config-form.component"
 import Solver from "./components/pages/solver.component";
 import Agenda from "./components/pages/agenda.component";
 import Salas from "./components/pages/salas-list.component";
@@ -75,6 +76,7 @@ function App() {
                 <Route path="/solver" element={<Solver/>} />
                 <Route path="/agenda" element={<Agenda/>} />
                 <Route path="/predios/:predio" element={<Salas/>}/>
+                <Route path="/config" element={<ConfigForm/>}/>
               </Routes>
               </Container>
           </Box>

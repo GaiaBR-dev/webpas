@@ -7,7 +7,6 @@ const configTemp={
         'Manhã':{
             'Ínicio':['800','1000'],
             'Fim':['1000','1200']
-        
         },
         'Tarde':{
             'Ínicio':['1400','1600'],

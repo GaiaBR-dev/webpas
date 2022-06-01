@@ -3,13 +3,54 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const configSchema = new Schema({
-    horariosInicio: [{type:Number, required:true}],
-    horariosFim: [{type:Number, required:true}],
-    diasDaSemana:[{type:String, required:true }],
-    creditos:[{type:Number,required:true}],
-    manha:{type:Boolean,required:true},
-    tarde:{type:Boolean,required:true},
-    noite:{type:Boolean,required:true},
+    horarios:{
+        "Manhã":{
+            type:{
+                "Ínicio":{
+                    slot1:{type:String,required:true},
+                    slot2:{type:String,required:true},
+                },
+                "Fim":{
+                    slot1:{type:String,required:true},
+                    slot2:{type:String,required:true},
+                }
+            },
+            required:false
+        },"Tarde":{
+            type:{
+                "Ínicio":{
+                    slot1:{type:String,required:true},
+                    slot2:{type:String,required:true},
+                },
+                "Fim":{
+                    slot1:{type:String,required:true},
+                    slot2:{type:String,required:true},
+                }
+            },
+            required:false
+        },"Noite":{
+            type:{
+                "Ínicio":{
+                    slot1:{type:String,required:true},
+                    slot2:{type:String,required:true},
+                },
+                "Fim":{
+                    slot1:{type:String,required:true},
+                    slot2:{type:String,required:true},
+                }
+            },
+            required:false
+        }
+    },
+    dias:[String],
+    periodos:[String],
+    usuario:{
+        type:String,
+        required:true,
+        index:true,
+        unique:true
+    }
+
 })
 
 const Config = mongoose.model('Config',configSchema)

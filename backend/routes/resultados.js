@@ -10,6 +10,23 @@ router.route('/').get((req,res)=>{
         .catch(err => res.status(400).json('Error: '+ err))
 })
 
+router.route('/:ano/:semestre').get((req,res)=>{
+    Resultado.find({ano:req.params.ano,semestre:req.params.semestre})
+        .then(resultados=>res.json(resultados))
+        .catch(err => res.status(400).json(err))
+})
+
+router.route('/:ano/:semestre/:dia/:periodo').get((req,res)=>{
+    Resultado.find({
+        ano:req.params.ano,
+        semestre:req.params.semestre,
+        dia:req.params.dia,
+        periodo:req.params.periodo
+    })
+        .then(resultados=>res.json(resultados))
+        .catch(err => res.status(400).json(err))
+})
+
 router.route('/diaperiodo').post(async (req, res) => {
     const ano = req.body.ano
     const semestre = req.body.semestre
@@ -70,8 +87,6 @@ router.route('/calculalista').post(async (req, res) => {
         }else if (produto.result.status == 5){
             resultObj[unidade.dia][unidade.periodo] = true;
         }
-        console.log(produto)
-
 
         return Resultado.findOneAndUpdate({
             ano:ano,

@@ -123,24 +123,27 @@ const Solver = props =>{
         if(isNaN(delta)){
             setErroDelta("Este campo deve conter um número")
         }else{
-            setErroDelta('')
-            setWorking(true)
-            const lista = criarLista(configTemp)
-            let data = {
-                ano: ano,
-                semestre:semestre,
-                delta:delta,
-                lista:lista
-            }
-            ResultadosDataService.calculaLista(data)
-                .then(res=>{
-                    setWorking(false)
-                    setExecutado(true)
-                   setResultObj(res.data)
-                   console.log(resultObj)
+            if (!temTodos){
 
-                })
-                .catch(err=>console.log(err))
+            }else{
+                setErroDelta('')
+                setWorking(true)
+                const lista = criarLista(configTemp)
+                let data = {
+                    ano: ano,
+                    semestre:semestre,
+                    delta:delta,
+                    lista:lista
+                }
+                ResultadosDataService.calculaLista(data)
+                    .then(res=>{
+                        setWorking(false)
+                        setExecutado(true)
+                        setResultObj(res.data)
+                        console.log(resultObj)
+                    })
+                    .catch(err=>console.log(err))
+            }
         }
     }
 
@@ -233,7 +236,7 @@ const Solver = props =>{
                                                     {working && dispCheckBoxList[dia][periodo] ?(
                                                         <CircularProgress size={16}/>
                                                     ):(
-                                                       executado && dispCheckBoxList[dia][periodo] ?(
+                                                        executado && dispCheckBoxList[dia][periodo] ?(
                                                             resultObj[dia]?(
                                                                 resultObj[dia][periodo]?(
                                                                     <DoneIcon color="success"/>

@@ -19,6 +19,7 @@ import HomeWorkIcon from '@mui/icons-material/HomeWork';
 import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
 import CalculateIcon from '@mui/icons-material/Calculate';
 import DateRangeIcon from '@mui/icons-material/DateRange';
+import SettingsIcon from '@mui/icons-material/Settings';
 import {
     Link as RouterLink,
     Route,
@@ -170,6 +171,7 @@ export default function MiniDrawer() {
             <ListItemLink to="/distancias" primary="Distâncias" icon={<DirectionsWalkIcon/>} />
             <ListItemLink to="/solver" primary="Resolver" icon={<CalculateIcon/>} />
             <ListItemLink to="/agenda" primary="Resultado" icon={<DateRangeIcon/>} />
+            <ListItemLink to="/config" primary="Configurações" icon={<SettingsIcon/>} />
         </List>
       </Drawer>
 
