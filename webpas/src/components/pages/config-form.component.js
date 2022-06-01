@@ -2,6 +2,7 @@ import React, {Component, useState} from "react";
 import PageHeader from '../page-header.component';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { Box, Paper, Grid, Typography, FormGroup, FormControlLabel, Checkbox, Divider, TextField, Button } from "@mui/material";
+import ConfigsDataService from '../../services/configs'
 
 const dias = ['Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo']
 const periodos = ['Manhã','Tarde','Noite']
@@ -78,7 +79,33 @@ const ConfigForm = props =>{
     }
 
     const handleBT = e =>{
-        console.log(horariosObj)
+        let config = {}
+        config.dias = []
+        dias.map((dia,indexD)=>{
+            if(diasCBList[indexD]){
+                config.dias.push(dia)
+            }
+        })
+        config.periodos = []
+        periodos.map((periodo,indexP)=>{
+            if(periodosCBList[indexP]){
+                config.periodos.push(periodo)
+            }
+        })
+        config.horarios = {}
+        periodos.map((periodo,indexP)=>{
+            if(periodosCBList[indexP]){
+                config.horarios[periodo] = horariosObj[periodo]
+            }
+        })
+
+        config.usuario = "Eu"
+        let data = {...config}
+        ConfigsDataService.addConfig(data)
+            .then(res=>console.log(res.data))
+            .catch(err=>console.log(err))
+
+
     }
 
     return(
