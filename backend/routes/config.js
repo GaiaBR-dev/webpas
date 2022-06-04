@@ -7,6 +7,12 @@ router.route('/').get((req,res)=>{// procurar por usuario
         .catch(err => res.status(400).json(err) )        
 })
 
+router.route('/user/:user').get((req,res)=>{// procurar por usuario
+    Config.find({usuario:req.params.user})
+        .then(config => res.json(config[0]))
+        .catch(err => res.status(400).json(err) )        
+})
+
 router.route('/newConfig').post((req,res)=>{ //Procurar config por usuário, se existir impedir novas configs
     const horarios = req.body.horarios
     const dias = req.body.dias
@@ -18,7 +24,7 @@ router.route('/newConfig').post((req,res)=>{ //Procurar config por usuário, se 
             if(configs.length>0){
                 res.status(400).json('Usuario ja existe')
             }else{
-                novaConfig = new Config({
+                const novaConfig = new Config({
                     horarios,
                     dias,
                     periodos,
@@ -26,7 +32,7 @@ router.route('/newConfig').post((req,res)=>{ //Procurar config por usuário, se 
                 })
 
                 novaConfig.save()
-                    .then(res=>res.json('Configuração Adicionada'))
+                    .then(()=>res.json('Configuração Adicionada'))
                     .catch(err=>{
                         console.log(err)
                         res.status(400).json(err)})

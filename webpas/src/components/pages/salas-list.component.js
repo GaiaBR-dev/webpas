@@ -20,6 +20,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Link as RouterLink } from 'react-router-dom';
 import { Checkbox } from "@mui/material";
 import FileFormSalas from "../forms/fileFormSala.component";
+import ConfigsDataService from '../../services/configs'
 
 const headCells =[
     {id:'actions',label:"Ações", disableSorting:true},
@@ -51,15 +52,11 @@ const tableStyle ={
     }
 }
 
-const configTemp={
-    dias:['Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
-    periodos:['Manhã','Tarde','Noite']
-}
-
 const Salas = ()=>{
     let params = useParams()
     const [salas,setSalas]=useState([])
     const [salaEdit,setSalaEdit] = useState(null)
+    const [config,setConfig] = useState({dias:[],periodos:[]});
     const [openModalForm, setOpenModalForm] = useState(false);
     const [openModalFile, setOpenModalFile] = useState(false);
     const [updatingS,setUpdatingS] = useState(false)
@@ -68,10 +65,19 @@ const Salas = ()=>{
     const [confirmDialog,setConfirmDialog] = useState({isOpen:false,title:'',subtitle:''})
     const [selected, setSelected] = React.useState([]);
 
+    useEffect(()=>{
+        retornaConfig()
+    }, [])
+
+    useEffect(()=>{
+        getSalas(params.predio)
+    },[params.predios,notify])
+
     const handleCloseModalForm = () => {
         setOpenModalForm(false)
         setSelected([])
     };
+
     const handleOpenModalFile = () => setOpenModalFile(true);
     const handleCloseModalFile = () => setOpenModalFile(false);
 
@@ -82,9 +88,11 @@ const Salas = ()=>{
             }).catch(err => console.log(err))
     }
 
-    useEffect(()=>{
-        getSalas(params.predio)
-    },[params.predios,notify])
+    const retornaConfig = () =>{
+        ConfigsDataService.getConfigByUser('Eu') // mudar para usuario
+            .then(res=> setConfig(res.data))
+            .catch(err=>console.log(err))
+    }
 
     const openInModalEdit = sala =>{
         setUpdatingS(true)
@@ -213,7 +221,7 @@ const Salas = ()=>{
                 <FileFormSalas
                     title="Adicionar Arquivo"
                     closeButton={handleCloseModalFile}
-                    config={configTemp}
+                    config={config}
                     handleResponse={fileHandleResponse}
                 />
             </Modal>
@@ -227,7 +235,7 @@ const Salas = ()=>{
                     aria-describedby="modal-modal-description"
                 ><DialogContent >
                     <SalaForm
-                        config={configTemp}
+                        config={config}
                         predio={params.predio}
                         addOrEdit={addOrEdit}
                         salaEdit = {salaEdit}
@@ -317,7 +325,7 @@ const Salas = ()=>{
                         {recordsAfterPagingAndSorting().map((sala,index)=>{
                             const isItemSelected = isSelected(sala._id);
                             const labelId = `salas-table-checkbox-${index}`;
-                            const totalDisp = configTemp.dias.length*configTemp.periodos.length
+                            const totalDisp = config.dias.length*config.periodos.length
                             let dispCount = 0
                             let disponibilidade = ''
                             sala.disponibilidade.map(obj=>{

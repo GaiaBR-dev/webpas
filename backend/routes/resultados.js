@@ -73,7 +73,7 @@ router.route('/calculalista').post(async (req, res) => {
     const semestre = req.body.semestre
     const delta = req.body.delta
     const lista = req.body.lista
-
+    
     let resultObj = {}
 
     const listaDePromises = lista.map(async (unidade)=>{
@@ -118,30 +118,7 @@ router.route('/:id').delete((req,res)=>{
 })
 
 router.route('/update/:id').post((req,res)=>{
-    Resultado.findById(req.params.id)
-        .then(resultado=> {
 
-            resultado.ano = req.body.ano
-            resultado.semestre = req.body.semestre
-            resultado.diaDaSemana = req.body.diaDaSemana
-            resultado.periodo = req.body.periodo
-            resultado.alocacoes = [{
-                turma: req.body.alocacoes.turma,
-                predio:{
-                    nome: req.body.alocacoes.predio.nome,
-                    sala:{
-                        numero:req.body.alocacoes.predio.sala.numero
-                    }
-                },
-                horarioInicio: req.body.alocacoes.horarioInicio,
-                horarioFim: req.body.alocacoes.horarioFim
-            }]
-
-            resultado.save()
-                .then(()=> res.json('Resultado atualizado'))
-                .catch(err =>res.status(400).json('Error: '+err))
-        })
-        .catch(err => res.status(400).json('Error: '+ err))
 })
 
 module.exports = router

@@ -20,14 +20,6 @@ import ConfirmDialog from "../confirmDialog.component";
 import handleServerResponses from "../../services/response-handler";
 import { Checkbox } from "@mui/material";
 
-const configTemp={
-    horarios:[800,1000,1200,1400,1600,1800,1900,2100,2300],
-    dias:['Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
-    creditos:[10,6,5,4,3,2,1,0],
-    anos:[2019,2020,2021,2022,2023],
-    semestres:[1,2]
-}
-
 const tableRowCss ={
     '& .MuiTableCell-root':{
         padding:1,
@@ -62,20 +54,34 @@ const headCells =[
     
 ]
 
-const thisYear =  2019//new Date().getFullYear()
+const thisYear =  new Date().getFullYear()
 
 const TurmasList = props =>{
+    const {config} = props
+
     const [turmas,setTurmas] = useState([]);
     const [openModalForm, setOpenModalForm] = React.useState(false);
     const [openModalFile, setOpenModalFile] = React.useState(false);
+    const [horariosInicio,setHorariosInicio] = useState([]);
+    const [horariosFim,setHorariosFim] = useState([]);
     const [turmaEdit,setTurmaEdit] = useState(null)
     const [updatingT,setUpdatingT] = useState(false)
     const [filterFn,setFilterFn] = useState({fn:items=>{return items;}})
+    const [anos,setAnos] = useState([]);
     const [anoTable,setAnoTable] = useState(thisYear)
     const [semestreTable,setSemestreTable] = useState(1)
     const [notify,setNotify] = useState({isOpen:false,message:'',type:''})
     const [confirmDialog,setConfirmDialog] = useState({isOpen:false,title:'',subtitle:''})
     const [selected, setSelected] = React.useState([]);
+
+    useEffect(()=>{
+        retornaAnos()
+        retornaHorarios()
+    },[])
+
+    useEffect(()=>{
+        retornaTurmas(anoTable,semestreTable)
+    }, [anoTable,semestreTable,notify])
 
     const handleCloseModalForm = () => {
         setOpenModalForm(false)
@@ -83,10 +89,6 @@ const TurmasList = props =>{
     };
     const handleOpenModalFile = () => setOpenModalFile(true);
     const handleCloseModalFile = () => setOpenModalFile(false);
-
-    useEffect(()=>{
-        retornaTurmas(anoTable,semestreTable)
-    }, [anoTable,semestreTable,notify])
 
     const retornaTurmas = (ano,semestre) =>{
         TurmasDataService.getByAnoSemestre(ano,semestre)
@@ -102,6 +104,33 @@ const TurmasList = props =>{
 
     const handleSemestreTableSelect = e =>{
         setSemestreTable(e.target.value)
+    }
+
+    const retornaHorarios = () =>{
+        let periodos = config.periodos ? config.periodos : []
+        if(config.horarios){
+            let horariosI = []
+            let horariosF = []
+            periodos.map((periodo)=>{
+                horariosI.push(config.horarios[periodo]['Ínicio'].slot1)
+                horariosI.push(config.horarios[periodo]['Ínicio'].slot2)
+                horariosF.push(config.horarios[periodo]['Fim'].slot1)
+                horariosF.push(config.horarios[periodo]['Fim'].slot2)
+            })
+            setHorariosInicio(horariosI)
+            setHorariosFim(horariosF)
+        }
+    }
+
+    const retornaAnos = () =>{
+        const anoAtual = new Date().getFullYear()
+        const firstYear = anoAtual - 4
+        let anos = []
+        for(let i=0;i<6;i++){
+            let anoA = firstYear + i
+            anos.push(anoA)
+        }
+        setAnos(anos)
     }
 
     const handleSearch = e =>{
@@ -238,8 +267,8 @@ const TurmasList = props =>{
                     <FileFormTurma
                         title="Adicionar Arquivo"
                         closeButton={handleCloseModalFile}
-                        anos={configTemp.anos}
-                        config={configTemp}
+                        anos={anos}
+                        config={config}
                         handleResponse={fileHandleResponse}
                     />
                 </Modal>
@@ -255,10 +284,10 @@ const TurmasList = props =>{
                         addOrEdit={addOrEdit}
                         turmaEdit = {turmaEdit}
                         updating={updatingT}
-                        dias={configTemp.dias}
-                        horarios={configTemp.horarios}
-                        creditos={configTemp.creditos}
-                        anos={configTemp.anos}
+                        dias={config.dias}
+                        horariosInicio={horariosInicio}
+                        horariosFim={horariosFim}
+                        anos={anos}
                         closeModalForm ={handleCloseModalForm}
                     /></DialogContent>
                 </Dialog>
@@ -305,7 +334,7 @@ const TurmasList = props =>{
                             label="Ano"
                             value={anoTable}
                             onChange={handleAnoTableSelect}
-                            options ={configTemp.anos}
+                            options ={anos}
                         />  
                     </Grid>
                     <Grid item xs={6} sm={2}>
@@ -313,7 +342,7 @@ const TurmasList = props =>{
                             label="Semestre"
                             value={semestreTable}
                             onChange={handleSemestreTableSelect}
-                            options ={configTemp.semestres}
+                            options ={[1,2]}
                         
                         />
                     </Grid>

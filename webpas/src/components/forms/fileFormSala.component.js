@@ -87,7 +87,7 @@ const FileFormSalas = (props) =>{
         reader.readAsArrayBuffer(file);
     }
 
-    const{title, closeButton,anos,  config, handleResponse } = props
+    const{title, closeButton, config, handleResponse} = props
     
     return (
         <Box component="form" sx = {modalStyleFile}>

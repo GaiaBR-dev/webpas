@@ -16,18 +16,6 @@ const arrayUnique = array => {
     return a;
 }
 
-router.route('/teste/t').get((req,res)=>{
-    let strId = '030'
-    let missing = 12 - strId.length
-    for(let i=0;i<missing;i++){
-            strId = strId + "0"
-    }
-
-    var id = new mongoose.Types.ObjectId(strId)
-    
-    res.send(id)
-})
-
 router.route('/').get((req,res)=>{
     Distancia.find()
         .then(distancias => res.json(distancias))

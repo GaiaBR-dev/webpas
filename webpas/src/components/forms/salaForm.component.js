@@ -8,7 +8,6 @@ import { IconButton } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 import { Checkbox } from "@mui/material";
 
-
 const inicialValues ={
     numeroSala: '',
     capacidade: '',

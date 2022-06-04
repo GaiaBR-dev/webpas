@@ -23,15 +23,12 @@ import { Dialog, DialogContent } from "@mui/material";
 import handleServerResponses from "../../services/response-handler";
 import Mensagem from "../mensagem.component";
 import FileFormSalas from "../forms/fileFormSala.component";
-
-const configTemp={
-    dias:['Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
-    periodos:['Manhã','Tarde','Noite']
-}
+import ConfigsDataService from '../../services/configs'
 
 const PrediosList = props =>{
-    const [predios,setPredios] = React.useState([])
-    const [predioEdit,setPredioEdit] = React.useState([])
+    const [predios,setPredios] = React.useState([]);
+    const [predioEdit,setPredioEdit] = React.useState([]);
+    const [config,setConfig] = useState({dias:[],periodos:[]});
     const [numeroSalas,setNumeroSalas] = useState([])
     const [openModalForm, setOpenModalForm] = useState(false);
     const [openModalFormEdit, setOpenModalFormEdit] = useState(false);
@@ -44,6 +41,10 @@ const PrediosList = props =>{
     const handleCloseModalFormEdit = () => setOpenModalFormEdit(false);
     const handleOpenModalFile = () => setOpenModalFile(true);
     const handleCloseModalFile = () => setOpenModalFile(false);
+
+    useEffect(()=>{
+        retornaConfig()
+    }, [])
 
     useEffect(()=>{
         if (predios.length > 0) {
@@ -90,6 +91,12 @@ const PrediosList = props =>{
     const openInModalEdit = predio =>{
         setPredioEdit(predio)
         setOpenModalFormEdit(true)
+    }
+
+    const retornaConfig = () =>{
+        ConfigsDataService.getConfigByUser('Eu') // mudar para usuario
+            .then(res=> setConfig(res.data))
+            .catch(err=>console.log(err))
     }
 
     const add = (values,disponibilidade,resetForm) =>{
@@ -169,7 +176,7 @@ const PrediosList = props =>{
                 <FileFormSalas
                     title="Adicionar Arquivo"
                     closeButton={handleCloseModalFile}
-                    config={configTemp}
+                    config={config}
                     handleResponse={fileHandleResponse}
                 />
             </Modal>
@@ -236,7 +243,7 @@ const PrediosList = props =>{
                     ><DialogContent >
                         <PredioForm
                             add ={add}
-                            config={configTemp}
+                            config={config}
                             closeModalForm ={handleCloseModalForm}
                         /></DialogContent>
                     </Dialog>

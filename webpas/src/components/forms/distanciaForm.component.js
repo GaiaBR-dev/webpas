@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import useForm from "./useForm";
-import { Button, Divider, FormControl, FormLabel, TextField } from "@mui/material";
+import { Button, Divider, TextField } from "@mui/material";
 import { Grid } from "@mui/material";
 import { Box } from "@mui/system";
 import { Typography } from "@mui/material";
@@ -23,8 +23,6 @@ const formCssClass ={
         }
     }
 }
-
-
 
 const DistanciaForm = props =>{
     const {closeModalForm, updating,addOrEdit,distanciaEdit,predios,departamentos, tableObjs} = props

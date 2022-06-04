@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import {BrowserRouter, Routes, Route} from "react-router-dom";
 import { styled } from '@mui/material/styles';
 import Navbar from "./components/navbar.component";
@@ -15,6 +15,7 @@ import { CssBaseline } from "@mui/material";
 import { Box, minWidth } from "@mui/system";
 import { createTheme } from '@mui/material/styles';
 import { ThemeProvider } from "@emotion/react";
+import ConfigsDataService from './services/configs'
 
 const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -58,6 +59,17 @@ const containerStyle = {
 }
 
 function App() {
+  const [config,setConfig] = useState({dias:[],periodos:[]})
+  useEffect(()=>{
+    retornaConfig()
+  },[])
+
+  const retornaConfig = () =>{
+    ConfigsDataService.getConfigByUser('Eu') // mudar para usuario
+        .then(res=> setConfig(res.data))
+        .catch(err=>console.log(err))
+  } 
+
     return (
 
       <ThemeProvider theme={theme}>
@@ -71,9 +83,9 @@ function App() {
               <Routes>
                 <Route path="/" element={<HomePage/>} />  
                 <Route path="/predios" element={<PrediosList/>} />
-                <Route path="/turmas" element={<TurmasList/>} />
+                <Route path="/turmas" element={<TurmasList config={config}/>} />
                 <Route path="/distancias" element={<DistanciasMatriz/>} />
-                <Route path="/solver" element={<Solver/>} />
+                <Route path="/solver" element={<Solver config={config}/>} />
                 <Route path="/agenda" element={<Agenda/>} />
                 <Route path="/predios/:predio" element={<Salas/>}/>
                 <Route path="/config" element={<ConfigForm/>}/>

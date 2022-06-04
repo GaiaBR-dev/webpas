@@ -1,5 +1,4 @@
-import React, {Component, useState, useEffect} from "react";
-import { Link } from "react-router-dom";
+import React, {useState, useEffect} from "react";
 import PageHeader from "../page-header.component";
 import CalculateIcon from '@mui/icons-material/Calculate';
 import { Paper, Typography, Grid, Box } from "@mui/material";
@@ -13,21 +12,21 @@ import { Checkbox } from "@mui/material";
 import { CircularProgress } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 import ResultadosDataService from "../../services/resultados"
-import { Button, Divider, FormControl, FormLabel, FormControlLabel, TextField} from "@mui/material";
+import { Button, FormControl, FormLabel, FormControlLabel, TextField} from "@mui/material";
+import ConfigsDataService from '../../services/configs'
 
-const thisYear =  2019//new Date().getFullYear()
+const thisYear = new Date().getFullYear()
 
-const configTemp={
-    horarios:[800,1000,1200,1400,1600,1800,1900,2100,2300],
-    dias:['Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
-    creditos:[10,6,5,4,3,2,1,0],
-    anos:[2019,2020,2021,2022,2023],
-    semestres:[1,2],
-    periodos:['Manhã','Tarde','Noite']
+const configTemp = {
+    dias: ['Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo'],
+    periodos: ['Manhã','Tarde','Noite']
 }
 
 const Solver = props =>{
+    const {config} = props
+
     const [ano,setAno] = useState(thisYear);
+    const [anos,setAnos] = useState([]);
     const [semestre,setSemestre] = useState(1);
     const [temTodos,setTemTodos] = useState(true);
     const [selectAll,setSelectAll] = useState(false);
@@ -36,7 +35,7 @@ const Solver = props =>{
     const [working,setWorking] = useState(false);
     const [executado,setExecutado] = useState(false);
     const [resultObj,setResultObj] = useState({});
-    const [dispCheckBoxList,setDispCheckBoxList] = useState(() =>{
+    const [dispCheckBoxList,setDispCheckBoxList] = useState(()=>{
         let result = {}
         configTemp.dias.map(dia=>{
             result[dia] = {}
@@ -49,7 +48,19 @@ const Solver = props =>{
 
     useEffect(()=>{
         retornaTemTodos()
+        retornaAnos()
     }, [])
+
+    const retornaAnos = () =>{
+        const anoAtual = new Date().getFullYear()
+        const firstYear = anoAtual - 4
+        let anos = []
+        for(let i=0;i<6;i++){
+            let anoA = firstYear + i
+            anos.push(anoA)
+        }
+        setAnos(anos)
+    }
 
     const handleCheckBox = e =>{
         const {name} = e.target
@@ -69,9 +80,9 @@ const Solver = props =>{
 
     const handleSelectAll = e =>{
         let result = {}
-        configTemp.dias.map(dia=>{
+        config.dias.map(dia=>{
             result[dia] = {}
-            configTemp.periodos.map(periodo=>{
+            config.periodos.map(periodo=>{
                 result[dia][periodo] = !selectAll
             })
         })
@@ -80,7 +91,7 @@ const Solver = props =>{
         setExecutado(false)
     }
 
-    const criarLista = config =>{
+    const criarLista = () =>{
         let lista = []
         config.dias.map(dia=>{
             config.periodos.map(periodo=>{
@@ -128,7 +139,7 @@ const Solver = props =>{
             }else{
                 setErroDelta('')
                 setWorking(true)
-                const lista = criarLista(configTemp)
+                const lista = criarLista()
                 let data = {
                     ano: ano,
                     semestre:semestre,
@@ -175,7 +186,7 @@ const Solver = props =>{
                         label="Ano"
                         value={ano}
                         onChange={handleAnoSelect}
-                        options ={configTemp.anos}
+                        options ={anos}
                     />  
                 </Grid>
                 <Grid item xs={3} >
@@ -183,7 +194,7 @@ const Solver = props =>{
                         label="Semestre"
                         value={semestre}
                         onChange={handleSemestreSelect}
-                        options ={configTemp.semestres}
+                        options ={[1,2]}
                     />
                 </Grid>
                 <Grid item xs={13}></Grid>
@@ -202,13 +213,10 @@ const Solver = props =>{
                     <Typography fontSize={'1.1rem'} fontWeight={'405'}> Escolher dias e períodos</Typography>
                 </Grid>
                 <Grid item xs={20}></Grid>
-                
-
-                
                 <Grid item xs ={4}></Grid>
                 
                 {
-                    configTemp.periodos.map((periodo,index)=>{
+                    config.periodos.map((periodo,index)=>{
                         return(
                             <Grid item xs={4} key={index}><Typography fontWeight={450}>{periodo}</Typography></Grid>
                         )
@@ -216,13 +224,13 @@ const Solver = props =>{
                 }
 
                 {
-                    configTemp.dias.map((dia,index)=>{
+                    config.dias.map((dia,index)=>{
                         return(
                             <Grid item xs ={20} key={index}>
                                 <FormControl  sx={{width:'100%'}}>
                                 <Grid container columnSpacing={3} alignItems="center"  justifyContent="flex-start">
                                     <Grid item xs={4}><FormLabel fontWeight={450}>{dia}</FormLabel></Grid>
-                                    {configTemp.periodos.map((periodo,indexp)=>{
+                                    {config.periodos.map((periodo,indexp)=>{
                                         return(
                                             <>
                                                 <Grid item xs={1} key={indexp} alignContent="center"> 

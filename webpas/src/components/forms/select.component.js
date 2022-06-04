@@ -1,7 +1,7 @@
 import { FormControl, FormHelperText, InputLabel , MenuItem, Select as MuiSelect} from "@mui/material";
 import React from "react";
 
-export default function Select(props){
+const Select = (props) =>{
     const  {name, label, value, onChange, options ,error = null} = props
 
     return(
@@ -28,3 +28,5 @@ export default function Select(props){
         </FormControl>
     )
 }
+
+export default Select;

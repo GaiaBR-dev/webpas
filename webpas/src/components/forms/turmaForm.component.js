@@ -36,7 +36,7 @@ const formCssClass ={
 }
 
 const TurmaForm = props =>{
-    const {dias,horarios,anos, closeModalForm, updating,addOrEdit,turmaEdit} = props
+    const {dias, horariosInicio, horariosFim, anos, closeModalForm, updating,addOrEdit,turmaEdit} = props
     const [formTitle,setFormTitle] = useState('Adicionar turma')
 
     const handleFormTitle = updatingT =>{
@@ -221,7 +221,7 @@ const TurmaForm = props =>{
                         label="Horário de Ínicio*"
                         value={values.horarioInicio}
                         onChange={handleInputChange}
-                        options ={horarios}
+                        options ={horariosInicio}
                         error={erros.horarioInicio}
                     />
                 </Grid>
@@ -231,7 +231,7 @@ const TurmaForm = props =>{
                         label="Horário de Término*"
                         value={values.horarioFim}
                         onChange={handleInputChange}
-                        options ={horarios}
+                        options ={horariosFim}
                         error={erros.horarioFim}
                     />
                 </Grid>

@@ -66,16 +66,33 @@ const ConfigForm = props =>{
         let periodo = name.slice(0,name.search("-"))
         let horario = name.slice(name.search("-")+1,name.search("_"))
         let slot = name.slice(name.search("_")+1)
-        setHorariosObj({
-            ...horariosObj,
-            [periodo]:{
-                ...horariosObj[periodo],
-                [horario]:{
-                    ...horariosObj[periodo][horario],
-                    [slot]:value
+        
+        if(horario == "Ínicio" && slot == "slot2"){
+            setHorariosObj({
+                ...horariosObj,
+                [periodo]:{
+                    ...horariosObj[periodo],
+                    ["Fim"]:{
+                        ...horariosObj[periodo]["Fim"],
+                        ['slot1']:value
+                    },[horario]:{
+                        ...horariosObj[periodo][horario],
+                        [slot]:value
+                    }
                 }
-            }
-        })
+            })
+        }else{
+            setHorariosObj({
+                ...horariosObj,
+                [periodo]:{
+                    ...horariosObj[periodo],
+                    [horario]:{
+                        ...horariosObj[periodo][horario],
+                        [slot]:value
+                    }
+                }
+            })
+        }
     }
 
     const handleBT = e =>{
@@ -193,7 +210,7 @@ const ConfigForm = props =>{
                                         label="Slot1"
                                         name = "Manhã-Fim_slot1"
                                         onChange={handleHorariosChange}
-                                        value ={horariosObj['Manhã']['Ínicio'].slot2}
+                                        value ={horariosObj['Manhã']['Fim'].slot1}
                                     />
                                 </Grid>
                                 <Grid item xs={3}>
@@ -245,7 +262,7 @@ const ConfigForm = props =>{
                                         label="Slot1"
                                         name = "Tarde-Fim_slot1"
                                         onChange={handleHorariosChange}
-                                        value ={horariosObj['Tarde']['Ínicio'].slot2}
+                                        value ={horariosObj['Tarde']['Fim'].slot1}
                                     />
                                 </Grid>
                                 <Grid item xs={3}>

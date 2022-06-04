@@ -1,19 +1,16 @@
 import React, {Component, useState, useEffect} from "react";
-import { Link } from "react-router-dom";
 import PageHeader from "../page-header.component";
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import {Grid,Toolbar,Button, TextField, Paper, Box} from "@mui/material";
+import ConfigsDataService from '../../services/configs'
 import Select from "../forms/select.component";
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import InputAdornment from '@mui/material/InputAdornment';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import HelpIcon from '@mui/icons-material/Help';
 import { IconButton } from "@mui/material";
 import { Tab,Tabs, Typography } from "@mui/material";
 import PropTypes from 'prop-types';
-
-const thisYear =  2019//new Date().getFullYear()
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -48,35 +45,93 @@ function TabPanel(props) {
     };
 }
 
-const configTemp={
-    horarios:[800,1000,1200,1400,1600,1800,1900,2100,2300],
-    horariosInicio:[800,1000,1400,1600,1900,2100],
-    dias:['Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
-    creditos:[10,6,5,4,3,2,1,0],
-    anos:[2019,2020,2021,2022,2023],
-    semestres:[1,2],
-    periodos:['Manhã','Tarde','Noite']
-}
+const thisYear = new Date().getFullYear()
 
 const Agenda = props =>{
     const [ano,setAno] = useState(thisYear);
+    const [anos,setAnos] = useState([]);
+    const [config,setConfig] = useState({dias:[],periodos:[]});
+    const [horariosInicio,setHorariosInicio] = useState([]);
+    const [periodo,setPeriodo]= useState('');
     const [semestre,setSemestre] = useState(1);
-    const [dia,setDia] = useState(configTemp.dias[0]);
-    const [horario,setHorario] = useState(configTemp.horariosInicio[0]);
+    const [dia,setDia] = useState('Segunda');
+    const [horario,setHorario] = useState(0);
     const [tabValue, setTabValue] = useState(0);
     const [resultados, setResultados] = useState([]);
     const [tabValueX, setTabValueX] = useState(0);
     const [tabHorarioValue, setTabHorarioValue] = useState(0);
 
     useEffect(()=>{
-        console.log('dia : ' + dia)
-        console.log('horario : ' + horario)
-    }, [ano,semestre])
+        retornaAnos()
+        retornaConfig()
+    }, [])
+
+    useEffect(()=>{
+        retornaHorariosInicio()
+    },[config])
+
+    useEffect(()=>{
+        setHorario(horariosInicio[0])
+    },[horariosInicio])
+
+    useEffect(()=>{
+        setPeriodo(getPeriodoByHorario(horario))
+    },[horario])
 
     const handleTabChange = (event, newValue) => {
         setTabValue(newValue);
-        setDia(configTemp.dias[newValue])
+        setDia(config.dias[newValue])
     };
+
+    const getPeriodoByHorario = horario =>{
+        let periodo = ''
+        if(config.horarios){
+            if(horario == config.horarios['Manhã']['Ínicio'].slot1 ||
+                horario == config.horarios['Manhã']['Ínicio'].slot2
+            ){
+                periodo = 'Manhã'
+            }else if(horario == config.horarios['Tarde']['Ínicio'].slot1 ||
+            horario == config.horarios['Tarde']['Ínicio'].slot2
+            ){
+                periodo = 'Tarde'
+            }else if(horario == config.horarios['Noite']['Ínicio'].slot1 ||
+            horario == config.horarios['Noite']['Ínicio'].slot2
+            ){
+                periodo = 'Noite'
+            }
+            console.log(periodo)
+            return periodo
+        }
+    }
+
+    const retornaAnos = () =>{
+        const anoAtual = new Date().getFullYear()
+        const firstYear = anoAtual - 4
+        let anos = []
+        for(let i=0;i<6;i++){
+            let anoA = firstYear + i
+            anos.push(anoA)
+        }
+        setAnos(anos)
+    }
+
+    const retornaConfig = () =>{
+        ConfigsDataService.getConfigByUser('Eu') // mudar para usuario
+            .then(res=> setConfig(res.data))
+            .catch(err=>console.log(err))
+    }
+
+    const retornaHorariosInicio = () =>{
+        let periodos = config.periodos ? config.periodos : []
+        if(config.horarios){
+            let horariosI = []
+            periodos.map((periodo)=>{
+                horariosI.push(config.horarios[periodo]['Ínicio'].slot1)
+                horariosI.push(config.horarios[periodo]['Ínicio'].slot2)
+            })
+            setHorariosInicio(horariosI)
+        }
+    }
 
     const handleTabXChange = (event, newValue) => {
         setTabValueX(newValue);
@@ -84,7 +139,8 @@ const Agenda = props =>{
 
     const handleTabHorarioChange = (event, newValue) => {
         setTabHorarioValue(newValue);
-        setHorario(configTemp.horariosInicio[newValue])
+        setHorario(horariosInicio[newValue])
+        
     };
 
     const handleAnoSelect = e =>{
@@ -143,7 +199,7 @@ const Agenda = props =>{
                                 label="Ano"
                                 value={ano}
                                 onChange={handleAnoSelect}
-                                options ={configTemp.anos}
+                                options ={anos}
                             />  
                         </Grid>
                         <Grid item xs={6} sm={2}>
@@ -151,7 +207,7 @@ const Agenda = props =>{
                                 label="Semestre"
                                 value={semestre}
                                 onChange={handleSemestreSelect}
-                                options ={configTemp.semestres}
+                                options ={[1,2]}
                             
                             />
                         </Grid>
@@ -172,7 +228,7 @@ const Agenda = props =>{
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                         <Tabs value={tabValue} onChange={handleTabChange} aria-label="aba de dias">
                             {
-                                configTemp.dias.map((dia,indexD)=>{
+                                config.dias.map((dia,indexD)=>{
                                     return(
                                         <Tab label={dia} {...a11yProps(indexD)} />
                                     )
@@ -181,12 +237,12 @@ const Agenda = props =>{
                         </Tabs>
                     </Box>
                     {
-                        configTemp.dias.map((dia,indexD)=>{
+                        config.dias.map((dia,indexD)=>{
                             return(
                                 <TabPanel value={tabValue} index={indexD}>
                                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                                         <Tabs value={tabHorarioValue} onChange={handleTabHorarioChange} aria-label="aba de dias">
-                                            {configTemp.horariosInicio.map((horario,indexH)=>{
+                                            {horariosInicio.map((horario,indexH)=>{
                                                 return(
                                                     <Tab label={horario} {...a11yProps(indexD+"_"+indexH)} />
                                                 )
@@ -219,8 +275,8 @@ const Agenda = props =>{
                                 aria-label="aba de dias"
                             >
                                 {
-                                    configTemp.dias.map((dia,indexD)=>{
-                                        return configTemp.horariosInicio.map((horario,indexH)=>{
+                                    config.dias.map((dia,indexD)=>{
+                                        return horariosInicio.map((horario,indexH)=>{
                                             return(
                                                 <Tab label={`${dia} ${horario}`} {...a11yProps("X" + indexD+"_"+indexH)} />
                                             )

@@ -1,28 +1,7 @@
 let Sala = require('./models/sala.model')
 let Turma = require('./models/turma.model')
 let Distancia = require('./models/distancia.model')
-
-const configTemp={
-    horarios:{
-        'Manhã':{
-            'Ínicio':['800','1000'],
-            'Fim':['1000','1200']
-        },
-        'Tarde':{
-            'Ínicio':['1400','1600'],
-            'Fim':['1600','1800']
-        },
-        'Noite':{
-            'Ínicio':['1900','2100'],
-            'Fim':['2100','2300']
-        }
-    },
-    dias:['Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
-    creditos:[10,6,5,4,3,2,1,0],
-    anos:[2019,2020,2021,2022,2023],
-    semestres:[1,2],
-    periodos:['Manhã','Tarde','Noite']
-}
+let Config = require('./models/config.model')
 
 async function dbtomodel(ano,semestre,periodo,diaDaSemana){
     
@@ -34,12 +13,14 @@ async function dbtomodel(ano,semestre,periodo,diaDaSemana){
         distancias: []
     }
 
-    let horarioInicioF1 = configTemp.horarios[periodo]['Ínicio'][0]
-    let horarioFimF1 = configTemp.horarios[periodo]['Fim'][0]
-    let horarioInicioF12 = configTemp.horarios[periodo]['Ínicio'][0]
-    let horarioFimF12 = configTemp.horarios[periodo]['Fim'][1]
-    let horarioInicioF2 = configTemp.horarios[periodo]['Ínicio'][1]
-    let horarioFimF2 = configTemp.horarios[periodo]['Fim'][1]
+    const config = await Config.find({usuario:"Eu"}) // Receber usuário como parametro para buscar config depois
+
+    let horarioInicioF1 = config[0].horarios[periodo]['Ínicio'].slot1
+    let horarioFimF1 = config[0].horarios[periodo]['Fim'].slot1
+    let horarioInicioF12 = config[0].horarios[periodo]['Ínicio'].slot1
+    let horarioFimF12 = config[0].horarios[periodo]['Fim'].slot2
+    let horarioInicioF2 = config[0].horarios[periodo]['Ínicio'].slot2
+    let horarioFimF2 = config[0].horarios[periodo]['Fim'].slot2
 
     modelo.turmasf1 = await Turma.find({
         ano:ano,
@@ -68,7 +49,6 @@ async function dbtomodel(ano,semestre,periodo,diaDaSemana){
         let dispArray = sala.disponibilidade
         dispArray.map(disp=>{
             if (disp.dia === diaDaSemana && disp.periodo === periodo && disp.disponivel == true){
-                
                 modelo.salas.push(sala)
             }
         })
