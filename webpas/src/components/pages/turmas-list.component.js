@@ -19,6 +19,7 @@ import Mensagem from "../mensagem.component";
 import ConfirmDialog from "../confirmDialog.component";
 import handleServerResponses from "../../services/response-handler";
 import { Checkbox } from "@mui/material";
+import AjudaTurma from "./help/ajuda-turma.component";
 
 const tableRowCss ={
     '& .MuiTableCell-root':{
@@ -62,6 +63,7 @@ const TurmasList = props =>{
     const [turmas,setTurmas] = useState([]);
     const [openModalForm, setOpenModalForm] = React.useState(false);
     const [openModalFile, setOpenModalFile] = React.useState(false);
+    const [openHelp, setOpenHelp] = useState(false);
     const [horariosInicio,setHorariosInicio] = useState([]);
     const [horariosFim,setHorariosFim] = useState([]);
     const [turmaEdit,setTurmaEdit] = useState(null)
@@ -89,6 +91,8 @@ const TurmasList = props =>{
     };
     const handleOpenModalFile = () => setOpenModalFile(true);
     const handleCloseModalFile = () => setOpenModalFile(false);
+    const handleCloseHelp = () => setOpenHelp(false);
+    const handleOpenHelp = () => setOpenHelp(true);
 
     const retornaTurmas = (ano,semestre) =>{
         TurmasDataService.getByAnoSemestre(ano,semestre)
@@ -291,6 +295,14 @@ const TurmasList = props =>{
                         closeModalForm ={handleCloseModalForm}
                     /></DialogContent>
                 </Dialog>
+                <Dialog
+                    open={openHelp}
+                    onClose={handleCloseHelp}
+                >
+                    <DialogContent>
+                        <AjudaTurma/>
+                    </DialogContent>
+                </Dialog>
                 <Toolbar>
                 <Grid container 
                     spacing={2} 
@@ -350,6 +362,7 @@ const TurmasList = props =>{
                         <IconButton
                             color="inherit"
                             edge="start"
+                            onClick={handleOpenHelp}
                         >
                             <HelpIcon />
                         </IconButton>

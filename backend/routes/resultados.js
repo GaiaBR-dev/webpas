@@ -20,7 +20,7 @@ router.route('/:ano/:semestre/:dia/:periodo').get((req,res)=>{
     Resultado.find({
         ano:req.params.ano,
         semestre:req.params.semestre,
-        dia:req.params.dia,
+        diaDaSemana:req.params.dia,
         periodo:req.params.periodo
     })
         .then(resultados=>res.json(resultados))

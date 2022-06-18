@@ -8,6 +8,7 @@ async function resolve(modelo,delta) {
     const turmasF2 =  modelo.turmasf2
     const salas = modelo.salas
     const delta1 = delta
+    const placeholder = 5000;
 
     const turmas = new Array().concat(turmasF1, turmasF12, turmasF2)
 
@@ -19,7 +20,7 @@ async function resolve(modelo,delta) {
             if ((turmasF1.includes(turma)||turmasF2.includes(turma)) && turma.departamentoTurma){
                 departamentoUsado = turma.departamentoTurma
             }
-            return  indiceDistancias[sala.predio][departamentoUsado]
+            return  indiceDistancias[sala.predio][departamentoUsado] ? indiceDistancias[sala.predio][departamentoUsado] : placeholder 
         })
     })
 

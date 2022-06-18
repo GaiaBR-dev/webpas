@@ -11,9 +11,10 @@ import DoneIcon from '@mui/icons-material/Done';
 import { Checkbox } from "@mui/material";
 import { CircularProgress } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
+import { Dialog, DialogContent } from "@mui/material";
+import AjudaSolver from './help/ajuda-solver.component'
 import ResultadosDataService from "../../services/resultados"
 import { Button, FormControl, FormLabel, FormControlLabel, TextField} from "@mui/material";
-import ConfigsDataService from '../../services/configs'
 
 const thisYear = new Date().getFullYear()
 
@@ -30,6 +31,7 @@ const Solver = props =>{
     const [semestre,setSemestre] = useState(1);
     const [temTodos,setTemTodos] = useState(true);
     const [selectAll,setSelectAll] = useState(false);
+    const [openHelp, setOpenHelp] = useState(false);
     const [delta,setDelta] = useState(0);
     const [erroDelta,setErroDelta] = useState('')
     const [working,setWorking] = useState(false);
@@ -50,6 +52,9 @@ const Solver = props =>{
         retornaTemTodos()
         retornaAnos()
     }, [])
+
+    const handleCloseHelp = () => setOpenHelp(false);
+    const handleOpenHelp = () => setOpenHelp(true);
 
     const retornaAnos = () =>{
         const anoAtual = new Date().getFullYear()
@@ -165,6 +170,14 @@ const Solver = props =>{
             subtitle="Execução do modelo de otimização"
             icon={<CalculateIcon/>}
         />
+        <Dialog
+            open={openHelp}
+            onClose={handleCloseHelp}
+        >
+            <DialogContent>
+                <AjudaSolver/>
+            </DialogContent>
+         </Dialog>
         <Paper>
             <Box padding={'30px'}>
             {temTodos ?(
@@ -202,6 +215,7 @@ const Solver = props =>{
                     <IconButton
                             color="inherit"
                             edge="start"
+                            onClick={handleOpenHelp}
                         >
                             <HelpIcon />
                         </IconButton>

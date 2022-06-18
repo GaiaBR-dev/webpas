@@ -2,11 +2,16 @@ import { FormControl, FormHelperText, InputLabel , MenuItem, Select as MuiSelect
 import React from "react";
 
 const Select = (props) =>{
-    const  {name, label, value, onChange, options ,error = null} = props
+    const  {name, label, value, onChange, options ,error, style = null} = props
+
+    const cssStyle= {
+        ...style,
+        width:'100%'
+    }
 
     return(
         <FormControl
-            sx={{width:'100%'}} 
+            sx={cssStyle} 
             variant='outlined'
             {...(error && {error:true})}
         >

@@ -1,16 +1,36 @@
 import React, {Component, useState, useEffect} from "react";
 import PageHeader from "../page-header.component";
 import DateRangeIcon from '@mui/icons-material/DateRange';
-import {Grid,Toolbar,Button, TextField, Paper, Box} from "@mui/material";
+import {Grid,Toolbar,Button, TextField, Paper, Box, TableContainer} from "@mui/material";
 import ConfigsDataService from '../../services/configs'
 import Select from "../forms/select.component";
-import AddIcon from '@mui/icons-material/Add';
+import CachedTwoToneIcon from '@mui/icons-material/CachedTwoTone';
 import SearchIcon from '@mui/icons-material/Search';
 import InputAdornment from '@mui/material/InputAdornment';
 import HelpIcon from '@mui/icons-material/Help';
 import { IconButton } from "@mui/material";
 import { Tab,Tabs, Typography } from "@mui/material";
 import PropTypes from 'prop-types';
+import AgendaResultado from './agenda-resultado.component';
+import FileDownloadTwoToneIcon from '@mui/icons-material/FileDownloadTwoTone';
+import PlaylistAddTwoToneIcon from '@mui/icons-material/PlaylistAddTwoTone';
+
+const inputCss = {
+    width:'100%',
+    '& input':{
+        paddingTop: '12px',
+        paddingBottom: '12px',
+        paddingRight: '12px',
+    }
+}
+
+const selectCss = {
+    '& .MuiSelect-select':{
+        paddingTop:'12px',
+        paddingBottom:'12px'
+    }
+
+}
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -75,7 +95,7 @@ const Agenda = props =>{
     },[horariosInicio])
 
     useEffect(()=>{
-        setPeriodo(getPeriodoByHorario(horario))
+        getPeriodoByHorario(horario)
     },[horario])
 
     const handleTabChange = (event, newValue) => {
@@ -99,8 +119,7 @@ const Agenda = props =>{
             ){
                 periodo = 'Noite'
             }
-            console.log(periodo)
-            return periodo
+            setPeriodo(periodo)
         }
     }
 
@@ -159,35 +178,38 @@ const Agenda = props =>{
                 icon={<DateRangeIcon />}
             />
             <Paper>
-                <Toolbar>
+                <Toolbar sx={{paddingY:'8px'}}>
                     <Grid container 
-                        spacing={2} 
+                        rowSpacing={1.5}
+                        columnSpacing={2} 
                         sx={{paddingY:'12px'}} 
                         alignItems="center" 
                         justifyContent="space-between"
-                        columns={20}
+                        columns={24}
                     > 
-                        <Grid item xs ={5} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}}>Adicionar</Grid>
-                        <Grid item xs ={9} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}}>Buscar</Grid>
-                        <Grid item xs ={4} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}}>Mostrar</Grid>
+                        <Grid item xs ={3} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}}>Editar</Grid>
+                        <Grid item xs ={3} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}}>Exportar</Grid>
+                        <Grid item xs ={10} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}}>Buscar</Grid>
+                        <Grid item xs ={7} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}}>Mostrar</Grid>
                         <Grid item xs ={1} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}}>Ajuda</Grid>
-                        <Grid item xs={6} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}} sm={2}>
+                        {/* Rotulos acima devem somar 24 */}
+                        <Grid item xs={6} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}} sm={3}>
                             <Button 
-                                startIcon={<AddIcon/>} 
+                                startIcon={<CachedTwoToneIcon/>} 
                                 variant="contained"  
-                                sx={{fontSize:'12px',paddingTop:'12px',paddingBottom:'12px'}} >Arquivo
+                                sx={{fontSize:'12px',paddingTop:'13px',paddingBottom:'12px'}} >Trocar Salas
                             </Button>
                         </Grid>
-                        <Grid item xs={6} sm={3}>
+                        <Grid item xs={6} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}} sm={3}>
                             <Button 
-                                startIcon={<AddIcon/>} 
-                                variant="contained" 
-                                sx={{fontSize:'12px',paddingTop:'12px',paddingBottom:'12px'}}>Formulário
+                                startIcon={<FileDownloadTwoToneIcon/>} 
+                                variant="contained"  
+                                sx={{fontSize:'12px',paddingTop:'13px',paddingBottom:'12px'}} >Exportar
                             </Button>
                         </Grid>
-                        <Grid item xs ={6} sm={9}>
+                        <Grid item xs ={6} sm={10}>
                             <TextField
-                                sx={{width:'100%'}}
+                                sx={inputCss}
                                 variant="outlined"
                                 InputProps={{
                                     startAdornment: <InputAdornment position="start"><SearchIcon/></InputAdornment>,
@@ -200,6 +222,7 @@ const Agenda = props =>{
                                 value={ano}
                                 onChange={handleAnoSelect}
                                 options ={anos}
+                                style={selectCss}
                             />  
                         </Grid>
                         <Grid item xs={6} sm={2}>
@@ -208,11 +231,19 @@ const Agenda = props =>{
                                 value={semestre}
                                 onChange={handleSemestreSelect}
                                 options ={[1,2]}
-                            
+                                style={selectCss}
                             />
+                        </Grid>
+                        <Grid item xs={6} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}} sm={3}>
+                            <Button 
+                                startIcon={<PlaylistAddTwoToneIcon/>} 
+                                variant="contained"  
+                                sx={{fontSize:'12px',paddingTop:'13px',paddingBottom:'12px'}} >Colunas
+                            </Button>
                         </Grid>
                         <Grid item xs={6} sm={1}>
                             <IconButton
+                                sx={{marginLeft:'4px'}}
                                 color="inherit"
                                 edge="start"
                             >
@@ -224,7 +255,7 @@ const Agenda = props =>{
             </Paper>
             <br/>
             <Paper>
-                <Box padding={'5px'} width={'100%'}>
+                <Box padding={'5px'}>
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                         <Tabs value={tabValue} onChange={handleTabChange} aria-label="aba de dias">
                             {
@@ -248,8 +279,8 @@ const Agenda = props =>{
                                                 )
                                             })}
                                         </Tabs>
-
-
+                                        
+                                        
 
                                     </Box>
                                 </TabPanel>
@@ -258,35 +289,21 @@ const Agenda = props =>{
                     }
                 </Box>
             </Paper>
-
-
-
-
-                    <br/>
-                    <br/>
-            <Paper>
-                <Box padding={'5px'} width={'100%'}>
-                    <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                            <Tabs  
-                                value={tabValueX} 
-                                variant="scrollable"
-                                scrollButtons="auto"
-                                onChange={handleTabXChange} 
-                                aria-label="aba de dias"
-                            >
-                                {
-                                    config.dias.map((dia,indexD)=>{
-                                        return horariosInicio.map((horario,indexH)=>{
-                                            return(
-                                                <Tab label={`${dia} ${horario}`} {...a11yProps("X" + indexD+"_"+indexH)} />
-                                            )
-                                        })
-                                    })
-                                }
-                            </Tabs>
-                    </Box>
+            <TableContainer sx={{top:'-20px',position:"relative"}} component={Paper}>
+                <Box width="1440px">
+                    <AgendaResultado 
+                        ano={ano}
+                        semestre={semestre}
+                        periodo={periodo}
+                        dia={dia}
+                        horario={horario}
+                    />
                 </Box>
-            </Paper>
+            </TableContainer>
+
+
+
+        
         </>
     )
 }
