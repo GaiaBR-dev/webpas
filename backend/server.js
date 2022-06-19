@@ -25,6 +25,7 @@ const distanciasRouter = require('./routes/distancias')
 const resultadosRouter = require('./routes/resultados')
 const configsRouter = require('./routes/config')
 const authenticationRouter = require('./routes/authentication')
+const privateRouter = require('./routes/private')
 
 app.use('/salas',salasRouter)
 app.use('/turmas',turmasRouter)
@@ -32,7 +33,13 @@ app.use('/distancias',distanciasRouter)
 app.use('/resultados',resultadosRouter)
 app.use('/configs',configsRouter)
 app.use('/auth',authenticationRouter)
+app.use('/private',privateRouter)
 
-app.listen(port,()=>{
+const server = app.listen(port,()=>{
     console.log(`Server running on port : ${port}`)
+})
+
+process.on("unhandledRejection",(err,promise)=>{
+    console.log(`Logged Error : ${err}`)
+    server.close(()=>process.exit(1))
 })
