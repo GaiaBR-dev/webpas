@@ -273,6 +273,8 @@ const TurmasList = props =>{
                         closeButton={handleCloseModalFile}
                         anos={anos}
                         config={config}
+                        horariosInicio={horariosInicio}
+                        horariosFim={horariosFim}
                         handleResponse={fileHandleResponse}
                     />
                 </Modal>

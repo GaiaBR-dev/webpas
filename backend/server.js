@@ -2,6 +2,7 @@ const express = require('express')
 const cors = require('cors')
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
+const errorHandler = require('./middleware/errorHandler')
 
 require('dotenv').config()
 
@@ -34,6 +35,8 @@ app.use('/resultados',resultadosRouter)
 app.use('/configs',configsRouter)
 app.use('/auth',authenticationRouter)
 app.use('/private',privateRouter)
+
+app.use(errorHandler)
 
 const server = app.listen(port,()=>{
     console.log(`Server running on port : ${port}`)

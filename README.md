@@ -18,5 +18,6 @@ Software web para resolução do problema de alocação de salas
 - Escrever textos da homepage e ajuda para cada página.
 - Centralizar upload de arquivos (talvez)
 - Implementar filtro e tratamento de dados para UFSCar
+- Criar aba mostrando linhas que não foram lidas e o motivo, na entrada de arquivos
 
 

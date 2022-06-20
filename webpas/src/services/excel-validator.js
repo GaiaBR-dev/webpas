@@ -1,5 +1,5 @@
 class ExcelValidator{
-    firstValidateTurmas(rowsTurmas,configProps){
+    firstValidateTurmas(rowsTurmas,configProps,horariosInicio,horariosFim){
         let erroPreenchido = false
         let erroHorarioI = false
         let erroHorarioF = false
@@ -21,7 +21,8 @@ class ExcelValidator{
         
         let turmaErroTipo =''
         let disciplinaErroTipo =''
-
+        console.log("HI : " + horariosInicio)
+        console.log("HF : " + horariosFim)
         rowsTurmas.map(row =>{
 
             if (row['Nome da Disciplina'] == null) {erroPreenchido = true}
@@ -36,10 +37,10 @@ class ExcelValidator{
             if (row['Dia'] == null)  {erroPreenchido = true}
             if (row['Horário de Ínicio'] == null)  {erroPreenchido = true}
             if (row['Horário de Término'] == null)  {erroPreenchido = true}
-            if (!configProps.horarios.includes(row['Horário de Ínicio'])) {
+            if (!horariosInicio.includes(row['Horário de Ínicio'])) {
                 erroHorarioI = true
             }
-            if (!configProps.horarios.includes(row['Horário de Término'])) {
+            if (!horariosFim.includes(row['Horário de Término'])) {
                 erroHorarioF = true
             }
             let str = row['Dia']
