@@ -21,7 +21,9 @@ router.route('/addPredio').post((req,res)=>{
     const capacidade = req.body.capacidade
     const nSalas = req.body.nSalas
     const disponibilidade = req.body.disponibilidade
+    const {user} = req
 
+    
     Sala.find({predio:predio})
         .then(salas =>{
             if (salas.length > 0) {

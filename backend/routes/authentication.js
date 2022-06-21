@@ -41,6 +41,15 @@ router.route('/login').post((req,res,next)=>{
     }
 })
 
+router.route('/logout').post((req,res)=>{
+    res.clearCookie("authToken",{
+        secure: process.env.NODE_ENV !== "development",
+        httpOnly: true,
+        maxAge: 1000 * 60 * 24 * 30 *60,
+    })
+    res.status(200).json({success:true})
+})
+
 router.route('/forgotpassword').post((req,res,next)=>{
     const {email} = req.body
 
@@ -98,7 +107,13 @@ router.route('/resetpassword/:resetToken').put((req,res,next)=>{
 
 const sendToken = (user,statusCode,res)=>{
     const token = user.getSignedToken()
-    res.status(statusCode).json({success:true,token})
+    res.cookie("authToken", token, {
+        secure: process.env.NODE_ENV !== "development",
+        httpOnly: true,
+        maxAge: 1000 * 60 * 24 * 30 *60,
+      });
+    res.status(statusCode).json({success:true,user})
 }
 
 module.exports = router
+

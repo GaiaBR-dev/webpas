@@ -1,11 +1,10 @@
 import React, {useState, useEffect} from "react";
 import {BrowserRouter, Routes, Route} from "react-router-dom";
-import PrivateRoute from "./components/privateRoute";
-import PrivateLogged from "./components/pages/private-logged";
 import Login from "./components/pages/user-management/login.component";
 import Cadastro from "./components/pages/user-management/cadastro.component";
 import LembrarSenha from "./components/pages/user-management/lembrar-senha.component";
 import RedefinirSenha from "./components/pages/user-management/redefinir-senha.component";
+import HomePage from "./components/pages/homepage.component";
 import { CssBaseline } from "@mui/material";
 import { Box } from "@mui/system";
 import { createTheme } from '@mui/material/styles';
@@ -38,15 +37,16 @@ const theme = createTheme({
   },
 })
 
+
+
 function App() {
 
     return (
-
       <ThemeProvider theme={theme}>
           <CssBaseline/>
           <BrowserRouter>
             <Routes>
-              <Route exact path="/" element={<PrivateLogged/>}/>
+              <Route exact path="/" element={<HomePage/>}/>
               <Route exact path="/login" element={<Login/>}/>
               <Route exact path="/cadastro" element={<Cadastro/>}/>
               <Route exact path="/lembrarsenha" element={<LembrarSenha/>}/>

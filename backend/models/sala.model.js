@@ -13,7 +13,8 @@ const salaSchema = new Schema({
         disponivel:{type:Boolean,required:true}
     }],
     terreo:Boolean, 
-    acessivel:Boolean
+    acessivel:Boolean,
+    user:{type:mongoose.Types.ObjectId,ref:'User',required:true}
 })
 
 salaSchema.index({predio: 1,numeroSala: 1}, {unique: true})

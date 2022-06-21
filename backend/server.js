@@ -3,13 +3,15 @@ const cors = require('cors')
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
 const errorHandler = require('./middleware/errorHandler')
+const cookieParser = require('cookie-parser')
 
 require('dotenv').config()
 
 const app = express()
+app.use(cookieParser())
 const port = process.env.PORT || 5000
 
-app.use(cors())
+app.use(cors({credentials:true,origin:'http://localhost:3000'}))
 app.use(bodyParser.json({limit: '5mb'}));
 app.use(bodyParser.urlencoded({limit: '5mb', extended: true}));
 
