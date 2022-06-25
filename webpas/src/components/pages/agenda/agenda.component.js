@@ -1,9 +1,9 @@
 import React, {Component, useState, useEffect} from "react";
-import PageHeader from "../page-header.component";
+import PageHeader from "../../re-usable/page-header.component";
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import {Grid,Toolbar,Button, TextField, Paper, Box, TableContainer} from "@mui/material";
-import ConfigsDataService from '../../services/configs'
-import Select from "../forms/select.component";
+import ConfigsDataService from '../../../services/configs'
+import Select from "../../forms/select.component";
 import CachedTwoToneIcon from '@mui/icons-material/CachedTwoTone';
 import SearchIcon from '@mui/icons-material/Search';
 import InputAdornment from '@mui/material/InputAdornment';

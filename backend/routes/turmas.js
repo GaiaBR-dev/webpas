@@ -1,6 +1,7 @@
 const router = require('express').Router()
 const { xlstojson } = require('../xlstojson')
 let Turma = require('../models/turma.model')
+const {protect} = require("../middleware/auth")
 
 const arrayUnique = array => {
     var a = array.concat();
@@ -13,16 +14,18 @@ const arrayUnique = array => {
     return a;
 }
 
-router.route('/').get((req,res)=>{ // filtros e classificação no cliente ? divisão em paginas ?
-    Turma.find()
+router.route('/').get(protect,(req,res)=>{
+    const user = req.user
+    Turma.find({user:user._id})
         .then(turmas => res.json(turmas))
         .catch(err => res.status(400).json(err))
 })
 
-router.route('/d/').get((req,res)=>{
-    Turma.find().distinct('departamentoOferta')
+router.route('/d/').get(protect,(req,res)=>{
+    const user = req.user
+    Turma.find({user:user._id}).distinct('departamentoOferta')
         .then(departamentosOferta=>{
-            Turma.find().distinct('departamentoTurma')
+            Turma.find({user:user._id}).distinct('departamentoTurma')
                 .then(departamentosTurma =>{
                     const departamentos = arrayUnique(departamentosOferta.concat(departamentosTurma))
                     res.json(departamentos)
@@ -30,19 +33,21 @@ router.route('/d/').get((req,res)=>{
         }).catch(err => res.status(400).json(err))
 })
 
-router.route('/:ano/:semestre').get((req,res)=>{
-    Turma.find({ano:req.params.ano,semestre:req.params.semestre})
+router.route('/:ano/:semestre').get(protect,(req,res)=>{
+    const user = req.user
+    Turma.find({ano:req.params.ano,semestre:req.params.semestre,user:user._id})
         .then(turmas => res.json(turmas))
         .catch(err => res.json(err))
 })
 
-router.route('/dep/').get((req,res)=>{ 
-    Turma.find().distinct('departamentoOferta')
+router.route('/dep/').get(protect,(req,res)=>{
+    const user = req.user
+    Turma.find({user:user._id}).distinct('departamentoOferta')
         .then(turmas => res.json(turmas))
         .catch(err => res.status(400).json(err))
 })
 
-router.route('/add').post((req,res) =>{
+router.route('/add').post(protect,(req,res) =>{
 
     const idTurma = req.body.idTurma
     const campus = req.body.campus
@@ -60,8 +65,9 @@ router.route('/add').post((req,res) =>{
     const docente = req.body.docente
     const ano = req.body.ano
     const semestre = req.body.semestre
+    const user = req.user
 
-    Turma.find({turma:turma,nomeDisciplina:nomeDisciplina,diaDaSemana:diaDaSemana,horarioInicio:horarioInicio,ano:ano,semestre:semestre})
+    Turma.find({turma,nomeDisciplina,diaDaSemana,horarioInicio,ano,semestre,user:user._id})
         .then(turmas =>{
             if (turmas.length > 0){
                 let err = {code:1,msg:"Esta turma ja está cadastrada"}
@@ -83,7 +89,8 @@ router.route('/add').post((req,res) =>{
                     creditosPratico,
                     docente,
                     ano,
-                    semestre
+                    semestre,
+                    user:user._id
                 })
                 novaTurma.save()
                     .then(()=> res.json('Turma adicionada'))
@@ -96,56 +103,43 @@ router.route('/add').post((req,res) =>{
         })
 })
 
-router.route('/:id').get((req,res)=>{
+router.route('/:id').get(protect,(req,res)=>{
     Turma.findById(req.params.id)
         .then(turma => res.json(turma))
         .catch(err => res.status(400).json(err))
 })
 
-router.route('/arquivoturma').post(async (req,res) =>{ // salvar a partir de arquivo vindo do cliente 
+router.route('/arquivoturma').post(protect,async (req,res) =>{ 
     const novasTurmas = req.body.novasTurmas
     Turma.insertMany(novasTurmas,{ordered:false})
         .then(()=> res.json('Turmas adicionadas'))
         .catch(err =>{
             res.status(400).json(err)})  
-
 })
 
-router.route('/insereturmas321').post((req, res) => {// Hard Coded - >deletar depois
-    const result = xlstojson()
-    const ano = req.body.ano
-    const semestre = req.body.semestre
-
-    const novasTurmas = result.Info.map(turma =>({...turma,ano:ano,semestre:semestre}))
-
-    Turma.insertMany(novasTurmas)
-        .then(()=> res.json('Turmas adicionadas'))
-        .catch(err =>res.status(400).json(err))
-    
-})
-
-router.route('/delete/:id').delete((req,res)=>{
+router.route('/delete/:id').delete(protect,(req,res)=>{
     Turma.findByIdAndDelete(req.params.id)
         .then(()=> res.json('Turma deletada'))
         .catch(err => res.status(400).json(err))
 })
 
-router.route('/deleteMany').post((req,res)=>{
+router.route('/deleteMany').post(protect,(req,res)=>{
     const turmasIds = req.body.turmasID
     Turma.deleteMany({_id:{$in:turmasIds}})
         .then(()=> res.json('Turmas deletadas'))
         .catch(err => res.status(400).json(err))
 })
 
-router.route('/update/:id').post((req,res)=>{
+router.route('/update/:id').post(protect,(req,res)=>{
     const turma = req.body.turma
     const nomeDisciplina = req.body.nomeDisciplina
     const diaDaSemana = req.body.diaDaSemana
     const horarioInicio = req.body.horarioInicio
     const ano = req.body.ano
     const semestre = req.body.semestre
+    const user = req.user
 
-    Turma.find({turma:turma,nomeDisciplina:nomeDisciplina,diaDaSemana:diaDaSemana,horarioInicio:horarioInicio,ano:ano,semestre:semestre})
+    Turma.find({turma,nomeDisciplina,diaDaSemana,horarioInicio,ano,semestre,user:user._id})
         .then(turmas =>{
             if (turmas.length > 1){
                 let err = {code:1,msg:"Esta turma ja está cadastrada"}

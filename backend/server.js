@@ -4,6 +4,7 @@ const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
 const errorHandler = require('./middleware/errorHandler')
 const cookieParser = require('cookie-parser')
+const {protect} = require("./middleware/auth")
 
 require('dotenv').config()
 

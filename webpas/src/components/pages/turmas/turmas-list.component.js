@@ -1,25 +1,25 @@
 import React from "react";
-import TurmaForm from '../forms/turmaForm.component'
-import FileFormTurma from "../forms/fileFormTurma.component";
-import PageHeader from '../page-header.component';
+import TurmaForm from '../../forms/turmaForm.component'
+import FileFormTurma from "../../forms/fileFormTurma.component";
+import PageHeader from '../../re-usable/page-header.component';
 import SchoolIcon from '@mui/icons-material/School';
 import { Modal, TableBody, TableCell, TableRow, Grid, Toolbar, TextField, DialogContent } from "@mui/material";
 import {Dialog, Button, IconButton}  from "@mui/material"
 import HelpIcon from '@mui/icons-material/Help';
-import useTable from "../useTable";
-import TurmasDataService from '../../services/turmas'
+import useTable from "../../re-usable/useTable";
+import TurmasDataService from '../../../services/turmas'
 import { useEffect, useState } from 'react';
 import { TableContainer, Paper } from "@mui/material";
-import Select from "../forms/select.component";
+import Select from "../../forms/select.component";
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import InputAdornment from '@mui/material/InputAdornment';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import Mensagem from "../mensagem.component";
-import ConfirmDialog from "../confirmDialog.component";
-import handleServerResponses from "../../services/response-handler";
+import Mensagem from "../../re-usable/mensagem.component";
+import ConfirmDialog from "../../re-usable/confirmDialog.component";
+import handleServerResponses from "../../../services/response-handler";
 import { Checkbox } from "@mui/material";
-import AjudaTurma from "./help/ajuda-turma.component";
+import AjudaTurma from "../help/ajuda-turma.component";
 
 const tableRowCss ={
     '& .MuiTableCell-root':{
@@ -58,7 +58,7 @@ const headCells =[
 const thisYear =  new Date().getFullYear()
 
 const TurmasList = props =>{
-    const {config} = props
+    const {config,user,logout} = props
 
     const [turmas,setTurmas] = useState([]);
     const [openModalForm, setOpenModalForm] = React.useState(false);
@@ -78,8 +78,11 @@ const TurmasList = props =>{
 
     useEffect(()=>{
         retornaAnos()
-        retornaHorarios()
     },[])
+
+    useEffect(()=>{
+        retornaHorarios()
+    },[config])
 
     useEffect(()=>{
         retornaTurmas(anoTable,semestreTable)
@@ -275,6 +278,7 @@ const TurmasList = props =>{
                         config={config}
                         horariosInicio={horariosInicio}
                         horariosFim={horariosFim}
+                        user={user}
                         handleResponse={fileHandleResponse}
                     />
                 </Modal>

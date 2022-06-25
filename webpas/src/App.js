@@ -9,7 +9,8 @@ import { CssBaseline } from "@mui/material";
 import { Box } from "@mui/system";
 import { createTheme } from '@mui/material/styles';
 import { ThemeProvider } from "@emotion/react";
-import ConfigsDataService from './services/configs'
+import ConfigWrapper from './components/pages/config/config-wrapper.component';
+import TurmasWrapper from "./components/pages/turmas/turmas-wrapper.component";
 
 const theme = createTheme({
   palette: {
@@ -44,15 +45,19 @@ function App() {
     return (
       <ThemeProvider theme={theme}>
           <CssBaseline/>
-          <BrowserRouter>
-            <Routes>
-              <Route exact path="/" element={<HomePage/>}/>
-              <Route exact path="/login" element={<Login/>}/>
-              <Route exact path="/cadastro" element={<Cadastro/>}/>
-              <Route exact path="/lembrarsenha" element={<LembrarSenha/>}/>
-              <Route exact path="/redefinirsenha/:resetToken" element={<RedefinirSenha/>}/>
-            </Routes>
-          </BrowserRouter>
+          <Box sx={{display:'flex'}}>
+            <BrowserRouter>
+              <Routes>
+                <Route exact path="/" element={<HomePage/>}/>
+                <Route exact path="/login" element={<Login/>}/>
+                <Route exact path="/cadastro" element={<Cadastro/>}/>
+                <Route exact path="/lembrarsenha" element={<LembrarSenha/>}/>
+                <Route exact path="/redefinirsenha/:resetToken" element={<RedefinirSenha/>}/>
+                <Route path="/config" element={<ConfigWrapper/>}/>
+                <Route path="/turmas" element={<TurmasWrapper/>}/>
+              </Routes>
+            </BrowserRouter>
+          </Box>
       </ThemeProvider>
     )
 }

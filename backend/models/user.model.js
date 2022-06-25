@@ -23,7 +23,8 @@ const userSchema = new Schema({
         select: false
     },
     resetPasswordToken:String,
-    resetPasswordExpire:Date
+    resetPasswordExpire:Date,
+    emailVerified:{type:Boolean},
 })
 
 userSchema.pre("save",async function(next){

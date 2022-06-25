@@ -1,12 +1,16 @@
 import http from "../http-commom";
 
 class ConfigsDataService {
-    addConfig(data){
-        return http.post('configs/newConfig',data)
+    newUserConfig(userId){
+        return http.post(`configs/createStandartConfig/${userId}`)
     }
 
-    getConfigByUser(user){
-        return http.get(`configs/user/${user}`)
+    updateConfig(data,id){
+        return http.post(`configs/updateConfig/${id}`,data)
+    }
+
+    getConfigById(userId){
+        return http.get(`configs/user/${userId}`)
     }
 }
 

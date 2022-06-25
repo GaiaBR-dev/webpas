@@ -1,8 +1,8 @@
 const router = require('express').Router()
 let Resultado = require('../models/resultado.model')
-const { dbtomodel } = require('../dbtomodel')
-const { resolve } = require('../gerasalahorarioglpk')
-const { trataresultado } = require('../trataresultado')
+const { dbtomodel } = require('../solver-logic/dbtomodel')
+const { resolve } = require('../solver-logic/gerasalahorarioglpk')
+const { trataresultado } = require('../solver-logic/trataresultado')
 
 router.route('/').get((req,res)=>{
     Resultado.find()
@@ -46,28 +46,6 @@ router.route('/diaperiodo').post(async (req, res) => {
     
 })
 
-router.route('/calculatudo').post(async (req, res) => {
-    const ano = req.body.ano
-    const semestre = req.body.semestre
-    const delta = req.body.delta
-    const periodos = ["Manhã","Tarde","Noite"]
-    const dias = ["Segunda","Terça","Quarta","Quinta","Sexta"]
-
-    dias.forEach(async (dia) =>{
-        periodos.forEach(async (periodo)=>{
-            const modelo = await dbtomodel(ano,semestre,periodo,dia)
-            const produto = await resolve(modelo,delta)
-            const alocacoes = await trataresultado(modelo,produto)
-    
-            let res = await Resultado.findOneAndUpdate({
-                ano:ano,
-                semestre:semestre,
-                diaDaSemana:dia,
-                periodo:periodo},{alocacoes:alocacoes},{upsert:true})
-        })
-    })
-})
-
 router.route('/calculalista').post(async (req, res) => {
     const ano = req.body.ano
     const semestre = req.body.semestre
@@ -77,29 +55,34 @@ router.route('/calculalista').post(async (req, res) => {
     let resultObj = {}
 
     const listaDePromises = lista.map(async (unidade)=>{
-        const modelo = await dbtomodel(ano,semestre,unidade.periodo,unidade.dia)
-        const produto = await resolve(modelo,delta)
-        const alocacoes = await trataresultado(modelo,produto)
+        try {
+            const modelo = await dbtomodel(ano,semestre,unidade.periodo,unidade.dia)
+            const produto = await resolve(modelo,delta)
+            const alocacoes = await trataresultado(modelo,produto)
 
-        resultObj[unidade.dia] = resultObj[unidade.dia]? resultObj[unidade.dia]: {}
-        if (produto.result.status == 4){
+            resultObj[unidade.dia] = resultObj[unidade.dia]? resultObj[unidade.dia]: {}
+            if (produto.result.status == 4){
+                resultObj[unidade.dia][unidade.periodo] = false;
+            }else if (produto.result.status == 5){
+                resultObj[unidade.dia][unidade.periodo] = true;
+            }
+
+            return Resultado.findOneAndUpdate({
+                ano:ano,
+                semestre:semestre,
+                diaDaSemana:unidade.dia,
+                periodo:unidade.periodo},{alocacoes:alocacoes},{upsert:true})
+
+        } catch (error) {
+            console.log(error)
+            resultObj[unidade.dia] = resultObj[unidade.dia]? resultObj[unidade.dia]: {}
             resultObj[unidade.dia][unidade.periodo] = false;
-        }else if (produto.result.status == 5){
-            resultObj[unidade.dia][unidade.periodo] = true;
         }
-
-        return Resultado.findOneAndUpdate({
-            ano:ano,
-            semestre:semestre,
-            diaDaSemana:unidade.dia,
-            periodo:unidade.periodo},{alocacoes:alocacoes},{upsert:true})
 
     })
 
     await Promise.all(listaDePromises)
     return res.json(resultObj)
-
-
 })
 
 

@@ -9,7 +9,7 @@ exports.protect = async (req,res,next) =>{
     }
 
     if(!token){
-        return res.status(400).json({success:false,error:"Não autorizado"})
+        return res.status(400).json({success:false,error:"Não autorizado",notAuth:true})
     }
 
     try{
@@ -20,10 +20,9 @@ exports.protect = async (req,res,next) =>{
         }
 
         req.user = user
-        console.log(user)
         next()
     }
     catch(error){
-        return res.status(400).json({success:false,error:"Não autorizado"})
+        return res.status(400).json({success:false,error:"Não autorizado",notAuth:true})
     }
 }

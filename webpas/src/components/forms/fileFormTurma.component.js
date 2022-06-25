@@ -55,7 +55,7 @@ const inicialValues ={
 }
 
 export default function FileFormTurma(props){
-    const{title, closeButton,anos,  config, handleResponse, horariosInicio, horariosFim } = props
+    const{title, closeButton,anos,  config, handleResponse, horariosInicio, horariosFim,user } = props
 
     const [working,setWorking] = useState(false)
 
@@ -82,7 +82,7 @@ export default function FileFormTurma(props){
             if (temTurma){
                 let res = ExcelValidator.firstValidateTurmas(rowObject,config,horariosInicio,horariosFim)
                 if (!res.erro){
-                    const nturmas = ExcelValidator.mapColumnKeysTurmas(rowObject,values.ano,values.semestre)
+                    const nturmas = ExcelValidator.mapColumnKeysTurmas(rowObject,values.ano,values.semestre,user._id)
                     let data ={
                         novasTurmas:nturmas
                     }

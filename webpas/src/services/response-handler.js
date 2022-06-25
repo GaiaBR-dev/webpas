@@ -47,7 +47,7 @@ const handleServerResponses = (collection,response,setNotify) =>{
                 })
             }
 
-        }else if (collection = 'distancias'){
+        }else if (collection === 'distancias'){
             if (response.response.data.code == 1){
                 setNotify({
                     isOpen:true,
@@ -62,6 +62,14 @@ const handleServerResponses = (collection,response,setNotify) =>{
                     message: `A distância do prédio "${predioError}" para o departamento ${departamentoError} já está cadastrada no banco de dados.
                     As demais distâncias foram inseridas com sucesso`,
                     type:'warning'
+                })
+            }
+        }else if(collection === 'configs'){
+            if (response.response.data.code == 1){
+                setNotify({
+                    isOpen:true,
+                    message: response.response.data.msg,
+                    type:'error'
                 })
             }
         }

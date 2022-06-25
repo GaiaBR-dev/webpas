@@ -5,7 +5,9 @@ import useForm from "../../forms/useForm";
 import { Container, Typography } from "@mui/material";
 import {TextField} from "@mui/material";
 import {Button, Grid, Paper, Link} from "@mui/material";
-import { Link as RouterLink,useSearchParams } from 'react-router-dom';
+import { Link as RouterLink,Navigate,useSearchParams } from 'react-router-dom';
+import useAuth from "../../../services/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const inicialValues ={
     email:'',
@@ -13,7 +15,17 @@ const inicialValues ={
 }
 
 const Login = props =>{
+    const {user} = useAuth(false)
+
     let [searchParams, setSearchParams] = useSearchParams();
+    const navigate = useNavigate()
+    const [error,setError] = useState("");
+    
+    useEffect(()=>{
+        if(user){
+            navigate('/')
+        }
+    },[user])
     
     const{
         values,
@@ -33,7 +45,16 @@ const Login = props =>{
                 let callbackUrl = searchParams.get("callbackUrl")
                 window.location.href = callbackUrl || "/"
             })
-            .catch(err=>console.log(err))
+            .catch(err=>{
+                let serverResponse = err.response.data
+                console.log(serverResponse)
+                setError(serverResponse.error)
+            })
+    }
+
+    const resetLogin = () =>{
+        resetForm()
+        setError("")
     }
 
     return(
@@ -41,7 +62,7 @@ const Login = props =>{
             <Box component="form" onSubmit={handleSubmit}>
                 <Container>
                 <Paper>
-                    <Grid container spacing={2} alignItens="center" padding="50px">
+                    <Grid container spacing={2} alignItems="center" padding="50px">
                         <Grid item xs={6}>
                             <Typography variant="h5">Login</Typography>
                         </Grid>
@@ -64,13 +85,16 @@ const Login = props =>{
                                 label="Senha"
                                 value ={values.password}></TextField>
                         </Grid>
+                        <Grid item xs={12}>
+                            <Typography color="peru">{error}</Typography>
+                        </Grid>
                         <Grid item xs={12} sx={{marginY:2}}>
-                            <Button variant='outlined' size="large" color='primary' onClick={resetForm} sx={{marginRight:2}}>Resetar</Button>
+                            <Button variant='outlined' size="large" color='primary' onClick={resetLogin} sx={{marginRight:2}}>Resetar</Button>
                             <Button variant='contained' type="submit"size="large" color='secondary'>Enviar</Button>
                         </Grid>
-                        <Grid xs={12}>
-                            <Typography> Não tem uma conta? 
-                                <Link  component={RouterLink} to="/cadastro">Registre-se</Link>
+                        <Grid item xs={12}>
+                            <Typography> Não tem uma conta?  
+                                <Link  component={RouterLink} to="/cadastro"> Registre-se</Link>
                             </Typography>
                         </Grid>
                     </Grid>

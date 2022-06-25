@@ -21,7 +21,6 @@ export default function useAuth(redirect=true) {
     }, [])
 
     React.useEffect(() => {
-        console.log('user: ',user)
         if (user === false && redirect) {
             navigate('/login?callbackUrl=' + window.location.href);
         }
@@ -34,7 +33,6 @@ export default function useAuth(redirect=true) {
                 setUser(null)
                 navigate('/login?callbackUrl=' + window.location.href);
             }).catch(err=>console.log(err))
-
     }
 
     return {

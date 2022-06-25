@@ -54,6 +54,11 @@ const TurmaForm = props =>{
         }
     },[turmaEdit])
 
+    useEffect(()=>{
+        console.log("HF: ",horariosInicio)
+        console.log("HF: ",horariosFim)
+    },[horariosFim,horariosInicio])
+
     const{
         values,
         setValues,

@@ -1,7 +1,7 @@
-let Sala = require('./models/sala.model')
-let Turma = require('./models/turma.model')
-let Distancia = require('./models/distancia.model')
-let Config = require('./models/config.model')
+let Sala = require('../models/sala.model')
+let Turma = require('../models/turma.model')
+let Distancia = require('../models/distancia.model')
+let Config = require('../models/config.model')
 
 async function dbtomodel(ano,semestre,periodo,diaDaSemana){
     

@@ -1,19 +1,19 @@
 import React, {useState, useEffect} from "react";
 import {BrowserRouter, Routes, Route} from "react-router-dom";
 import { styled } from '@mui/material/styles';
-import Navbar from "../navbar.component"
-import HomePage from "./homepage.component"
+import Navbar from "../re-usable/navbar.component";
+import HomePage from "./homepage.component";
 import PrediosList from "./predios-list.component";
 import TurmasList from "./turmas-list.component";
 import DistanciasMatriz from "./distancias-matriz.component";
-import ConfigForm from "./config-form.component"
+import ConfigForm from "./config/config-form.component"
 import Solver from "./solver.component";
-import Agenda from "./agenda.component";
+import Agenda from "./agenda/agenda.component";
 import Salas from "./salas-list.component";
 import { Container } from "@mui/material";
 import { Box } from "@mui/system";
 import ConfigsDataService from '../../services/configs'
-import PrivateRoute from "../privateRoute";
+import useAuth from '../../services/useAuth'
 
 const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',

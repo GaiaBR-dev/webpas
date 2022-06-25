@@ -13,7 +13,7 @@ router.route('/register').post((req,res,next)=>{
     })
     user.save()
         .then(()=>{
-            sendToken(user,200,res)
+            res.status(200).json(user)
         }).catch(err=>{
             next(err)
         })
