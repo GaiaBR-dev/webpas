@@ -1,17 +1,20 @@
 const router = require('express').Router()
 const { xlstojson } = require('../xlstojson')
 let Sala = require('../models/sala.model')
+const {protect} = require('../middleware/auth')
 
 diasTemp = ['Segunda','Terça','Quarta','Quinta','Sexta','Sábado']
 
 router.route('/').get((req,res)=>{
-    Sala.find()
+    const user = req.user
+    Sala.find({user:user._id})
         .then(salas => res.json(salas))
         .catch(err => res.status(400).json(err))
 })
 
 router.route('/p/').get((req,res)=>{
-    Sala.find().distinct('predio')
+    const user = req.user
+    Sala.find({user:user._id}).distinct('predio')
         .then(predios => res.json(predios))
         .catch(err => res.status(400).json(err))
 })
@@ -22,9 +25,8 @@ router.route('/addPredio').post((req,res)=>{
     const nSalas = req.body.nSalas
     const disponibilidade = req.body.disponibilidade
     const {user} = req
-
     
-    Sala.find({predio:predio})
+    Sala.find({predio:predio,user:user._id})
         .then(salas =>{
             if (salas.length > 0) {
                 let err = {code:1,msg:'Um prédio com o nome '+ predio + ' já existe'}
@@ -36,7 +38,8 @@ router.route('/addPredio').post((req,res)=>{
                         predio:predio,
                         numeroSala: 'Sala ' + i,
                         capacidade:capacidade,
-                        disponibilidade:disponibilidade
+                        disponibilidade:disponibilidade,
+                        user:user._id
                     }
                 }
                 Sala.insertMany(novasSalas)
@@ -47,7 +50,8 @@ router.route('/addPredio').post((req,res)=>{
 })
 
 router.route('/:predio').get((req,res)=>{
-    Sala.find({predio:req.params.predio})
+    const {user} = req
+    Sala.find({predio:req.params.predio,user:user._id})
         .then(salas => res.json(salas))
         .catch(err => res.status(400).json('Error: '+ err))
 })
@@ -55,14 +59,15 @@ router.route('/:predio').get((req,res)=>{
 router.route('/:predio/update').post((req,res)=>{
     const predioVelho = req.params.predio
     const predioNovo = req.body.predioNovo
+    const {user} = req
             
-    Sala.find({predio:predioNovo})
+    Sala.find({predio:predioNovo,user:user._id})
         .then(salasN =>{
             if (salasN.length > 0) {
                 let err = {code:1,msg:'Um prédio com o nome '+ predioNovo + ' já existe'}
                 res.status(400).json(err)
             }else{
-                Sala.updateMany({predio:predioVelho},{predio:predioNovo})
+                Sala.updateMany({predio:predioVelho,user:user._id},{predio:predioNovo,user:user._id})
                     .then(()=> res.json('Predio Atualizado'))
                     .catch(err =>res.status(400).json('Error: '+ err))
             }
@@ -70,7 +75,8 @@ router.route('/:predio/update').post((req,res)=>{
 })
 
 router.route('/:predio/delete').delete((req,res)=>{
-    Sala.deleteMany({predio:req.params.predio})
+    const {user} = req
+    Sala.deleteMany({predio:req.params.predio,user:user._id})
         .then(()=> res.json('Predio deletado'))
         .catch(err => res.status(400).json('Error: '+ err))
 })
@@ -80,8 +86,9 @@ router.route('/:predio/addSala').post((req,res)=>{
     const numeroSala = req.body.numeroSala
     const capacidade = req.body.capacidade
     const disponibilidade = req.body.disponibilidade
+    const {user} = req
 
-    Sala.find({predio:predio, numeroSala:numeroSala})
+    Sala.find({predio:predio, numeroSala:numeroSala,user:user._id})
         .then(salas=>{
             if (salas.length > 0){
                 let err = {code:1,msg:"Uma sala com o mesmo nome já está cadastrada"}
@@ -91,7 +98,8 @@ router.route('/:predio/addSala').post((req,res)=>{
                     predio:predio,
                     numeroSala:numeroSala,
                     capacidade:capacidade,
-                    disponibilidade:disponibilidade
+                    disponibilidade:disponibilidade,
+                    user:user._id
                 })
                 novaSala.save()
                     .then(()=> res.json('Sala adicionada'))
@@ -103,8 +111,9 @@ router.route('/:predio/addSala').post((req,res)=>{
 router.route('/:predio/update/:id').post((req,res)=>{
     const predio = req.params.predio
     const numeroSala = req.body.numeroSala
-
-    Sala.find({predio:predio, numeroSala:numeroSala})
+    const {user} = req
+    
+    Sala.find({predio:predio, numeroSala:numeroSala,user:user._id})
         .then(salas =>{
             if (salas.length > 1){
                 let err = {code:1,msg:"Uma sala com o mesmo nome já está cadastrada"}
@@ -142,8 +151,8 @@ router.route('/deleteMany').post((req,res)=>{
         .catch(err => res.status(400).json(err))
 })
 
-router.route('/arquivosala').post((req, res) => { // salvar a partir de arquivo vindo do cliente
-    novasSalas = req.body.novasSalas// considera que o cliente organizou tudo bunitin
+router.route('/arquivosala').post((req, res) => { 
+    novasSalas = req.body.novasSalas
     Sala.insertMany(novasSalas,{ordered:false})
         .then(()=> res.json('Salas adicionadas'))
         .catch(err =>{

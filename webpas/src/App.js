@@ -11,6 +11,8 @@ import { createTheme } from '@mui/material/styles';
 import { ThemeProvider } from "@emotion/react";
 import ConfigWrapper from './components/pages/config/config-wrapper.component';
 import TurmasWrapper from "./components/pages/turmas/turmas-wrapper.component";
+import PrediosWrapper from "./components/pages/predios-salas/predios-wrapper.component";
+import SalasWrapper from "./components/pages/predios-salas/salas-wrapper.component";
 
 const theme = createTheme({
   palette: {
@@ -55,6 +57,8 @@ function App() {
                 <Route exact path="/redefinirsenha/:resetToken" element={<RedefinirSenha/>}/>
                 <Route path="/config" element={<ConfigWrapper/>}/>
                 <Route path="/turmas" element={<TurmasWrapper/>}/>
+                <Route path="/predios" element={<PrediosWrapper/>}/>
+                <Route path="/predios/:predio" element={<SalasWrapper/>}/>
               </Routes>
             </BrowserRouter>
           </Box>

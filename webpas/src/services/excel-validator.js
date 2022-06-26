@@ -39,13 +39,10 @@ class ExcelValidator{
             if (row['Horário de Ínicio'] == null)  {erroPreenchido = true}
             if (row['Horário de Término'] == null)  {erroPreenchido = true}
             if (!horariosInicio.includes(row['Horário de Ínicio'].toString())) {
-                console.log(row['Horário de Ínicio'])
                 erroHorarioI = true
-                console.log(row)
             }
             if (!horariosFim.includes(row['Horário de Término'].toString())) {
                 erroHorarioF = true
-                console.log(row)
             }
             let str = row['Dia']
             let dia = str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
@@ -228,13 +225,14 @@ class ExcelValidator{
         return res
     }
 
-    mapColumnKeysSalas(rowsSalas,config){
+    mapColumnKeysSalas(rowsSalas,config,user){
         const salas = rowsSalas.map(row =>{
 
             let sala = {
                 predio: row['Predio'],
                 numeroSala: row['Sala'],
-                capacidade: row['Capacidade']
+                capacidade: row['Capacidade'],
+                user:user._id
             }
             let disponibilidade = []
             config.dias.map(dia=>{

@@ -36,7 +36,7 @@ const TurmasWrapper = props =>{
 
     const retornaConfig = () =>{
         let searchId = user? user._id : "10"
-        ConfigsDataService.getConfigById(user._id) 
+        ConfigsDataService.getConfigById(searchId) 
             .then(res=> {
               setConfig(res.data)})
             .catch(err=>{

@@ -47,6 +47,7 @@ const modalStyleFile = {
 };
 
 const FileFormSalas = (props) =>{
+    const{title, closeButton, config, handleResponse,user} = props
     const [working,setWorking] = useState(false)
 
     useEffect(()=>{
@@ -70,7 +71,7 @@ const FileFormSalas = (props) =>{
             if (temSala){
                 let res = ExcelValidator.firstValidateSalas(rowObject,config)
                 if (!res.erro){
-                    const nsalas = ExcelValidator.mapColumnKeysSalas(rowObject,config)
+                    const nsalas = ExcelValidator.mapColumnKeysSalas(rowObject,config,user)
                     let data ={
                         novasSalas:nsalas
                     }
@@ -87,7 +88,7 @@ const FileFormSalas = (props) =>{
         reader.readAsArrayBuffer(file);
     }
 
-    const{title, closeButton, config, handleResponse} = props
+    
     
     return (
         <Box component="form" sx = {modalStyleFile}>

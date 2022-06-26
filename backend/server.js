@@ -31,7 +31,7 @@ const configsRouter = require('./routes/config')
 const authenticationRouter = require('./routes/authentication')
 const privateRouter = require('./routes/private')
 
-app.use('/salas',salasRouter)
+app.use('/salas',protect,salasRouter)
 app.use('/turmas',turmasRouter)
 app.use('/distancias',distanciasRouter)
 app.use('/resultados',resultadosRouter)

@@ -29,9 +29,9 @@ const Turma = mongoose.model('Turma',turmaSchema)
 
 Turma.on('index', function(err) {
     if (err) {
-        console.error('User index error: %s', err);
+        console.error('Turmas: User index error: %s', err);
     } else {
-        console.info('User indexing complete');
+        console.info('Turmas: User indexing complete');
     }
 });
 
