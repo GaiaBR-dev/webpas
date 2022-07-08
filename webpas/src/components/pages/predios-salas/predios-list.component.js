@@ -2,8 +2,8 @@ import React from "react";
 import { Link as RouterLink } from 'react-router-dom';
 import { Typography } from "@mui/material";
 import { useState, useEffect } from "react";
-import SalasDataService from '../../services/salas'
-import ConfirmDialog from "../confirmDialog.component";
+import SalasDataService from '../../../services/salas'
+import ConfirmDialog from "../../re-usable/confirmDialog.component";
 import { Card } from "@mui/material";
 import { Grid } from "@mui/material";
 import CardActions from '@mui/material/CardActions';
@@ -11,24 +11,26 @@ import CardContent from '@mui/material/CardContent';
 import { CardActionArea } from '@mui/material';
 import { Button } from "@mui/material";
 import { IconButton } from "@mui/material";
-import PageHeader from '../page-header.component'
+import PageHeader from '../../re-usable/page-header.component'
 import HomeWorkIcon from '@mui/icons-material/HomeWork';
 import { Paper, Toolbar, TextField, InputAdornment, Modal } from "@mui/material";
 import HelpIcon from '@mui/icons-material/Help';
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
-import PredioForm from "../forms/predioForm.component";
-import PredioEditForm from "../forms/predioEditForm.component";
+import PredioForm from "../../forms/predioForm.component";
+import PredioEditForm from "../../forms/predioEditForm.component";
 import { Dialog, DialogContent } from "@mui/material";
-import handleServerResponses from "../../services/response-handler";
-import Mensagem from "../mensagem.component";
-import FileFormSalas from "../forms/fileFormSala.component";
-import ConfigsDataService from '../../services/configs'
+import handleServerResponses from "../../../services/response-handler";
+import Mensagem from "../../re-usable/mensagem.component";
+import FileFormSalas from "../../forms/fileFormSala.component";
+import {Skeleton} from "@mui/material";
 
 const PrediosList = props =>{
+    const {config,user,logout} = props
+
     const [predios,setPredios] = React.useState([]);
+    const [loading,setLoading] = React.useState(true);
     const [predioEdit,setPredioEdit] = React.useState([]);
-    const [config,setConfig] = useState({dias:[],periodos:[]});
     const [numeroSalas,setNumeroSalas] = useState([])
     const [openModalForm, setOpenModalForm] = useState(false);
     const [openModalFormEdit, setOpenModalFormEdit] = useState(false);
@@ -43,18 +45,19 @@ const PrediosList = props =>{
     const handleCloseModalFile = () => setOpenModalFile(false);
 
     useEffect(()=>{
-        retornaConfig()
-    }, [])
-
-    useEffect(()=>{
         if (predios.length > 0) {
             getNumeroSalas()
+            setLoading(false)
         }
     }, [predios])
 
     useEffect(()=>{
         retornaPredios()
     }, [notify])
+
+    useEffect(()=>{
+        
+    },[numeroSalas])
 
     const getNumeroSalas = () =>{
         SalasDataService.getAll()
@@ -79,6 +82,10 @@ const PrediosList = props =>{
             .then(response =>{
                 setPredios(response.data)
             }).catch(err =>{
+                let notAuthorized = err.response.data?.notAuth ? err.response.data.notAuth : false
+                if (notAuthorized){
+                    logout()
+                }
                 console.log(err)
             })
     }
@@ -91,12 +98,6 @@ const PrediosList = props =>{
     const openInModalEdit = predio =>{
         setPredioEdit(predio)
         setOpenModalFormEdit(true)
-    }
-
-    const retornaConfig = () =>{
-        ConfigsDataService.getConfigByUser('Eu') // mudar para usuario
-            .then(res=> setConfig(res.data))
-            .catch(err=>console.log(err))
     }
 
     const add = (values,disponibilidade,resetForm) =>{
@@ -178,6 +179,7 @@ const PrediosList = props =>{
                     closeButton={handleCloseModalFile}
                     config={config}
                     handleResponse={fileHandleResponse}
+                    user={user}
                 />
             </Modal>
             <Paper>
@@ -265,57 +267,76 @@ const PrediosList = props =>{
                 </Toolbar>
             </Paper>
             <Grid container spacing={4} marginTop={1}>
-                    {filterFn.fn(numeroSalas).map(predioObj=>{
-                        
-                        return (
-                            <Grid item xs={3}>
-                                <Card>
-                                    <CardActionArea>
-                                    <CardContent>
-                                        <Typography gutterBottom variant="h5" component="div">
-                                            {predioObj.nome}
-                                        </Typography>
-                                        <Typography variant="body2" color="text.secondary" my={2}>
-                                            Número de Salas: {predioObj.salas}
-                                        </Typography>
-                                    </CardContent>
-                                    </CardActionArea>
-                                    <CardActions>
-                                        <Grid container spacing={1} rowSpacing={1}>
-                                            <Grid item xs ={12}>
-                                                <Button 
-                                                    size="small" 
-                                                    variant='outlined' 
-                                                    sx={{width:'100%'}}
-                                                    component={RouterLink}
-                                                    to={"/predios/"+predioObj.nome}
-                                                >
-                                                    Ver Salas
-                                                </Button>
+                    {
+                        loading?(
+                            <>
+                                <Grid item xs={3}>
+                                    <Card>
+                                        <CardActionArea>
+                                        <CardContent>
+                                            <Typography gutterBottom variant="h5" component="div">
+                                                <Skeleton/>
+                                            </Typography>
+                                            <Typography variant="body2" my={2}>
+                                                <Skeleton/>
+                                            </Typography>
+                                        </CardContent>
+                                        </CardActionArea>
+                                    </Card>
+                                </Grid>
+                            </>
+                        ):(
+                            filterFn.fn(numeroSalas).map(predioObj=>{
+                            return (
+                                <Grid item xs={3}>
+                                    <Card>
+                                        <CardActionArea>
+                                        <CardContent>
+                                            <Typography gutterBottom variant="h5" component="div">
+                                                {predioObj.nome}
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary" my={2}>
+                                                Número de Salas: {predioObj.salas}
+                                            </Typography>
+                                        </CardContent>
+                                        </CardActionArea>
+                                        <CardActions>
+                                            <Grid container spacing={1} rowSpacing={1}>
+                                                <Grid item xs ={12}>
+                                                    <Button 
+                                                        size="small" 
+                                                        variant='outlined' 
+                                                        sx={{width:'100%'}}
+                                                        component={RouterLink}
+                                                        to={"/predios/"+predioObj.nome}
+                                                    >
+                                                        Ver Salas
+                                                    </Button>
+                                                </Grid>
+                                                <Grid item xs ={6}>
+                                                    <Button size="small" variant='outlined' sx={{width:'100%'}}
+                                                        onClick={()=>openInModalEdit(predioObj.nome)}
+                                                    >Editar</Button>
+                                                </Grid>
+                                                <Grid item xs ={6}>
+                                                    <Button size="small" variant='outlined' sx={{width:'100%'}}
+                                                        onClick={()=>{
+                                                            setConfirmDialog({
+                                                                isOpen:true,
+                                                                title: `Deletar Predio - ${predioObj.nome}`,
+                                                                subtitle:'Tem certeza que deseja deletar? Você não pode desfazer esta operação.',
+                                                                onConfirm: () =>{onDelete(predioObj.nome)}
+                                                            })
+                                                        }}
+                                                    >Deletar</Button>
+                                                </Grid>
                                             </Grid>
-                                            <Grid item xs ={6}>
-                                                <Button size="small" variant='outlined' sx={{width:'100%'}}
-                                                    onClick={()=>openInModalEdit(predioObj.nome)}
-                                                >Editar</Button>
-                                            </Grid>
-                                            <Grid item xs ={6}>
-                                                <Button size="small" variant='outlined' sx={{width:'100%'}}
-                                                    onClick={()=>{
-                                                        setConfirmDialog({
-                                                            isOpen:true,
-                                                            title: `Deletar Predio - ${predioObj.nome}`,
-                                                            subtitle:'Tem certeza que deseja deletar? Você não pode desfazer esta operação.',
-                                                            onConfirm: () =>{onDelete(predioObj.nome)}
-                                                        })
-                                                    }}
-                                                >Deletar</Button>
-                                            </Grid>
-                                        </Grid>
-                                    </CardActions>
-                                </Card>
-                            </Grid>
-                        )
-                    })}
+                                        </CardActions>
+                                    </Card>
+                                </Grid>
+                            )}
+                        ))
+                    }
             </Grid>
         </React.Fragment>
     )

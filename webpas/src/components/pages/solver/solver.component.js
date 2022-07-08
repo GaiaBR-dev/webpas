@@ -1,9 +1,9 @@
 import React, {useState, useEffect} from "react";
-import PageHeader from "../page-header.component";
+import PageHeader from "../../re-usable/page-header.component";
 import CalculateIcon from '@mui/icons-material/Calculate';
 import { Paper, Typography, Grid, Box } from "@mui/material";
-import Select from "../forms/select.component";
-import DistanciasDataService from '../../services/distancias'
+import Select from "../../forms/select.component";
+import DistanciasDataService from '../../../services/distancias'
 import { Alert } from "@mui/material";
 import { IconButton } from "@mui/material";
 import HelpIcon from '@mui/icons-material/Help';
@@ -12,8 +12,8 @@ import { Checkbox } from "@mui/material";
 import { CircularProgress } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 import { Dialog, DialogContent } from "@mui/material";
-import AjudaSolver from './help/ajuda-solver.component'
-import ResultadosDataService from "../../services/resultados"
+import AjudaSolver from '../help/ajuda-solver.component'
+import ResultadosDataService from "../../../services/resultados"
 import { Button, FormControl, FormLabel, FormControlLabel, TextField} from "@mui/material";
 
 const thisYear = new Date().getFullYear()
@@ -24,7 +24,7 @@ const configTemp = {
 }
 
 const Solver = props =>{
-    const {config} = props
+    const {config,user,logout} = props
 
     const [ano,setAno] = useState(thisYear);
     const [anos,setAnos] = useState([]);
@@ -131,7 +131,7 @@ const Solver = props =>{
         DistanciasDataService.temTodos()
             .then(res => {
                 setTemTodos(res.data.isComplete)
-            }).catch(err => console.log(err))
+            }).catch(err => {console.log(err)})
     }
 
     const handleExecute = () =>{

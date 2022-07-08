@@ -1,25 +1,26 @@
 import React from "react";
-import TurmaForm from '../forms/turmaForm.component'
-import FileFormTurma from "../forms/fileFormTurma.component";
-import PageHeader from '../page-header.component';
-import SchoolIcon from '@mui/icons-material/School';
+import DistanciaForm from '../../forms/distanciaForm.component'
+import PageHeader from '../../re-usable/page-header.component';
+import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
 import { Modal, TableBody, TableCell, TableRow, Grid, Toolbar, TextField, DialogContent } from "@mui/material";
 import {Dialog, Button, IconButton}  from "@mui/material"
 import HelpIcon from '@mui/icons-material/Help';
-import useTable from "../useTable";
-import TurmasDataService from '../../services/turmas'
+import useTable from "../../re-usable/useTable";
+import DistanciasDataService from '../../../services/distancias'
+import TurmasDataService from '../../../services/turmas';
+import SalasDataService from '../../../services/salas';
 import { useEffect, useState } from 'react';
 import { TableContainer, Paper } from "@mui/material";
-import Select from "../forms/select.component";
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import InputAdornment from '@mui/material/InputAdornment';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import Mensagem from "../mensagem.component";
-import ConfirmDialog from "../confirmDialog.component";
-import handleServerResponses from "../../services/response-handler";
+import Mensagem from "../../re-usable/mensagem.component";
+import ConfirmDialog from "../../re-usable/confirmDialog.component";
+import handleServerResponses from "../../../services/response-handler";
 import { Checkbox } from "@mui/material";
-import AjudaTurma from "./help/ajuda-turma.component";
+import FileFormDistancias from "../../forms/fileFormDistancia.component";
+import { Alert } from "@mui/material";
 
 const tableRowCss ={
     '& .MuiTableCell-root':{
@@ -39,51 +40,30 @@ const tableStyle ={
 
 const headCells =[
     {id:'actions',label:"Editar", disableSorting:true},
-    {id:'idTurma', label:'idTurma'},
-    {id:'nomeDisciplina', label:'Nome da Disciplina'},
-    {id:'turma', label:'Turma'},
-    {id:'totalTurma', label:'Total de Alunos'},
-    {id:'diaDaSemana', label:'Dia'},
-    {id:'horarioInicio', label:'Horário de Ínicio'},
-    {id:'horarioFim', label:'Horário de Término'},
-    {id:'creditosAula', label:'Creditos'},
-    {id:'departamentoOferta', label:'Departamento de Oferta'},
-    {id:'departamentoTurma', label:'Departamento Recomendado'},
-    {id:'campus', label:'Campus'},
-    {id:'docentes', label:'Docentes'},
-    {id:'codDisciplina', label:'Código da Disciplina'},
-    
+    {id:'predio', label:'Prédio'},
+    {id:'departamento', label:'Departamento'},
+    {id:'distancia', label:'Distância'},
+    {id:'status', label:'Status'},
+
 ]
 
-const thisYear =  new Date().getFullYear()
+const DistanciasMatriz = props =>{
+    const {user,logout,config} = props
 
-const TurmasList = props =>{
-    const {config} = props
-
-    const [turmas,setTurmas] = useState([]);
+    const [distancias,setDistancias] = useState([]);
+    const [predios,setPredios] = useState([]);
+    const [departamentos,setDepartamentos] = useState([]);
+    const [temTodos,setTemTodos] = useState(true);
+    const [indiceDistancias,setIndiceDistancias] = useState({});
+    const [distanciaTableObjs,setDistanciaTableObjs] = useState([]);
     const [openModalForm, setOpenModalForm] = React.useState(false);
     const [openModalFile, setOpenModalFile] = React.useState(false);
-    const [openHelp, setOpenHelp] = useState(false);
-    const [horariosInicio,setHorariosInicio] = useState([]);
-    const [horariosFim,setHorariosFim] = useState([]);
-    const [turmaEdit,setTurmaEdit] = useState(null)
-    const [updatingT,setUpdatingT] = useState(false)
+    const [distanciaEdit,setDistanciaEdit] = useState(null)
+    const [updatingD,setUpdatingD] = useState(false)
     const [filterFn,setFilterFn] = useState({fn:items=>{return items;}})
-    const [anos,setAnos] = useState([]);
-    const [anoTable,setAnoTable] = useState(thisYear)
-    const [semestreTable,setSemestreTable] = useState(1)
     const [notify,setNotify] = useState({isOpen:false,message:'',type:''})
     const [confirmDialog,setConfirmDialog] = useState({isOpen:false,title:'',subtitle:''})
     const [selected, setSelected] = React.useState([]);
-
-    useEffect(()=>{
-        retornaAnos()
-        retornaHorarios()
-    },[])
-
-    useEffect(()=>{
-        retornaTurmas(anoTable,semestreTable)
-    }, [anoTable,semestreTable,notify])
 
     const handleCloseModalForm = () => {
         setOpenModalForm(false)
@@ -91,50 +71,97 @@ const TurmasList = props =>{
     };
     const handleOpenModalFile = () => setOpenModalFile(true);
     const handleCloseModalFile = () => setOpenModalFile(false);
-    const handleCloseHelp = () => setOpenHelp(false);
-    const handleOpenHelp = () => setOpenHelp(true);
 
-    const retornaTurmas = (ano,semestre) =>{
-        TurmasDataService.getByAnoSemestre(ano,semestre)
+    useEffect(()=>{
+        retornaPredios()
+        retornaDepartamentos()
+        retornaDistancias()
+    }, [notify])
+
+    useEffect(()=>{
+        retornaIndiceDistancias()
+        retornaTemTodos()
+    },[distancias])
+
+    useEffect(()=>{
+        retornaDistanciasTableObjs()
+    },[indiceDistancias,predios,departamentos])
+
+    const retornaDistancias = () =>{
+        DistanciasDataService.getAll()
             .then(response => {
-                setTurmas(response.data)
+                setDistancias(response.data)
+            })
+            .catch(err => handleServerResponses('distancias',err,setNotify))
+    }
+
+    const retornaDepartamentos = () =>{
+        TurmasDataService.getDepartamentos()
+            .then(response => {
+                setDepartamentos(response.data)
             })
             .catch(err => handleServerResponses('turmas',err,setNotify))
     }
 
-    const handleAnoTableSelect = e =>{
-        setAnoTable(e.target.value)
-    }
-
-    const handleSemestreTableSelect = e =>{
-        setSemestreTable(e.target.value)
-    }
-
-    const retornaHorarios = () =>{
-        let periodos = config.periodos ? config.periodos : []
-        if(config.horarios){
-            let horariosI = []
-            let horariosF = []
-            periodos.map((periodo)=>{
-                horariosI.push(config.horarios[periodo]['Ínicio'].slot1)
-                horariosI.push(config.horarios[periodo]['Ínicio'].slot2)
-                horariosF.push(config.horarios[periodo]['Fim'].slot1)
-                horariosF.push(config.horarios[periodo]['Fim'].slot2)
+    const retornaPredios = () =>{
+        SalasDataService.getPredios()
+            .then(response => {
+                setPredios(response.data)
             })
-            setHorariosInicio(horariosI)
-            setHorariosFim(horariosF)
-        }
+            .catch(err => {
+                let notAuthorized = err.response.data?.notAuth ? err.response.data.notAuth : false
+                if (notAuthorized){
+                    logout()
+                }
+                handleServerResponses('salas',err,setNotify)
+            })
     }
 
-    const retornaAnos = () =>{
-        const anoAtual = new Date().getFullYear()
-        const firstYear = anoAtual - 4
-        let anos = []
-        for(let i=0;i<6;i++){
-            let anoA = firstYear + i
-            anos.push(anoA)
-        }
-        setAnos(anos)
+    const retornaIndiceDistancias = () =>{
+        const indexDist = distancias.reduce((acc, cur) => {
+            acc[cur.predio] = acc[cur.predio] ? acc[cur.predio] : {}
+            acc[cur.predio] = {
+                ...acc[cur.predio],
+                [cur.departamento]: {}
+            }
+            acc[cur.predio][cur.departamento] = {
+                ...acc[cur.predio][cur.departamento],
+                distancia:cur.valorDist,
+                _id:cur._id
+            }
+            return acc
+        }, {})
+        setIndiceDistancias(indexDist)
+    }
+
+    const retornaDistanciasTableObjs = () =>{
+        let distTableObjArray = []
+        predios.map((predio,indexp)=>{
+            departamentos.map((departamento,indexd)=>{
+                let strId =  `${indexp}${indexd}`
+                let missing = 12 - strId.length
+                indiceDistancias[predio] = indiceDistancias[predio]? indiceDistancias[predio]: {}
+                for(let i=0;i<missing;i++){
+                    strId = strId + "0"
+                }
+                let distTableObj = {
+                    _id: indiceDistancias[predio][departamento]?._id ? indiceDistancias[predio][departamento]._id : strId,
+                    predio:predio,
+                    departamento:departamento,
+                    valorDist: indiceDistancias[predio][departamento]?.distancia ? indiceDistancias[predio][departamento].distancia : "-",
+                    status: indiceDistancias[predio][departamento]?.distancia ? "OK" : "Não Informado" 
+                }
+                distTableObjArray.push(distTableObj)
+            })
+        })
+        setDistanciaTableObjs(distTableObjArray)
+    }
+
+    const retornaTemTodos = () =>{
+        DistanciasDataService.temTodos()
+            .then(res => {
+                setTemTodos(res.data.isComplete)
+            }).catch(err => console.log(err))
     }
 
     const handleSearch = e =>{
@@ -144,24 +171,26 @@ const TurmasList = props =>{
                 if(target.value == ""){
                     return items
                 }else{
-                    return items.filter(turma => {
+                    return items.filter(distancia => {
                         return (
-                            turma.nomeDisciplina
+                            distancia.predio
                                 .toLowerCase()
                                 .includes(target.value.toLowerCase())
-                            //|| turma.docentes
-                            //    .toLowerCase()
-                            //    .includes(target.value.toLowerCase()) 
+                            || distancia.departamento
+                                .toLowerCase()
+                                .includes(target.value.toLowerCase()) 
+                            || distancia.status
+                                .toLowerCase()
+                                .includes(target.value.toLowerCase()) 
                         )
                     }) 
                 }
             }
         })
     }
-    
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-          const newSelecteds = recordsAfterPagingAndSorting().map((turma) => turma._id);
+          const newSelecteds = recordsAfterPagingAndSorting().map((distancia) => distancia._id);
           setSelected(newSelecteds);
           return;
         }
@@ -191,38 +220,38 @@ const TurmasList = props =>{
 
     const fileHandleResponse = res =>{
         setOpenModalFile(false)
-        handleServerResponses('turmas',res,setNotify)
-        retornaTurmas(anoTable,semestreTable)
+        handleServerResponses('distancias',res,setNotify)
+        retornaDistancias()
     }
     
 
-    const addOrEdit = (updating,turma,resetForm) =>{
-        let data= {...turma}
+    const addOrEdit = (updating,distancia,resetForm) =>{
+        let data= {...distancia}
         if (updating){
-            TurmasDataService.updateTurma(turma._id,data)
-                .then(res =>handleServerResponses('turmas',res,setNotify))
-                .catch(err=>handleServerResponses('turmas',err,setNotify))
-            setSelected([]);
+            DistanciasDataService.updateDistancia(distancia._id,data)
+                .then(res =>handleServerResponses('distancias',res,setNotify))
+                .catch(err=>handleServerResponses('distancias',err,setNotify))
         }else{
-            TurmasDataService.addTurma(data)
-                .then(res =>handleServerResponses('turmas',res,setNotify))
-                .catch(err=>handleServerResponses('turmas',err,setNotify))
+            DistanciasDataService.addDistancia(data)
+                .then(res =>handleServerResponses('distancias',res,setNotify))
+                .catch(err=>handleServerResponses('distancias',err,setNotify))
         }
+        setSelected([]);
         resetForm()
         setOpenModalForm(false)
-        retornaTurmas(anoTable,semestreTable)
+        retornaDistancias()
     }
 
-    const onDelete =(turmas)=>{
+    const onDelete =(distancias)=>{
         setConfirmDialog({
             ...confirmDialog,
             isOpen:false
         })
-        let data={turmasID:turmas}
-        TurmasDataService.deleteTurmas(data)
-            .then(res =>handleServerResponses('turmas',res,setNotify))
-            .catch(err=>handleServerResponses('turmas',err,setNotify))
-        retornaTurmas(anoTable,semestreTable)
+        let data={distanciasID:distancias}
+        DistanciasDataService.deleteDistancias(data)
+            .then(res =>handleServerResponses('distancias',res,setNotify))
+            .catch(err=>handleServerResponses('distancias',err,setNotify))
+        retornaDistancias()
         setSelected([]);
     }
 
@@ -231,27 +260,28 @@ const TurmasList = props =>{
         TblHead,
         TblPagination,
         recordsAfterPagingAndSorting
-    }=useTable(turmas,headCells,filterFn)
+    }=useTable(distanciaTableObjs,headCells,filterFn)
 
-    const openInModalEdit = turma =>{
-        setUpdatingT(true)
-        setTurmaEdit(turma)
+    const openInModalEdit = distancia =>{
+        setUpdatingD(true)
+        setDistanciaEdit(distancia)
         setOpenModalForm(true)
     }
 
     const openInModalNew = () =>{
-        setUpdatingT(false)
-        setTurmaEdit(null)
+        setUpdatingD(false)
+        setDistanciaEdit(null)
         setOpenModalForm(true)
     }
 
     return(
         <>
             <PageHeader 
-                title="Turmas"
-                subtitle="Cadastro, edição e visualização de turmas"
-                icon={<SchoolIcon />}
+                title="Distâncias"
+                subtitle="Cadastro, edição e visualização de distâncias"
+                icon={<DirectionsWalkIcon />}
             />
+            
             <Mensagem 
                 notify={notify}
                 setNotify={setNotify}
@@ -268,11 +298,9 @@ const TurmasList = props =>{
                     aria-labelledby="modal-modal-title"
                     aria-describedby="modal-modal-description"
                 >
-                    <FileFormTurma
-                        title="Adicionar Arquivo"
+                    <FileFormDistancias
+                        title={'Adicionar arquivo'}
                         closeButton={handleCloseModalFile}
-                        anos={anos}
-                        config={config}
                         handleResponse={fileHandleResponse}
                     />
                 </Modal>
@@ -284,26 +312,19 @@ const TurmasList = props =>{
                     aria-labelledby="modal-modal-title"
                     aria-describedby="modal-modal-description"
                 ><DialogContent >
-                    <TurmaForm
-                        addOrEdit={addOrEdit}
-                        turmaEdit = {turmaEdit}
-                        updating={updatingT}
-                        dias={config.dias}
-                        horariosInicio={horariosInicio}
-                        horariosFim={horariosFim}
-                        anos={anos}
-                        closeModalForm ={handleCloseModalForm}
-                    /></DialogContent>
-                </Dialog>
-                <Dialog
-                    open={openHelp}
-                    onClose={handleCloseHelp}
-                >
-                    <DialogContent>
-                        <AjudaTurma/>
-                    </DialogContent>
+                        <DistanciaForm
+                            addOrEdit ={addOrEdit}
+                            predios = {predios}
+                            departamentos = {departamentos}
+                            tableObjs = {distanciaTableObjs}
+                            updating = {updatingD}
+                            distanciaEdit = {distanciaEdit}
+                            closeModalForm ={handleCloseModalForm}
+                        />
+                </DialogContent>
                 </Dialog>
                 <Toolbar>
+                
                 <Grid container 
                     spacing={2} 
                     sx={{paddingTop:'12px'}} 
@@ -342,41 +363,32 @@ const TurmasList = props =>{
                         />
                     </Grid>
                     <Grid item xs={6} sm={2}>
-                        <Select
-                            label="Ano"
-                            value={anoTable}
-                            onChange={handleAnoTableSelect}
-                            options ={anos}
-                        />  
                     </Grid>
                     <Grid item xs={6} sm={2}>
-                        <Select 
-                            label="Semestre"
-                            value={semestreTable}
-                            onChange={handleSemestreTableSelect}
-                            options ={[1,2]}
-                        
-                        />
                     </Grid>
                     <Grid item xs={6} sm={1}>
                         <IconButton
                             color="inherit"
                             edge="start"
-                            onClick={handleOpenHelp}
                         >
                             <HelpIcon />
                         </IconButton>
                     </Grid>
                 </Grid>
-                </Toolbar>
+                </Toolbar>{temTodos ?(
+                <></>
+            ):(
+                <Alert severity="error" sx={{marginTop:'10px'}}>Existem distâncias entre prédios e departamentos 
+                não informadas. A otimização só podera ser executada com todas as distâncias cadastradas.</Alert>
+            )}
                 <TblContainer 
                     sx={tableStyle} 
-                    tableTitle="Lista de Turmas"
+                    tableTitle="Lista de distâncias"
                     numSelected={selected.length}
                     deleteSelected={()=>{
                         setConfirmDialog({
                             isOpen:true,
-                            title:'Deletar Turmas',
+                            title:'Deletar Distâncias',
                             subtitle:'Tem certeza que deseja deletar? Você não pode desfazer esta operação.',
                             onConfirm: () =>{onDelete(selected)}
                         })
@@ -388,17 +400,17 @@ const TurmasList = props =>{
                         rowCount={recordsAfterPagingAndSorting().length}
                     />
                     <TableBody>
-                        {recordsAfterPagingAndSorting().map((turma,index)=>{
-                            const isItemSelected = isSelected(turma._id);
-                            const labelId = `turmas-table-checkbox-${index}`;
+                        {recordsAfterPagingAndSorting().map((distancia,index)=>{
+                            const isItemSelected = isSelected(distancia._id);
+                            const labelId = `distancias-table-checkbox-${index}`;
                             return(
                                 <TableRow 
-                                    key={turma._id} 
+                                    key={distancia._id} 
                                     sx ={tableRowCss}
                                     selected={isItemSelected}
                                     aria-checked={isItemSelected}
                                     role="checkbox"
-                                    onClick={(event) => handleClick(event, turma._id)}
+                                    onClick={(event) => handleClick(event, distancia._id)}
                                 >
                                     <TableCell padding="checkbox">
                                         <Checkbox
@@ -413,24 +425,15 @@ const TurmasList = props =>{
                                         <IconButton 
                                             sx={{padding:'4px'}} 
                                             color="primary"
-                                            onClick={()=>{openInModalEdit(turma)}}
+                                            onClick={()=>{openInModalEdit(distancia)}}
                                         >
                                             <EditOutlinedIcon fontSize="small"/> 
                                         </IconButton>
                                     </TableCell>
-                                    <TableCell>{turma.idTurma}</TableCell>
-                                    <TableCell>{turma.nomeDisciplina}</TableCell>
-                                    <TableCell>{turma.turma}</TableCell>
-                                    <TableCell>{turma.totalTurma}</TableCell>
-                                    <TableCell>{turma.diaDaSemana}</TableCell>
-                                    <TableCell>{turma.horarioInicio}</TableCell>
-                                    <TableCell>{turma.horarioFim}</TableCell>
-                                    <TableCell>{turma.creditosAula}</TableCell>
-                                    <TableCell>{turma.departamentoOferta}</TableCell>
-                                    <TableCell>{turma.departamentoTurma}</TableCell>
-                                    <TableCell>{turma.campus}</TableCell>
-                                    <TableCell>{turma.docentes}</TableCell>
-                                    <TableCell>{turma.codDisciplina}</TableCell>
+                                    <TableCell>{distancia.predio}</TableCell>
+                                    <TableCell>{distancia.departamento}</TableCell>
+                                    <TableCell>{distancia.valorDist}</TableCell>
+                                    <TableCell>{distancia.status}</TableCell>
 
                                 </TableRow>
                             )
@@ -439,8 +442,10 @@ const TurmasList = props =>{
                 </TblContainer>
                 <TblPagination/>
             </ TableContainer>
+
+
         </>
     )
 }
 
-export default TurmasList;
+export default DistanciasMatriz;

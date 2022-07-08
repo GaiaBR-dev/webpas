@@ -176,7 +176,6 @@ async function resolve(modelo,delta) {
         varsPAS = getVariables()
         constraintsPAS = getConstraints()
         binariesPAS = getBinaries()
-        console.log(varsPAS)
 
         result = {
             name: 'ModeloPAS',
@@ -196,15 +195,17 @@ async function resolve(modelo,delta) {
     const res = glpk.solve(modeloPAS, options)
 
     function removeZeros(obj) {
-        for (var property in obj.result.vars) {
-            if (obj.result.vars[property] == 0) {
-                delete obj.result.vars[property];
+        let objNoZeros = {...obj}
+        for (var property in objNoZeros.result.vars) {
+            if (objNoZeros.result.vars[property] == 0) {
+                delete objNoZeros.result.vars[property];
             }
         }
+        return objNoZeros
     }
 
-    removeZeros(res)
-    return res
+    const respostaModelo = removeZeros(res)
+    return respostaModelo
 
 }
 

@@ -1,50 +1,75 @@
 const router = require('express').Router()
 let Config = require('../models/config.model')
+const {protect} = require("../middleware/auth")
 
-router.route('/').get((req,res)=>{// procurar por usuario
+const StandartConfig = {
+    horarios:{
+        "Manhã":{
+            "Ínicio":{
+                slot1:"800",
+                slot2:"1000"
+            },
+            "Fim":{
+                slot1:"1000",
+                slot2:"1200"
+            }
+        },
+        "Tarde":{
+            "Ínicio":{
+                slot1:"1400",
+                slot2:"1600"
+            },
+            "Fim":{
+                slot1:"1600",
+                slot2:"1800"
+            }
+        },
+        "Noite":{
+            "Ínicio":{
+                slot1:"1900",
+                slot2:"2100"
+            },
+            "Fim":{
+                slot1:"2100",
+                slot2:"2300"
+            }
+        },
+    },
+    dias:["Segunda","Terça","Quarta","Quinta","Sexta"],
+    periodos:["Manhã","Tarde","Noite"]
+}
+
+router.route('/').get(protect,(req,res)=>{
     Config.find()
         .then(config => res.json(config))
         .catch(err => res.status(400).json(err) )        
 })
 
-router.route('/user/:user').get((req,res)=>{// procurar por usuario
-    Config.find({usuario:req.params.user})
-        .then(config => res.json(config[0]))
+router.route('/user/:id').get(protect,(req,res)=>{
+    Config.findOne({user:req.params.id})
+        .then(config => res.json(config))
         .catch(err => res.status(400).json(err) )        
 })
 
-router.route('/newConfig').post((req,res)=>{ //Procurar config por usuário, se existir impedir novas configs
-    const horarios = req.body.horarios
-    const dias = req.body.dias
-    const periodos = req.body.periodos
-    const usuario = req.body.usuario
-
-    Config.find({usuario:usuario})
-        .then(configs=>{
-            if(configs.length>0){
-                res.status(400).json('Usuario ja existe')
-            }else{
-                const novaConfig = new Config({
-                    horarios,
-                    dias,
-                    periodos,
-                    usuario
-                })
-
-                novaConfig.save()
-                    .then(()=>res.json('Configuração Adicionada'))
-                    .catch(err=>{
-                        console.log(err)
-                        res.status(400).json(err)})
-            }
-        })
+router.route('/createStandartConfig/:id').post((req,res)=>{
+    const novaConfig = new Config(StandartConfig)
+    novaConfig.user = req.params.id
+    novaConfig.save()
+        .then(()=>{
+            res.status(200).json({success:true, message:"Config Criada"})
+        }).catch(err=>res.status(400).json(err))
 })
 
-router.route('/update/:id').post((req,res)=>{
-    Config.findById(req.params.id)
-        .then(config=>{
+router.route('/updateConfig/:id').post(protect,(req,res)=>{ //Procurar config por usuário, se existir impedir novas configs
+    const { horarios,dias,periodos} = req.body
+    const id = req.params.id
 
-        }).catch(err=>res.status(400).json(err))
+    Config.findByIdAndUpdate(id,{horarios,dias,periodos})
+        .then(()=>res.status(200).json("Configuração atualizada"))
+        .catch(err=>{
+            console.log(err)
+            res.status(400).json({msg:"Configuração inválida",code:1})})
+
 })
 
 module.exports = router

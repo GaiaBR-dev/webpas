@@ -13,11 +13,20 @@ const salaSchema = new Schema({
         disponivel:{type:Boolean,required:true}
     }],
     terreo:Boolean, 
-    acessivel:Boolean
+    acessivel:Boolean,
+    user:{type:mongoose.Types.ObjectId,ref:'User',required:true}
 })
 
-salaSchema.index({predio: 1,numeroSala: 1}, {unique: true})
+salaSchema.index({predio: 1,numeroSala: 1,user:1}, {unique: true})
 
 const Sala = mongoose.model('Sala',salaSchema)
+
+Sala.on('index', function(err) {
+    if (err) {
+        console.error('Salas: User index error: %s', err);
+    } else {
+        console.info('Salas: User indexing complete');
+    }
+});
 
 module.exports = Sala

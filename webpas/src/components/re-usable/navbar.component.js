@@ -6,6 +6,7 @@ import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
+import { Link } from 'react-router-dom';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -20,6 +21,7 @@ import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
 import CalculateIcon from '@mui/icons-material/Calculate';
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import SettingsIcon from '@mui/icons-material/Settings';
+import {Grid} from '@mui/material';
 import {
     Link as RouterLink,
     Route,
@@ -28,6 +30,8 @@ import {
     useLocation,
   } from 'react-router-dom';
 import { StaticRouter } from 'react-router-dom/server';
+import { Button } from '@mui/material';
+import useAuth from '../../services/useAuth';
 
 const drawerWidth = 240;
 
@@ -124,7 +128,8 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
-export default function MiniDrawer() {
+const Navbar = props =>{
+  const {logout,user} = useAuth()
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
 
@@ -141,21 +146,45 @@ export default function MiniDrawer() {
       <React.Fragment>
       <AppBar position="fixed" open={open} sx={{opacity:100}}>
         <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            sx={{
-              marginRight: '36px',
-              ...(open && { display: 'none' }),
-            }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" noWrap component="div">
-            WebPAS
-          </Typography>
+          <Grid container spacing={1} columns={40} alignItems="center" justifyContent="flex-start">
+            <Grid item xs={1}>
+                <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                onClick={handleDrawerOpen}
+                edge="start"
+                sx={{
+                  marginRight: '36px',
+                  ...(open && { display: 'none' }),
+                }}
+              >
+                <MenuIcon />
+              </IconButton>
+            </Grid>
+            <Grid item xs={37}>
+                <Link to="/" variant="h1" style={{textDecoration: 'none'}} color="#fff">
+                <Typography variant="h5" style={{textDecoration: 'none'}} color="#fff">
+                    WebPAS
+                </Typography>
+              </Link>
+            </Grid>
+            <Grid item xs={2}>
+              <Button 
+              variant="contained" 
+              onClick={logout} 
+              style={{float:"right",
+                backgroundColor:"#eee",
+                color:"#222"
+
+              }}>
+                
+                Logout</Button>
+            </Grid>
+
+          </Grid>
+          
+
+
         </Toolbar>
       </AppBar>
       <Drawer variant="permanent" open={open}>
@@ -178,3 +207,5 @@ export default function MiniDrawer() {
     </React.Fragment>
   );
 }
+
+export default Navbar;

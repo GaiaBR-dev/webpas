@@ -1,5 +1,5 @@
 class ExcelValidator{
-    firstValidateTurmas(rowsTurmas,configProps){
+    firstValidateTurmas(rowsTurmas,configProps,horariosInicio,horariosFim){
         let erroPreenchido = false
         let erroHorarioI = false
         let erroHorarioF = false
@@ -14,14 +14,16 @@ class ExcelValidator{
                     code: 0,
                     msg:'Tabela dentro dos padrões'
                 }
-            } 
+            },
+            listaErros:[]
         }
         let turmaDup =''
         let disciplinaDup =''
         
         let turmaErroTipo =''
         let disciplinaErroTipo =''
-
+        console.log("HI : ", horariosInicio)
+        console.log("HF : ", horariosFim)
         rowsTurmas.map(row =>{
 
             if (row['Nome da Disciplina'] == null) {erroPreenchido = true}
@@ -36,10 +38,10 @@ class ExcelValidator{
             if (row['Dia'] == null)  {erroPreenchido = true}
             if (row['Horário de Ínicio'] == null)  {erroPreenchido = true}
             if (row['Horário de Término'] == null)  {erroPreenchido = true}
-            if (!configProps.horarios.includes(row['Horário de Ínicio'])) {
+            if (!horariosInicio.includes(row['Horário de Ínicio'].toString())) {
                 erroHorarioI = true
             }
-            if (!configProps.horarios.includes(row['Horário de Término'])) {
+            if (!horariosFim.includes(row['Horário de Término'].toString())) {
                 erroHorarioF = true
             }
             let str = row['Dia']
@@ -92,7 +94,7 @@ class ExcelValidator{
     }
 
 
-    mapColumnKeysTurmas(rowsTurmas,ano,semestre){
+    mapColumnKeysTurmas(rowsTurmas,ano,semestre,user){
         let turmas = new Array()
         rowsTurmas.map(row =>{
             let str = row['Dia']
@@ -113,8 +115,9 @@ class ExcelValidator{
                 alocadoChefia: false,
                 creditosAula:row['Créditos'],
                 docentes:row['Docentes'],
-                ano:ano,
-                semestre:semestre
+                ano,
+                semestre,
+                user,
             }
             turmas.push(turma)
         })
@@ -222,13 +225,14 @@ class ExcelValidator{
         return res
     }
 
-    mapColumnKeysSalas(rowsSalas,config){
+    mapColumnKeysSalas(rowsSalas,config,user){
         const salas = rowsSalas.map(row =>{
 
             let sala = {
                 predio: row['Predio'],
                 numeroSala: row['Sala'],
-                capacidade: row['Capacidade']
+                capacidade: row['Capacidade'],
+                user:user._id
             }
             let disponibilidade = []
             config.dias.map(dia=>{

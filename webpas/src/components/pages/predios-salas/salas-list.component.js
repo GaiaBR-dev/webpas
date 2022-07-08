@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import SalasDataService from '../../services/salas'
-import PageHeader from "../page-header.component";
-import Mensagem from "../mensagem.component";
-import ConfirmDialog from "../confirmDialog.component";
+import SalasDataService from '../../../services/salas';
+import PageHeader from "../../re-usable/page-header.component";
+import Mensagem from "../../re-usable/mensagem.component";
+import ConfirmDialog from "../../re-usable/confirmDialog.component";
 import { TableContainer, Paper, TableBody, TableCell, TableRow} from "@mui/material";
-import useTable from "../useTable";
+import useTable from "../../re-usable/useTable";
 import { Toolbar, Grid, Button, TextField, Modal } from "@mui/material";
 import { IconButton } from "@mui/material";
 import HelpIcon from '@mui/icons-material/Help';
@@ -13,14 +13,13 @@ import { InputAdornment } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import handleServerResponses from "../../services/response-handler";
+import handleServerResponses from "../../../services/response-handler";
 import { Dialog, DialogContent } from "@mui/material";
-import SalaForm from '../forms/salaForm.component';
+import SalaForm from '../../forms/salaForm.component';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Link as RouterLink } from 'react-router-dom';
 import { Checkbox } from "@mui/material";
-import FileFormSalas from "../forms/fileFormSala.component";
-import ConfigsDataService from '../../services/configs'
+import FileFormSalas from "../../forms/fileFormSala.component";
 
 const headCells =[
     {id:'actions',label:"Ações", disableSorting:true},
@@ -52,11 +51,11 @@ const tableStyle ={
     }
 }
 
-const Salas = ()=>{
+const Salas = props=>{
     let params = useParams()
+    const {user,config,logout} = props
     const [salas,setSalas]=useState([])
     const [salaEdit,setSalaEdit] = useState(null)
-    const [config,setConfig] = useState({dias:[],periodos:[]});
     const [openModalForm, setOpenModalForm] = useState(false);
     const [openModalFile, setOpenModalFile] = useState(false);
     const [updatingS,setUpdatingS] = useState(false)
@@ -66,7 +65,7 @@ const Salas = ()=>{
     const [selected, setSelected] = React.useState([]);
 
     useEffect(()=>{
-        retornaConfig()
+        
     }, [])
 
     useEffect(()=>{
@@ -85,13 +84,12 @@ const Salas = ()=>{
         SalasDataService.getSalas(predio)
             .then(response=>{
                 setSalas(response.data)
-            }).catch(err => console.log(err))
-    }
-
-    const retornaConfig = () =>{
-        ConfigsDataService.getConfigByUser('Eu') // mudar para usuario
-            .then(res=> setConfig(res.data))
-            .catch(err=>console.log(err))
+            }).catch(err => {
+                let notAuthorized = err.response.data?.notAuth ? err.response.data.notAuth : false
+                if (notAuthorized){
+                    logout()
+                }console.log(err)
+            })
     }
 
     const openInModalEdit = sala =>{
@@ -222,6 +220,7 @@ const Salas = ()=>{
                     title="Adicionar Arquivo"
                     closeButton={handleCloseModalFile}
                     config={config}
+                    user={user}
                     handleResponse={fileHandleResponse}
                 />
             </Modal>

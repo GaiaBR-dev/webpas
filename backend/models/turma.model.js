@@ -18,19 +18,20 @@ const turmaSchema = new Schema({
     creditosAula: {type:Number,  trim:true},
     docentes: {type:String,trim:true},
     ano:{type:Number,required:true},
-    semestre:{type:Number, required:true}
+    semestre:{type:Number, required:true},
+    user:{type:mongoose.Types.ObjectId,ref:'User',required:true}
 })
-turmaSchema.index({turma:1,nomeDisciplina:1,diaDaSemana:1,horarioInicio:1,ano:1,semestre:1},{ unique:true})
-turmaSchema.index({ano:1,semestre:1})
+turmaSchema.index({turma:1,nomeDisciplina:1,diaDaSemana:1,horarioInicio:1,ano:1,semestre:1,user:1},{ unique:true})
+turmaSchema.index({ano:1,semestre:1,user:1})
 //turmaSchema.index({docente:1,diaDaSemana:1,horarioInicio:1},{unique:true,sparse:true}) 
 
 const Turma = mongoose.model('Turma',turmaSchema)
 
 Turma.on('index', function(err) {
     if (err) {
-        console.error('User index error: %s', err);
+        console.error('Turmas: User index error: %s', err);
     } else {
-        console.info('User indexing complete');
+        console.info('Turmas: User indexing complete');
     }
 });
 

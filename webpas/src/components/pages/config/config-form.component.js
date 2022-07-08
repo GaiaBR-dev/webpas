@@ -1,13 +1,17 @@
-import React, {Component, useState} from "react";
-import PageHeader from '../page-header.component';
+import React, {Component, useEffect, useState} from "react";
+import PageHeader from '../../re-usable/page-header.component';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { Box, Paper, Grid, Typography, FormGroup, FormControlLabel, Checkbox, Divider, TextField, Button } from "@mui/material";
-import ConfigsDataService from '../../services/configs'
+import ConfigsDataService from '../../../services/configs';
+import Mensagem from '../../re-usable/mensagem.component';
+import handleServerResponses from "../../../services/response-handler";
 
 const dias = ['Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo']
 const periodos = ['Manhã','Tarde','Noite']
 
 const ConfigForm = props =>{
+    const {config,user,logout} = props
+    const [notify,setNotify] = useState({isOpen:false,message:'',type:''})
     const [diasCBList,setDiasCBList] = useState(new Array(dias.length).fill(false))
     const [periodosCBList,setPeriodosCBList] = useState(new Array(periodos.length).fill(false))
     const [horariosObj,setHorariosObj] = useState(()=>{
@@ -45,6 +49,28 @@ const ConfigForm = props =>{
         }
         return horarios
     })
+
+    useEffect(()=>{
+        setFormByConfig()
+    },[config])
+
+    const setFormByConfig = () =>{
+        if (config){
+            let tempArrayDias = new Array(dias.length).fill(false)
+            config.dias.map(dia=>{
+                tempArrayDias[dias.indexOf(dia)] = true
+            })
+            setDiasCBList(tempArrayDias)
+
+            let tempArrayPeriodos = new Array(periodos.length).fill(false)
+            config.periodos.map(periodo=>{
+                tempArrayPeriodos[periodos.indexOf(periodo)] = true
+            })
+            setPeriodosCBList(tempArrayPeriodos)
+
+            setHorariosObj(config.horarios)
+        }
+    }
 
 
     const handleCBDias = position =>{
@@ -96,33 +122,38 @@ const ConfigForm = props =>{
     }
 
     const handleBT = e =>{
-        let config = {}
-        config.dias = []
+        let configTemp = {}
+        configTemp.dias = []
         dias.map((dia,indexD)=>{
             if(diasCBList[indexD]){
-                config.dias.push(dia)
+                configTemp.dias.push(dia)
             }
         })
-        config.periodos = []
+        configTemp.periodos = []
         periodos.map((periodo,indexP)=>{
             if(periodosCBList[indexP]){
-                config.periodos.push(periodo)
+                configTemp.periodos.push(periodo)
             }
         })
-        config.horarios = {}
+        configTemp.horarios = {}
         periodos.map((periodo,indexP)=>{
             if(periodosCBList[indexP]){
-                config.horarios[periodo] = horariosObj[periodo]
+                configTemp.horarios[periodo] = horariosObj[periodo]
             }
         })
 
-        config.usuario = "Eu"
-        let data = {...config}
-        ConfigsDataService.addConfig(data)
-            .then(res=>console.log(res.data))
-            .catch(err=>console.log(err))
-
-
+        let data = {...configTemp}
+        ConfigsDataService.updateConfig(data,config._id)
+            .then(res=>handleServerResponses('configs',res,setNotify))
+            .catch(err=>{
+                console.log(err.response.data)
+                let notAuthorized = err.response.data?.notAuth ? err.response.data.notAuth : false
+                if (notAuthorized){
+                    logout()
+                }else{
+                    handleServerResponses('configs',err,setNotify)
+                }
+            })
     }
 
     return(
@@ -131,6 +162,10 @@ const ConfigForm = props =>{
                 title="Configurações"
                 subtitle="Definir dias, periodos e horários"
                 icon={<SettingsIcon/>}
+            />
+            <Mensagem 
+                notify={notify}
+                setNotify={setNotify}
             />
             <Paper>
                 <Box padding={'25px'}>
@@ -326,14 +361,15 @@ const ConfigForm = props =>{
                                         value ={horariosObj['Noite']['Fim'].slot2}
                                     />
                                 </Grid>
-
                             </>
                         ):(<></>)}
                         
-
                     </Grid>
-
-                    <Button onClick={handleBT}> Click me</Button>
+                    <br/>
+                    <br/>
+                    <Button variant="contained" onClick={handleBT}>Salvar</Button>
+                    <br/>
+                    
                 </Box>
             </Paper>
         

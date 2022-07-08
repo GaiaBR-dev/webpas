@@ -2,13 +2,17 @@ const express = require('express')
 const cors = require('cors')
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
+const errorHandler = require('./middleware/errorHandler')
+const cookieParser = require('cookie-parser')
+const {protect} = require("./middleware/auth")
 
 require('dotenv').config()
 
 const app = express()
+app.use(cookieParser())
 const port = process.env.PORT || 5000
 
-app.use(cors())
+app.use(cors({credentials:true,origin:'http://localhost:3000'}))
 app.use(bodyParser.json({limit: '5mb'}));
 app.use(bodyParser.urlencoded({limit: '5mb', extended: true}));
 
@@ -24,13 +28,22 @@ const turmasRouter = require('./routes/turmas')
 const distanciasRouter = require('./routes/distancias')
 const resultadosRouter = require('./routes/resultados')
 const configsRouter = require('./routes/config')
+const authenticationRouter = require('./routes/authentication')
 
-app.use('/salas',salasRouter)
+app.use('/salas',protect,salasRouter)
 app.use('/turmas',turmasRouter)
-app.use('/distancias',distanciasRouter)
-app.use('/resultados',resultadosRouter)
+app.use('/distancias',protect,distanciasRouter)
+app.use('/resultados',protect,resultadosRouter)
 app.use('/configs',configsRouter)
+app.use('/auth',authenticationRouter)
 
-app.listen(port,()=>{
+app.use(errorHandler)
+
+const server = app.listen(port,()=>{
     console.log(`Server running on port : ${port}`)
+})
+
+process.on("unhandledRejection",(err,promise)=>{
+    console.log(`Logged Error : ${err}`)
+    server.close(()=>process.exit(1))
 })

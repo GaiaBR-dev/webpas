@@ -55,6 +55,8 @@ const inicialValues ={
 }
 
 export default function FileFormTurma(props){
+    const{title, closeButton,anos,  config, handleResponse, horariosInicio, horariosFim,user } = props
+
     const [working,setWorking] = useState(false)
 
     useEffect(()=>{
@@ -69,6 +71,8 @@ export default function FileFormTurma(props){
             const workbook = XLSX.read(e.target.result);
             let temTurma = false
             let rowObject
+
+
             workbook.SheetNames.forEach(sheet => {
                 if (sheet === 'Turmas'){
                     temTurma = true
@@ -76,9 +80,9 @@ export default function FileFormTurma(props){
                 }
             });
             if (temTurma){
-                let res = ExcelValidator.firstValidateTurmas(rowObject,config)
+                let res = ExcelValidator.firstValidateTurmas(rowObject,config,horariosInicio,horariosFim)
                 if (!res.erro){
-                    const nturmas = ExcelValidator.mapColumnKeysTurmas(rowObject,values.ano,values.semestre)
+                    const nturmas = ExcelValidator.mapColumnKeysTurmas(rowObject,values.ano,values.semestre,user._id)
                     let data ={
                         novasTurmas:nturmas
                     }
@@ -111,7 +115,7 @@ export default function FileFormTurma(props){
     }
 
 
-    const{title, closeButton,anos,  config, handleResponse } = props
+    
     const{
         values,
         setValues,
