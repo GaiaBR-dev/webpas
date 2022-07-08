@@ -13,6 +13,9 @@ import ConfigWrapper from './components/pages/config/config-wrapper.component';
 import TurmasWrapper from "./components/pages/turmas/turmas-wrapper.component";
 import PrediosWrapper from "./components/pages/predios-salas/predios-wrapper.component";
 import SalasWrapper from "./components/pages/predios-salas/salas-wrapper.component";
+import DistanciasWrapper from "./components/pages/distancias/distancias-wrapper.component";
+import SolverWrapper from "./components/pages/solver/solver-wrapper.component";
+import AgendaWrapper from "./components/pages/agenda/agenda-wrapper.component";
 
 const theme = createTheme({
   palette: {
@@ -59,6 +62,9 @@ function App() {
                 <Route path="/turmas" element={<TurmasWrapper/>}/>
                 <Route path="/predios" element={<PrediosWrapper/>}/>
                 <Route path="/predios/:predio" element={<SalasWrapper/>}/>
+                <Route path="/distancias" element={<DistanciasWrapper/>}/>
+                <Route path="/solver" element={<SolverWrapper/>}/>
+                <Route path="/agenda" element={<AgendaWrapper/>}/>
               </Routes>
             </BrowserRouter>
           </Box>

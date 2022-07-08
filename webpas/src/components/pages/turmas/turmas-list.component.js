@@ -102,7 +102,12 @@ const TurmasList = props =>{
             .then(response => {
                 setTurmas(response.data)
             })
-            .catch(err => handleServerResponses('turmas',err,setNotify))
+            .catch(err => {
+                let notAuthorized = err.response.data?.notAuth ? err.response.data.notAuth : false
+                if (notAuthorized){
+                    logout()
+                }
+                handleServerResponses('turmas',err,setNotify)})
     }
 
     const handleAnoTableSelect = e =>{

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import useAuth from '../../services/useAuth';
 import { styled } from '@mui/material/styles';
 import Navbar from "../re-usable/navbar.component";
@@ -24,6 +24,12 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
 function HomePage(){
     const {logout,user} = useAuth()
+
+    useEffect(()=>{
+        if(user===false){
+            logout()
+        }
+    },[])
 
     return(
         <>

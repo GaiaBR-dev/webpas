@@ -1,25 +1,25 @@
 import React from "react";
-import DistanciaForm from '../forms/distanciaForm.component'
-import PageHeader from '../page-header.component';
+import DistanciaForm from '../../forms/distanciaForm.component'
+import PageHeader from '../../re-usable/page-header.component';
 import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
 import { Modal, TableBody, TableCell, TableRow, Grid, Toolbar, TextField, DialogContent } from "@mui/material";
 import {Dialog, Button, IconButton}  from "@mui/material"
 import HelpIcon from '@mui/icons-material/Help';
-import useTable from "../useTable";
-import DistanciasDataService from '../../services/distancias'
-import TurmasDataService from '../../services/turmas';
-import SalasDataService from '../../services/salas';
+import useTable from "../../re-usable/useTable";
+import DistanciasDataService from '../../../services/distancias'
+import TurmasDataService from '../../../services/turmas';
+import SalasDataService from '../../../services/salas';
 import { useEffect, useState } from 'react';
 import { TableContainer, Paper } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import InputAdornment from '@mui/material/InputAdornment';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import Mensagem from "../mensagem.component";
-import ConfirmDialog from "../confirmDialog.component";
-import handleServerResponses from "../../services/response-handler";
+import Mensagem from "../../re-usable/mensagem.component";
+import ConfirmDialog from "../../re-usable/confirmDialog.component";
+import handleServerResponses from "../../../services/response-handler";
 import { Checkbox } from "@mui/material";
-import FileFormDistancias from "../forms/fileFormDistancia.component";
+import FileFormDistancias from "../../forms/fileFormDistancia.component";
 import { Alert } from "@mui/material";
 
 const tableRowCss ={
@@ -48,6 +48,8 @@ const headCells =[
 ]
 
 const DistanciasMatriz = props =>{
+    const {user,logout,config} = props
+
     const [distancias,setDistancias] = useState([]);
     const [predios,setPredios] = useState([]);
     const [departamentos,setDepartamentos] = useState([]);
@@ -106,7 +108,13 @@ const DistanciasMatriz = props =>{
             .then(response => {
                 setPredios(response.data)
             })
-            .catch(err => handleServerResponses('salas',err,setNotify))
+            .catch(err => {
+                let notAuthorized = err.response.data?.notAuth ? err.response.data.notAuth : false
+                if (notAuthorized){
+                    logout()
+                }
+                handleServerResponses('salas',err,setNotify)
+            })
     }
 
     const retornaIndiceDistancias = () =>{
@@ -426,8 +434,6 @@ const DistanciasMatriz = props =>{
                                     <TableCell>{distancia.departamento}</TableCell>
                                     <TableCell>{distancia.valorDist}</TableCell>
                                     <TableCell>{distancia.status}</TableCell>
-                                    
-
 
                                 </TableRow>
                             )

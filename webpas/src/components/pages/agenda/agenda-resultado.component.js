@@ -1,5 +1,5 @@
 import React, {Component, useEffect, useState} from "react";
-import ResultadosDataService from '../../services/resultados'
+import ResultadosDataService from '../../../services/resultados'
 import { Grid } from "@mui/material";
 import { Typography } from "@mui/material";
 

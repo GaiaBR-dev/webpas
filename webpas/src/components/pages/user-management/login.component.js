@@ -41,7 +41,7 @@ const Login = props =>{
         const data = {...values}
         UserDataService.login(data)
             .then(res=>{
-                document.cookie = `user=${JSON.stringify(res.data.user)};max-age=${1000 * 60 * 24 * 30 *60}`
+                document.cookie = `user=${JSON.stringify(res.data.userToken)};max-age=${1000 * 60 * 24 * 30 *60}`
                 let callbackUrl = searchParams.get("callbackUrl")
                 window.location.href = callbackUrl || "/"
             })

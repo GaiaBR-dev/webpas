@@ -82,6 +82,10 @@ const PrediosList = props =>{
             .then(response =>{
                 setPredios(response.data)
             }).catch(err =>{
+                let notAuthorized = err.response.data?.notAuth ? err.response.data.notAuth : false
+                if (notAuthorized){
+                    logout()
+                }
                 console.log(err)
             })
     }

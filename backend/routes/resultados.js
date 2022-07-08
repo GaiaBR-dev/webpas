@@ -5,23 +5,27 @@ const { resolve } = require('../solver-logic/gerasalahorarioglpk')
 const { trataresultado } = require('../solver-logic/trataresultado')
 
 router.route('/').get((req,res)=>{
-    Resultado.find()
+    const {user} = req
+    Resultado.find({user:user._id})
         .then(resultados => res.json(resultados))
         .catch(err => res.status(400).json('Error: '+ err))
 })
 
 router.route('/:ano/:semestre').get((req,res)=>{
-    Resultado.find({ano:req.params.ano,semestre:req.params.semestre})
+    const {user} = req
+    Resultado.find({ano:req.params.ano,semestre:req.params.semestre,user:user._id})
         .then(resultados=>res.json(resultados))
         .catch(err => res.status(400).json(err))
 })
 
 router.route('/:ano/:semestre/:dia/:periodo').get((req,res)=>{
+    const {user} = req
     Resultado.find({
         ano:req.params.ano,
         semestre:req.params.semestre,
         diaDaSemana:req.params.dia,
-        periodo:req.params.periodo
+        periodo:req.params.periodo,
+        user:user._id
     })
         .then(resultados=>res.json(resultados))
         .catch(err => res.status(400).json(err))
@@ -33,6 +37,7 @@ router.route('/diaperiodo').post(async (req, res) => {
     const periodo = req.body.periodo
     const diaDaSemana = req.body.diaDaSemana
     const delta = req.body.delta
+    const {user} = req
 
     // checar se periodo está em config, se não retornar erro
     // config = await Config.find({user:user})
@@ -51,12 +56,13 @@ router.route('/calculalista').post(async (req, res) => {
     const semestre = req.body.semestre
     const delta = req.body.delta
     const lista = req.body.lista
+    const {user} = req
     
     let resultObj = {}
 
     const listaDePromises = lista.map(async (unidade)=>{
         try {
-            const modelo = await dbtomodel(ano,semestre,unidade.periodo,unidade.dia)
+            const modelo = await dbtomodel(ano,semestre,unidade.periodo,unidade.dia,user)
             const produto = await resolve(modelo,delta)
             const alocacoes = await trataresultado(modelo,produto)
 
@@ -68,6 +74,7 @@ router.route('/calculalista').post(async (req, res) => {
             }
 
             return Resultado.findOneAndUpdate({
+                user:user._id,
                 ano:ano,
                 semestre:semestre,
                 diaDaSemana:unidade.dia,
@@ -82,6 +89,7 @@ router.route('/calculalista').post(async (req, res) => {
     })
 
     await Promise.all(listaDePromises)
+    console.log ("Otimização concluida")
     return res.json(resultObj)
 })
 

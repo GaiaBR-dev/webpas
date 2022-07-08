@@ -29,15 +29,13 @@ const distanciasRouter = require('./routes/distancias')
 const resultadosRouter = require('./routes/resultados')
 const configsRouter = require('./routes/config')
 const authenticationRouter = require('./routes/authentication')
-const privateRouter = require('./routes/private')
 
 app.use('/salas',protect,salasRouter)
 app.use('/turmas',turmasRouter)
-app.use('/distancias',distanciasRouter)
-app.use('/resultados',resultadosRouter)
+app.use('/distancias',protect,distanciasRouter)
+app.use('/resultados',protect,resultadosRouter)
 app.use('/configs',configsRouter)
 app.use('/auth',authenticationRouter)
-app.use('/private',privateRouter)
 
 app.use(errorHandler)
 

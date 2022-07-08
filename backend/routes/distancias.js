@@ -4,6 +4,7 @@ let Distancia = require('../models/distancia.model')
 let Turma = require('../models/turma.model')
 let Sala = require('../models/sala.model')
 var mongoose = require('mongoose');
+const {protect} = require('../middleware/auth')
 
 const arrayUnique = array => {
     var a = array.concat();
@@ -17,7 +18,8 @@ const arrayUnique = array => {
 }
 
 router.route('/').get((req,res)=>{
-    Distancia.find()
+    const {user} = req
+    Distancia.find({user:user._id})
         .then(distancias => res.json(distancias))
         .catch(err => res.status(400).json('Error: '+ err))
 })
@@ -32,14 +34,16 @@ router.route('/add').post((req,res) =>{
     const departamento = req.body.departamento
     const predio = req.body.predio
     const valorDist = req.body.valorDist
+    const {user} = req
 
     const novaDistancia = new Distancia({
         departamento,
         predio,
-        valorDist
+        valorDist,
+        user:user._id
     })
 
-    Distancia.find({predio:predio,departamento:departamento})
+    Distancia.find({predio:predio,departamento:departamento,user:user._id})
         .then(distancias =>{
             if (distancias.length > 0){
                 let err = {code:1,msg:"Esta distância ja está cadastrada"}
@@ -54,20 +58,17 @@ router.route('/add').post((req,res) =>{
 })
 
 router.route('/arquivodistancia').post((req,res) =>{//salvar a partir de arquivo vindo do cliente
+    const {user} = req
     novasDistancias = req.body.novasDistancias
+    novasDistancias.map(distancia =>{
+        distancia.user = user._id
+    })
+    console.log(novasDistancias)
     Distancia.insertMany(novasDistancias,{ordered:false})
         .then(()=> res.json('Distancias adicionadas'))
         .catch(err =>res.status(400).json(err))
 })
 
-router.route('/inseredistancias321').post((req, res) => { // Hard coded -> deletar depois
-    const result = xlstojson()
-    novasDistancias = result.Distancia
-
-    Distancia.insertMany(novasDistancias)
-        .then(()=> res.json('Distancias adicionadas'))
-        .catch(err =>res.status(400).json('Error: '+ err))  
-})
 
 router.route('/:id').delete((req,res)=>{
     Distancia.findByIdAndDelete(req.params.id)
@@ -100,12 +101,13 @@ router.route('/deleteMany').post((req,res)=>{
 })
 
 router.route('/iscomplete').get(async (req,res)=>{
-    const predios = await Sala.find().distinct('predio')
-    const departamentosOferta = await Turma.find().distinct('departamentoOferta')
-    const departamentosTurma = await Turma.find().distinct('departamentoTurma')
+    const {user} = req
+    const predios = await Sala.find({user:user._id}).distinct('predio')
+    const departamentosOferta = await Turma.find({user:user._id}).distinct('departamentoOferta')
+    const departamentosTurma = await Turma.find({user:user._id}).distinct('departamentoTurma')
     const departamentos = arrayUnique(departamentosOferta.concat(departamentosTurma))
 
-    Distancia.find()
+    Distancia.find({user:user._id})
         .then(distancias =>{
             const indiceDistancias = distancias.reduce((acc, cur) => {
                 acc[cur.predio] = acc[cur.predio] ? acc[cur.predio] : {}

@@ -53,7 +53,7 @@ const tableStyle ={
 
 const Salas = props=>{
     let params = useParams()
-    const {user,config} = props
+    const {user,config,logout} = props
     const [salas,setSalas]=useState([])
     const [salaEdit,setSalaEdit] = useState(null)
     const [openModalForm, setOpenModalForm] = useState(false);
@@ -84,7 +84,12 @@ const Salas = props=>{
         SalasDataService.getSalas(predio)
             .then(response=>{
                 setSalas(response.data)
-            }).catch(err => console.log(err))
+            }).catch(err => {
+                let notAuthorized = err.response.data?.notAuth ? err.response.data.notAuth : false
+                if (notAuthorized){
+                    logout()
+                }console.log(err)
+            })
     }
 
     const openInModalEdit = sala =>{

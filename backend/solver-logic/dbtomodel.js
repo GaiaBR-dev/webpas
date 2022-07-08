@@ -3,7 +3,7 @@ let Turma = require('../models/turma.model')
 let Distancia = require('../models/distancia.model')
 let Config = require('../models/config.model')
 
-async function dbtomodel(ano,semestre,periodo,diaDaSemana){
+async function dbtomodel(ano,semestre,periodo,diaDaSemana,user){
     
     let modelo = {
         turmasf1: [],
@@ -13,7 +13,7 @@ async function dbtomodel(ano,semestre,periodo,diaDaSemana){
         distancias: []
     }
 
-    const config = await Config.find({usuario:"Eu"}) // Receber usuário como parametro para buscar config depois
+    const config = await Config.find({user:user._id}) 
 
     let horarioInicioF1 = config[0].horarios[periodo]['Ínicio'].slot1
     let horarioFimF1 = config[0].horarios[periodo]['Fim'].slot1
@@ -28,23 +28,26 @@ async function dbtomodel(ano,semestre,periodo,diaDaSemana){
         diaDaSemana:diaDaSemana,
         horarioInicio:horarioInicioF1,
         horarioFim:horarioFimF1,
+        user:user._id
     })
     modelo.turmasf12 = await Turma.find({
         ano:ano,
         semestre:semestre,
         diaDaSemana:diaDaSemana,
         horarioInicio:horarioInicioF12,
-        horarioFim:horarioFimF12
+        horarioFim:horarioFimF12,
+        user:user._id
     })
     modelo.turmasf2 = await Turma.find({
         ano:ano,
         semestre:semestre,
         diaDaSemana:diaDaSemana,
         horarioInicio:horarioInicioF2,
-        horarioFim:horarioFimF2
+        horarioFim:horarioFimF2,
+        user:user._id
     })
 
-    const salasDB = await Sala.find()
+    const salasDB = await Sala.find({user:user._id})
     salasDB.map(sala=>{
         let dispArray = sala.disponibilidade
         dispArray.map(disp=>{
@@ -54,7 +57,7 @@ async function dbtomodel(ano,semestre,periodo,diaDaSemana){
         })
     })
 
-    const distanciasDb = await Distancia.find()
+    const distanciasDb = await Distancia.find({user:user._id})
     modelo.distancias= distanciasDb.reduce((acc, cur) => {
         acc[cur.predio] = acc[cur.predio] ? acc[cur.predio] : {}
         acc[cur.predio] = {

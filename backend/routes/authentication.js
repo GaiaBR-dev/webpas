@@ -3,6 +3,11 @@ let User = require('../models/user.model')
 const ErrorResponse = require('../utils/errorResponse') 
 const sendEmail = require('../utils/sendEmail')
 const crypto = require('crypto')
+const {protect} = require("../middleware/auth")
+
+router.route('/getAuthorized').get(protect,(req,res)=>{
+    res.status(200).json({success:true,notAuth:false})
+})
 
 router.route('/register').post((req,res,next)=>{
     const {username, email,password} = req.body
@@ -107,12 +112,17 @@ router.route('/resetpassword/:resetToken').put((req,res,next)=>{
 
 const sendToken = (user,statusCode,res)=>{
     const token = user.getSignedToken()
+    const userToken = {
+        _id:user._id,
+        username:user.username,
+        email:user.email
+    }
     res.cookie("authToken", token, {
         secure: process.env.NODE_ENV !== "development",
         httpOnly: true,
         maxAge: 1000 * 60 * 24 * 30 *60,
       });
-    res.status(statusCode).json({success:true,user})
+    res.status(statusCode).json({success:true,userToken})
 }
 
 module.exports = router

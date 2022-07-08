@@ -68,9 +68,10 @@ function TabPanel(props) {
 const thisYear = new Date().getFullYear()
 
 const Agenda = props =>{
+    const {user,logout,config} = props
+
     const [ano,setAno] = useState(thisYear);
     const [anos,setAnos] = useState([]);
-    const [config,setConfig] = useState({dias:[],periodos:[]});
     const [horariosInicio,setHorariosInicio] = useState([]);
     const [periodo,setPeriodo]= useState('');
     const [semestre,setSemestre] = useState(1);
@@ -83,7 +84,6 @@ const Agenda = props =>{
 
     useEffect(()=>{
         retornaAnos()
-        retornaConfig()
     }, [])
 
     useEffect(()=>{
@@ -132,12 +132,6 @@ const Agenda = props =>{
             anos.push(anoA)
         }
         setAnos(anos)
-    }
-
-    const retornaConfig = () =>{
-        ConfigsDataService.getConfigByUser('Eu') // mudar para usuario
-            .then(res=> setConfig(res.data))
-            .catch(err=>console.log(err))
     }
 
     const retornaHorariosInicio = () =>{
