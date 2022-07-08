@@ -9,7 +9,7 @@ const tableHeadCss = {
 }
 
 
-const AgendaResultado = props =>{
+const AgendaLinhas = props =>{
     const {ano,semestre,dia,periodo,config,horario} = props
 
     const [resultados,setResultados] = useState([]);
@@ -74,4 +74,4 @@ const AgendaResultado = props =>{
 
 }
 
-export default AgendaResultado
+export default AgendaLinhas

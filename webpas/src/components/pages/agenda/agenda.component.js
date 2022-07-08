@@ -2,7 +2,6 @@ import React, {Component, useState, useEffect} from "react";
 import PageHeader from "../../re-usable/page-header.component";
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import {Grid,Toolbar,Button, TextField, Paper, Box, TableContainer} from "@mui/material";
-import ConfigsDataService from '../../../services/configs'
 import Select from "../../forms/select.component";
 import CachedTwoToneIcon from '@mui/icons-material/CachedTwoTone';
 import SearchIcon from '@mui/icons-material/Search';
@@ -11,7 +10,7 @@ import HelpIcon from '@mui/icons-material/Help';
 import { IconButton } from "@mui/material";
 import { Tab,Tabs, Typography } from "@mui/material";
 import PropTypes from 'prop-types';
-import AgendaResultado from './agenda-resultado.component';
+import AgendaColunas from './agenda-colunas.component';
 import FileDownloadTwoToneIcon from '@mui/icons-material/FileDownloadTwoTone';
 import PlaylistAddTwoToneIcon from '@mui/icons-material/PlaylistAddTwoTone';
 
@@ -285,7 +284,7 @@ const Agenda = props =>{
             </Paper>
             <TableContainer sx={{top:'-20px',position:"relative"}} component={Paper}>
                 <Box width="1440px">
-                    <AgendaResultado 
+                    <AgendaColunas
                         ano={ano}
                         semestre={semestre}
                         periodo={periodo}
