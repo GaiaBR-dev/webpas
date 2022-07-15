@@ -53,7 +53,7 @@ function App() {
           <Box sx={{display:'flex'}}>
             <BrowserRouter>
               <Routes>
-                <Route exact path="/" element={<HomePage/>}/>
+                <Route exact path="/" element={<HomePage />}/>
                 <Route exact path="/login" element={<Login/>}/>
                 <Route exact path="/cadastro" element={<Cadastro/>}/>
                 <Route exact path="/lembrarsenha" element={<LembrarSenha/>}/>

@@ -31,6 +31,18 @@ router.route('/:ano/:semestre/:dia/:periodo').get((req,res)=>{
         .catch(err => res.status(400).json(err))
 })
 
+router.route('/:ano/:semestre/:dia').get((req,res)=>{
+    const {user} = req
+    Resultado.find({
+        ano:req.params.ano,
+        semestre:req.params.semestre,
+        diaDaSemana:req.params.dia,
+        user:user._id
+    })
+        .then(resultados=>res.json(resultados))
+        .catch(err => res.status(400).json(err))
+})
+
 router.route('/diaperiodo').post(async (req, res) => {
     const ano = req.body.ano
     const semestre = req.body.semestre
@@ -54,7 +66,7 @@ router.route('/diaperiodo').post(async (req, res) => {
 router.route('/calculalista').post(async (req, res) => {
     const ano = req.body.ano
     const semestre = req.body.semestre
-    const delta = req.body.delta
+    const delta = parseInt(req.body.delta)
     const lista = req.body.lista
     const {user} = req
     
@@ -67,7 +79,7 @@ router.route('/calculalista').post(async (req, res) => {
             const alocacoes = await trataresultado(modelo,produto)
 
             resultObj[unidade.dia] = resultObj[unidade.dia]? resultObj[unidade.dia]: {}
-            if (produto.result.status == 4){
+            if (produto.result.status == 4 ){
                 resultObj[unidade.dia][unidade.periodo] = false;
             }else if (produto.result.status == 5){
                 resultObj[unidade.dia][unidade.periodo] = true;

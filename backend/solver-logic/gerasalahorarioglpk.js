@@ -11,7 +11,7 @@ async function resolve(modelo,delta) {
     const placeholder = 5000;
 
     const turmas = new Array().concat(turmasF1, turmasF12, turmasF2)
-
+    console.log("Delta",delta1)
     const indiceDistancias = modelo.distancias
     const distanciasCalculadas = turmas.map((turma) => {
         return salas.map((sala) => {
@@ -174,8 +174,11 @@ async function resolve(modelo,delta) {
 
     function generateModel() {
         varsPAS = getVariables()
+        //console.log("vars :", varsPAS)
         constraintsPAS = getConstraints()
+        //console.log("constraints :", constraintsPAS)
         binariesPAS = getBinaries()
+        //console.log("binaries :", binariesPAS)
 
         result = {
             name: 'ModeloPAS',
@@ -206,7 +209,6 @@ async function resolve(modelo,delta) {
 
     const respostaModelo = removeZeros(res)
     return respostaModelo
-
 }
 
 exports.resolve = resolve

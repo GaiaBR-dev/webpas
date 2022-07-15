@@ -29,6 +29,7 @@ const distanciasRouter = require('./routes/distancias')
 const resultadosRouter = require('./routes/resultados')
 const configsRouter = require('./routes/config')
 const authenticationRouter = require('./routes/authentication')
+const testeGLPKRouter = require('./routes/testeGLPK')
 
 app.use('/salas',protect,salasRouter)
 app.use('/turmas',turmasRouter)
@@ -36,6 +37,7 @@ app.use('/distancias',protect,distanciasRouter)
 app.use('/resultados',protect,resultadosRouter)
 app.use('/configs',configsRouter)
 app.use('/auth',authenticationRouter)
+app.use('/teste',testeGLPKRouter)
 
 app.use(errorHandler)
 

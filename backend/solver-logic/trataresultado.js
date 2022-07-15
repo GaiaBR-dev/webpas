@@ -4,7 +4,7 @@ async function trataresultado(modelo,resultado){
     const turmasF12 = modelo.turmasf12
     const turmasF2 =  modelo.turmasf2
     const turmas = new Array().concat(turmasF1, turmasF12, turmasF2)
-    const alocacoes = resultado.result.vars
+    const alocacoes = resultado.result?.vars ? resultado.result.vars : []
     let alocacoesTratadas = new Array()
 
     Object.keys(alocacoes).map((alocacao)=>{

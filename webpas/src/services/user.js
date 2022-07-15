@@ -21,8 +21,8 @@ class UserDataService {
         return http.put(`auth/resetpassword/${token}`,data)
     }
 
-    getprivate(){
-        return http.get('private')
+    getPrivate(){
+        return http.get('auth/getAuthorized')
     }
 
 }

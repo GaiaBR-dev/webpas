@@ -6,6 +6,7 @@ import { Container } from "@mui/material";
 import { Box } from "@mui/system";
 import PageHeader from "../re-usable/page-header.component";
 import WebhookIcon from '@mui/icons-material/Webhook';
+import UserDataService from '../../services/user'
 
 const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
@@ -22,13 +23,20 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     }
   }
 
-function HomePage(){
+const HomePage = props =>{
     const {logout,user} = useAuth()
 
     useEffect(()=>{
-        if(user===false){
-            logout()
-        }
+        UserDataService.getPrivate()
+            .then(res=>{
+                let authorized = res.data.success
+                if(!authorized){
+                    logout()
+                }
+            }).catch(err=>{
+                console.log(err)
+                logout()
+            })
     },[])
 
     return(

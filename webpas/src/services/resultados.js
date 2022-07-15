@@ -9,6 +9,10 @@ class ResultadosDataService {
         return http.get(`resultados/${ano}/${semestre}`)
     }
 
+    getByAnoSemestreDia(ano,semestre,dia){
+        return http.get(`resultados/${ano}/${semestre}/${dia}`)
+    }
+
     getByAnoSemestreDiaPeriodo(ano,semestre,dia,periodo){
         return http.get(`resultados/${ano}/${semestre}/${dia}/${periodo}`)
     }
