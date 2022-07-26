@@ -83,7 +83,7 @@ const Agenda = props =>{
     const [tabValue, setTabValue] = useState(0);
     const [formatoAgenda,setFormatoAgenda] = useState('colunas');
     const [anchorEl, setAnchorEl] = React.useState(null);
-    const [filterFn,setFilterFn] = useState({fn:items=>{return items;}})
+    const [filterFn,setFilterFn] = useState({fn:items=>{return items;},fnAgenda:items=>{return items;}})
     const [state,setState] = React.useState({
         capacidade:true,
         idTurma:false,
@@ -197,6 +197,34 @@ const Agenda = props =>{
                                 .includes(target.value.toLowerCase())               
                         )
                     }) 
+                }
+            },
+            fnAgenda: items =>{
+                if (target.value == ""){
+                    return items
+                }else{
+                    return items.filter(alocacao =>{
+                        let result = false
+                        Object.keys(alocacao).map(horario=>{
+                            if(alocacao[horario]){
+                                if(alocacao[horario].nomeDisciplina){
+                                    if (alocacao[horario].nomeDisciplina
+                                        .toLowerCase()
+                                        .includes(target.value.toLowerCase())){
+                                            result = true
+                                        }
+                                }
+                                if(alocacao[horario].docentes){
+                                    if (alocacao[horario].docentes
+                                        .toLowerCase()
+                                        .includes(target.value.toLowerCase())){
+                                            result = true
+                                        }
+                                }
+                            }
+                        })
+                        return result
+                    })
                 }
             }
         })

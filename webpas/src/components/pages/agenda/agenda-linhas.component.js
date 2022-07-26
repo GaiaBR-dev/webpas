@@ -114,6 +114,7 @@ const AgendaLinhas = props =>{
             })
             return result
         })
+        console.log(tableObjs)
         setTableObj(sortAlocacoes(tableObjs))
     }
 
@@ -138,7 +139,7 @@ const AgendaLinhas = props =>{
         <TableContainer component={Paper} sx={{boxShadow:"0"}}>
             <Grid container  maxHeight={'550px'} justifyContent='space-around' spacing={1.5} alignItems="center" columns={22} padding={'10px 20px 10px 20px'}> 
                {
-                    tableObj.map(obj=>{
+                    filterFn.fnAgenda(tableObj).map(obj=>{
                         return(
                             <>
                                 <Grid item xs={2}><Typography sx={tableRowCss} >{obj.predio}</Typography></Grid>
@@ -180,6 +181,15 @@ const AgendaLinhas = props =>{
                                                             <>
                                                                 <Typography sx={tableRowCss}>
                                                                     {obj[horario].idTurma}
+                                                                </Typography>
+                                                            </>
+                                                        ):(<></>)
+                                                    }
+                                                    {
+                                                        state.totalTurma && obj[horario] ?(
+                                                            <>
+                                                                <Typography sx={tableRowCss}>
+                                                                    {obj[horario].totalTurma}
                                                                 </Typography>
                                                             </>
                                                         ):(<></>)

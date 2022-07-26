@@ -26,6 +26,7 @@ const AgendaColunas = props =>{
     
 
     useEffect(()=>{
+        console.log(filterFn)
         retornaResultados(ano,semestre,dia)
     },[ano,semestre,dia])
 
@@ -151,6 +152,7 @@ const AgendaColunas = props =>{
         <TableContainer component={Paper} sx={{boxShadow:"0"}}>
             <Grid container  maxHeight={'550px'} spacing={1.5} alignItems="center" columns={26} padding={'10px 20px 10px 20px'}> 
                 {
+                    
                     filterFn.fn(alocacoes).map((alocacao,index)=>{
                         return(
                         <React.Fragment key={index}>
