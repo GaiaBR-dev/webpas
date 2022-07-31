@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import useAuth from '../../services/useAuth';
 import { styled } from '@mui/material/styles';
 import Navbar from "../re-usable/navbar.component";
-import { Container } from "@mui/material";
+import { Button, Container } from "@mui/material";
 import { Box } from "@mui/system";
 import PageHeader from "../re-usable/page-header.component";
 import WebhookIcon from '@mui/icons-material/Webhook';
@@ -23,8 +23,10 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     }
   }
 
+
 const HomePage = props =>{
     const {logout,user} = useAuth()
+
 
     useEffect(()=>{
         UserDataService.getPrivate()

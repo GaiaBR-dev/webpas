@@ -12,9 +12,9 @@ const turmaSchema = new Schema({
     totalTurma: {type:Number, required:true, trim:true},
     departamentoOferta: {type:String, required:true, trim:true},
     diaDaSemana: {type:String, required:true, trim:true},
-    horarioInicio: {type:Number, required:true, trim:true},
-    horarioFim: {type:Number, required:true, trim:true},
-    alocadoChefia: {type:String, trim:true}, // tratar dados - trocar para boolean
+    horarioInicio: {type:String, required:true, trim:true},
+    horarioFim: {type:String, required:true, trim:true},
+    alocadoChefia: {type:Boolean, trim:true}, 
     creditosAula: {type:Number,  trim:true},
     docentes: {type:String,trim:true},
     ano:{type:Number,required:true},

@@ -195,10 +195,46 @@ const AgendaLinhas = props =>{
                                                         ):(<></>)
                                                     }
                                                     {
+                                                        state.codDisciplina && obj[horario] ?(
+                                                            <>
+                                                                <Typography sx={tableRowCss}>
+                                                                    {obj[horario].codDisciplina}
+                                                                </Typography>
+                                                            </>
+                                                        ):(<></>)
+                                                    }
+                                                    {
+                                                        state.departamentoOferta && obj[horario] ?(
+                                                            <>
+                                                                <Typography sx={tableRowCss}>
+                                                                    {obj[horario].departamentoOferta}
+                                                                </Typography>
+                                                            </>
+                                                        ):(<></>)
+                                                    }
+                                                    {
+                                                        state.departamentoTurma && obj[horario] ?(
+                                                            <>
+                                                                <Typography sx={tableRowCss}>
+                                                                    {obj[horario].departamentoTurma}
+                                                                </Typography>
+                                                            </>
+                                                        ):(<></>)
+                                                    }
+                                                    {
                                                         state.docentes && obj[horario] ?(
                                                             <>
                                                                 <Typography sx={tableRowCss}>
                                                                     {obj[horario].docentes}
+                                                                </Typography>
+                                                            </>
+                                                        ):(<></>)
+                                                    }
+                                                    {
+                                                        state.creditosAula && obj[horario] ?(
+                                                            <>
+                                                                <Typography sx={tableRowCss}>
+                                                                    {obj[horario].creditosAula}
                                                                 </Typography>
                                                             </>
                                                         ):(<></>)

@@ -3,7 +3,7 @@ import TurmaForm from '../../forms/turmaForm.component'
 import FileFormTurma from "../../forms/fileFormTurma.component";
 import PageHeader from '../../re-usable/page-header.component';
 import SchoolIcon from '@mui/icons-material/School';
-import { Modal, TableBody, TableCell, TableRow, Grid, Toolbar, TextField, DialogContent } from "@mui/material";
+import { Modal, TableBody, TableCell, TableRow, Grid, Toolbar, TextField, DialogContent, Container } from "@mui/material";
 import {Dialog, Button, IconButton}  from "@mui/material"
 import HelpIcon from '@mui/icons-material/Help';
 import useTable from "../../re-usable/useTable";
@@ -20,6 +20,7 @@ import ConfirmDialog from "../../re-usable/confirmDialog.component";
 import handleServerResponses from "../../../services/response-handler";
 import { Checkbox } from "@mui/material";
 import AjudaTurma from "../help/ajuda-turma.component";
+import ErrorIcon from '@mui/icons-material/Error';
 
 const tableRowCss ={
     '& .MuiTableCell-root':{
@@ -75,6 +76,8 @@ const TurmasList = props =>{
     const [notify,setNotify] = useState({isOpen:false,message:'',type:''})
     const [confirmDialog,setConfirmDialog] = useState({isOpen:false,title:'',subtitle:''})
     const [selected, setSelected] = React.useState([]);
+    const [listaErros,setListaErros] = useState([]);
+    const [openErros,setOpenErros] = useState(false);
 
     useEffect(()=>{
         retornaAnos()
@@ -96,6 +99,8 @@ const TurmasList = props =>{
     const handleCloseModalFile = () => setOpenModalFile(false);
     const handleCloseHelp = () => setOpenHelp(false);
     const handleOpenHelp = () => setOpenHelp(true);
+    const handleCloseErros = () => setOpenErros(false);
+    const handleOpenErros = () => setOpenErros(true);
 
     const retornaTurmas = (ano,semestre) =>{
         TurmasDataService.getByAnoSemestre(ano,semestre)
@@ -268,6 +273,94 @@ const TurmasList = props =>{
                 confirmDialog={confirmDialog}
                 setConfirmDialog={setConfirmDialog}
             />
+            <Paper>
+            <Toolbar>
+                <Grid container 
+                    spacing={2} 
+                    sx={{paddingTop:'12px'}} 
+                    alignItems="center" 
+                    justifyContent="space-between"
+                    columns={22}
+                > 
+                    <Grid item xs ={5} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}}>Adicionar</Grid>
+                    <Grid item xs ={9} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}}>Buscar</Grid>
+                    <Grid item xs ={7} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}}>Mostrar</Grid>
+                    <Grid item xs ={1} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}}>Ajuda</Grid>
+                    <Grid item xs={6} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}} sm={2}>
+                        <Button 
+                            startIcon={<AddIcon/>} 
+                            variant="contained"  
+                            onClick ={handleOpenModalFile}
+                            sx={{fontSize:'12px',paddingTop:'15px',paddingBottom:'15px'}} >Arquivo
+                        </Button>
+                    </Grid>
+                    <Grid item xs={6} sm={3}>
+                        <Button 
+                            startIcon={<AddIcon/>} 
+                            variant="contained" 
+                            onClick={openInModalNew}
+                            sx={{fontSize:'12px',paddingTop:'15px',paddingBottom:'15px'}}>Formulário
+                        </Button>
+                    </Grid>
+                    <Grid item xs ={6} sm={9}>
+                        <TextField
+                            sx={{width:'100%'}}
+                            variant="outlined"
+                            InputProps={{
+                                startAdornment: <InputAdornment position="start"><SearchIcon/></InputAdornment>,
+                            }}
+                            onChange={handleSearch}
+                        />
+                    </Grid>
+                    <Grid item xs={6} sm={2}>
+                        <Select
+                            label="Ano"
+                            value={anoTable}
+                            onChange={handleAnoTableSelect}
+                            options ={anos}
+                        />  
+                    </Grid>
+                    <Grid item xs={6} sm={2}>
+                        <Select 
+                            label="Semestre"
+                            value={semestreTable}
+                            onChange={handleSemestreTableSelect}
+                            options ={[1,2]}
+                        />
+                    </Grid>
+                    <Grid item xs={6} sm={3}>
+                            {
+                                listaErros.length > 0 ? (
+                                    <Button
+                                        startIcon={<ErrorIcon color='error'/>}
+                                        onClick={handleOpenErros}
+                                        variant="outlined"
+                                        sx={{fontSize:'12px',paddingTop:'15px',paddingBottom:'15px'}}>Erros
+                                    </Button>   
+                                ):(
+                                    <Button
+                                        onClick={handleOpenErros}
+                                        variant="outlined"
+                                        sx={{fontSize:'12px',paddingTop:'15px',paddingBottom:'15px'}}>Erros
+                                    </Button> 
+                                )
+                            }
+                    </Grid>
+                    <Grid item xs={6} sm={1}>
+                        <IconButton
+                            color="inherit"
+                            edge="start"
+                            
+                            onClick={handleOpenHelp}
+                        >
+                            <HelpIcon />
+                        </IconButton>
+                    </Grid>
+                </Grid>
+                </Toolbar>
+                <br/>
+            </Paper>
+            <br/>
             <TableContainer component={Paper}>
                 <Modal
                     id='modalFile'
@@ -285,6 +378,7 @@ const TurmasList = props =>{
                         horariosFim={horariosFim}
                         user={user}
                         handleResponse={fileHandleResponse}
+                        setListaErros={setListaErros}
                     />
                 </Modal>
                 <Dialog maxWidth="md"
@@ -314,72 +408,28 @@ const TurmasList = props =>{
                         <AjudaTurma/>
                     </DialogContent>
                 </Dialog>
-                <Toolbar>
-                <Grid container 
-                    spacing={2} 
-                    sx={{paddingTop:'12px'}} 
-                    alignItems="center" 
-                    justifyContent="space-between"
-                    columns={20}
-                > 
-                    <Grid item xs ={5} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}}>Adicionar</Grid>
-                    <Grid item xs ={9} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}}>Buscar</Grid>
-                    <Grid item xs ={4} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}}>Mostrar</Grid>
-                    <Grid item xs ={1} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}}>Ajuda</Grid>
-                    <Grid item xs={6} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}} sm={2}>
-                        <Button 
-                            startIcon={<AddIcon/>} 
-                            variant="contained"  
-                            onClick ={handleOpenModalFile}
-                            sx={{fontSize:'12px',paddingTop:'12px',paddingBottom:'12px'}} >Arquivo
-                        </Button>
-                    </Grid>
-                    <Grid item xs={6} sm={3}>
-                        <Button 
-                            startIcon={<AddIcon/>} 
-                            variant="contained" 
-                            onClick={openInModalNew}
-                            sx={{fontSize:'12px',paddingTop:'12px',paddingBottom:'12px'}}>Formulário
-                        </Button>
-                    </Grid>
-                    <Grid item xs ={6} sm={9}>
-                        <TextField
-                            sx={{width:'100%'}}
-                            variant="outlined"
-                            InputProps={{
-                                startAdornment: <InputAdornment position="start"><SearchIcon/></InputAdornment>,
-                            }}
-                            onChange={handleSearch}
-                        />
-                    </Grid>
-                    <Grid item xs={6} sm={2}>
-                        <Select
-                            label="Ano"
-                            value={anoTable}
-                            onChange={handleAnoTableSelect}
-                            options ={anos}
-                        />  
-                    </Grid>
-                    <Grid item xs={6} sm={2}>
-                        <Select 
-                            label="Semestre"
-                            value={semestreTable}
-                            onChange={handleSemestreTableSelect}
-                            options ={[1,2]}
-                        
-                        />
-                    </Grid>
-                    <Grid item xs={6} sm={1}>
-                        <IconButton
-                            color="inherit"
-                            edge="start"
-                            onClick={handleOpenHelp}
-                        >
-                            <HelpIcon />
-                        </IconButton>
-                    </Grid>
-                </Grid>
-                </Toolbar>
+                <Dialog
+                    open={openErros}
+                    onClose={handleCloseErros}
+                >
+                    <DialogContent>
+                        <Container>
+                            <h5>Número de turmas com erros : {listaErros.length}</h5>
+
+                            {listaErros.map(erro=>{
+                                return(
+                                    <>
+                                        <p>Turma: {JSON.stringify(erro.turma)}</p>
+                                        <p>Erro: {erro.tipo}</p>
+                                        <br/>
+                                    
+                                    </>
+                                )
+                            })}
+                        </Container>
+                    </DialogContent>
+                </Dialog>
+                
                 <TblContainer 
                     sx={tableStyle} 
                     tableTitle="Lista de Turmas"

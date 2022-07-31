@@ -85,7 +85,7 @@ const Agenda = props =>{
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [filterFn,setFilterFn] = useState({fn:items=>{return items;},fnAgenda:items=>{return items;}})
     const [state,setState] = React.useState({
-        capacidade:true,
+        capacidade:false,
         idTurma:false,
         nomeDisciplina:true,
         codDisciplina:false,
@@ -205,17 +205,24 @@ const Agenda = props =>{
                 }else{
                     return items.filter(alocacao =>{
                         let result = false
-                        Object.keys(alocacao).map(horario=>{
-                            if(alocacao[horario]){
-                                if(alocacao[horario].nomeDisciplina){
-                                    if (alocacao[horario].nomeDisciplina
+                        Object.keys(alocacao).map(alocacaoKey=>{
+                            if(alocacao[alocacaoKey]){
+                                if(alocacao[alocacaoKey].nomeDisciplina){
+                                    if (alocacao[alocacaoKey].nomeDisciplina
                                         .toLowerCase()
                                         .includes(target.value.toLowerCase())){
                                             result = true
                                         }
                                 }
-                                if(alocacao[horario].docentes){
-                                    if (alocacao[horario].docentes
+                                if(alocacao[alocacaoKey].docentes){
+                                    if (alocacao[alocacaoKey].docentes
+                                        .toLowerCase()
+                                        .includes(target.value.toLowerCase())){
+                                            result = true
+                                        }
+                                }
+                                if(alocacaoKey == 'predio'){
+                                    if (alocacao[alocacaoKey]
                                         .toLowerCase()
                                         .includes(target.value.toLowerCase())){
                                             result = true

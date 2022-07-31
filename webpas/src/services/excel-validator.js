@@ -1,11 +1,49 @@
+const DEPARA_SIGA = {
+    "BCI":"DCI",
+    "Biotec":"DB",
+    "CB":"DB",
+    "CBL":"DB",
+    "CC":"DC",
+    "CSo":"DCSo",
+    "EC":"DC",
+    "ECiv":"DECiv",
+    "EE":"DEE",
+    "EEspL":"DPsi",
+    "EF":"DEFMH",
+    "EFi":"DF",
+    "EFL":"DEFMH",
+    "EMa":"DEMa",
+    "EMec":"DEMec",
+    "Enf":"DEnf",
+    "EP":"DEP",
+    "EQ":"DEQ",
+    "Es":"Des",
+    "F":"DF",
+    "Fil":"DFIL",
+    "Fisio":"DFisio",
+    "FLN":"DF",
+    "GAAm":"DCAm",
+    "Gero":"DGero",
+    "IS":"DAC",
+    "Ling":"DL",
+    "LLE":"DL",
+    "LLI":"DL",
+    "M":"DM",
+    "Med":"DMed",
+    "MN":"DM",
+    "MusL":"DAC",
+    "PedL":"DEd",
+    "PedLN":"DEd",
+    "Psi":"DPsi",
+    "Q":"DQ",
+    "QL":"DQ",
+    "TILSP":"DPsi",
+    "TO":"DTO", 
+}
+
 class ExcelValidator{
+    
     firstValidateTurmas(rowsTurmas,configProps,horariosInicio,horariosFim){
-        let erroPreenchido = false
-        let erroHorarioI = false
-        let erroHorarioF = false
-        let erroDia = false
-        let erroDuplicatas = false
-        let erroTipo = false
         let res ={
             status:200,
             erro: false,
@@ -17,39 +55,78 @@ class ExcelValidator{
             },
             listaErros:[]
         }
-        let turmaDup =''
-        let disciplinaDup =''
-        
-        let turmaErroTipo =''
-        let disciplinaErroTipo =''
-        console.log("HI : ", horariosInicio)
-        console.log("HF : ", horariosFim)
         rowsTurmas.map(row =>{
-
-            if (row['Nome da Disciplina'] == null) {erroPreenchido = true}
-            if (row['Turma'] == null)  {erroPreenchido = true}
-            if (row['Departamento de Oferta'] == null)  {erroPreenchido = true}
-            if (row['Total de Alunos'] == null)  {erroPreenchido = true}
-            if (isNaN(row['Total de Alunos']))  {
-                turmaErroTipo = row['Turma']
-                disciplinaErroTipo = row['Nome da Disciplina']
-                erroTipo = true    
+            let erro = {}
+            row.erro = false
+            if (row['Nome da Disciplina'] == null) {
+                row.erro = true
+                erro.turma  = row
+                erro.tipo = "O nome da disciplina é um campo obrigátorio e deve ser preenchido"
+                res.listaErros.push(erro)
             }
-            if (row['Dia'] == null)  {erroPreenchido = true}
-            if (row['Horário de Ínicio'] == null)  {erroPreenchido = true}
-            if (row['Horário de Término'] == null)  {erroPreenchido = true}
+            if (row['Turma'] == null) {
+                row.erro = true
+                erro.turma  = row
+                erro.tipo = "A turma é um campo obrigátorio e deve ser preenchido"
+                res.listaErros.push(erro)
+            }
+            if (row['Departamento de Oferta'] == null)  {
+                row.erro = true
+                erro.turma  = row
+                erro.tipo = "O departamento de oferta é um campo obrigátorio e deve ser preenchido"
+                res.listaErros.push(erro)
+            }
+            if (row['Total de Alunos'] == null)  {
+                row.erro = true
+                erro.turma  = row
+                erro.tipo = "O total de alunos é um campo obrigátorio e deve ser preenchido"
+                res.listaErros.push(erro)
+            }
+            if (isNaN(row['Total de Alunos']))  {
+                row.erro = true
+                erro.turma  = row
+                erro.tipo = "O total de alunos deve ser preenchido com um número"
+                res.listaErros.push(erro) 
+            }
+            if (row['Dia'] == null)  {
+                row.erro = true
+                erro.turma  = row
+                erro.tipo = "O dia em que a turma é ministrada é um campo obrigátorio e deve ser preenchido"
+                res.listaErros.push(erro)
+            }
+            if (row['Horário de Ínicio'] == null)  {
+                row.erro = true
+                erro.turma  = row
+                erro.tipo = "O horário de ínicio da disciplina é um campo obrigátorio e deve ser preenchido"
+                res.listaErros.push(erro)
+            
+            }
+            if (row['Horário de Término'] == null)  {
+                row.erro = true
+                erro.turma  = row
+                erro.tipo = "O horário de término da disciplina é um campo obrigátorio e deve ser preenchido"
+                res.listaErros.push(erro)
+            }
             if (!horariosInicio.includes(row['Horário de Ínicio'].toString())) {
-                erroHorarioI = true
+                row.erro = true
+                erro.turma  = row
+                erro.tipo = "O horário de ínicio fornecido está fora dos padrões da universidade"
+                res.listaErros.push(erro)
             }
             if (!horariosFim.includes(row['Horário de Término'].toString())) {
-                erroHorarioF = true
+                row.erro = true
+                erro.turma  = row
+                erro.tipo = "O horário de término fornecido está fora dos padrões da universidade"
+                res.listaErros.push(erro)
             }
             let str = row['Dia']
             let dia = str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
             
             if (!configProps.dias.includes(dia)) {
-                erroDia = true
-                console.log(dia)
+                row.erro = true
+                erro.turma  = row
+                erro.tipo = "O dia fornecido está fora dos padrões da universidade"
+                res.listaErros.push(erro)
             }
 
             let contadorDup = 0
@@ -63,36 +140,106 @@ class ExcelValidator{
                 }
             })
             if (contadorDup>1){
-                erroDuplicatas = true
-                turmaDup = row['Turma']
-                disciplinaDup = row['Nome da Disciplina']
+                row.erro = true
+                erro.turma  = row
+                erro.tipo = "A turma está duplicada na tabela"
+                res.listaErros.push(erro)
             }
         
         })
-        if (erroPreenchido){
+        if (res.listaErros.length > 0){
             res.status = 400
             res.erro = true 
-            res.response.data = {code:3,msg:'A Tabela possui uma ou mais linhas com campos obrigatórios não preenchidos'}
-        }else if (erroHorarioF || erroHorarioI){
-            res.status = 400
-            res.erro = true 
-            res.response.data = {code:3,msg:'Um ou mais horários estão fora do padrão da universidade'}
-        }else if (erroDia){
-            res.status = 400
-            res.erro = true 
-            res.response.data = {code:3,msg:'Uma ou mais turmas estão com o dia fora do padrão da universidade'}
-        }else if (erroDuplicatas){
-            res.status = 400
-            res.erro = true
-            res.response.data = {code:3,msg:`A turma "${turmaDup}" da disciplina "${disciplinaDup}" está duplicada na tabela`}
-        }else if (erroTipo){
-            res.status = 400
-            res.erro = true
-            res.response.data = {code:3,msg:`O Total de alunos da turma "${turmaErroTipo}" da disciplina "${disciplinaErroTipo}" não está em formato númerico`}
+            res.response.data = {code:3,msg:'A tabela inserida possui linhas com erros que não serão inseridas ao Banco de Dados. As demais linhas serão adicionadas normalmente'}
         }
         return res
     }
 
+    tratarDadosTurmasSIGA(rowsTurmas){
+        rowsTurmas.map(row=>{
+            // Padroniza os horários
+            if (row['hora_inicio'].toString() != ""){
+                if (parseInt(row['hora_inicio']) >= 700 && parseInt(row['hora_inicio']) <= 900){
+                    row['hora_inicio'] = "800"
+                }else if (parseInt(row['hora_inicio']) >= 1000 && parseInt(row['hora_inicio']) < 1200){
+                    row['hora_inicio'] = "1000"
+                }else if (parseInt(row['hora_inicio']) > 1300 && parseInt(row['hora_inicio']) < 1500){
+                    row['hora_inicio'] = "1400"
+                }else if (parseInt(row['hora_inicio']) >= 1600 && parseInt(row['hora_inicio']) < 1800){
+                    row['hora_inicio'] = "1600"
+                }else if (parseInt(row['hora_inicio']) >= 1800 && parseInt(row['hora_inicio']) < 2100){
+                    row['hora_inicio'] = "1900"
+                }else if (parseInt(row['hora_inicio']) >= 2100 && parseInt(row['hora_inicio']) < 2300){
+                    row['hora_inicio'] = "2100"
+                }else{
+                    row.considerar = false
+                }   
+            }
+            //Determina o departamento recomendado baseado no curso indicado
+            row['cursos_indicados'] = row['cursos_indicados'] ? row['cursos_indicados'] : "" 
+            if(row['cursos_indicados'].toString() != ""){
+                let depString = row['cursos_indicados'].toString().trim()
+                let depIndicado = depString.slice(0,depString.indexOf("-"))
+                if (depIndicado.includes("/")){
+                    depIndicado = depIndicado.slice(0,depIndicado.indexOf("/"))
+                }
+                row.departamentoTurma = DEPARA_SIGA[depIndicado]
+            }
+
+            row['juncao_id'] = row['juncao_id'] ? row['juncao_id'] : "" 
+            rowsTurmas.map(innerRow=>{
+                //Verifica se as turmas precisam ser unificadas baseadas na coluna juncao_id
+                if (row['cod discip'] == innerRow['cod discip'] && 
+                    row['juncao_id'] == innerRow['juncao_id'] && 
+                    row['juncao_id'].toString() != "" && 
+                    row['horario_id'] != innerRow['horario_id'] &&
+                    !'considerar' in row
+                    ){
+                        row['solicitacoes_deferidas'] = row['solicitacoes_deferidas'] + innerRow['solicitacoes_deferidas']
+                        innerRow.considerar = false 
+                }
+                //Verifica se as turmas precisam ser unificadas baseadas no horário em sequencia
+                if (row['cod discip'] == innerRow['cod discip'] &&
+                    parseInt(row['cred_aula']) + parseInt(row['cred_pratico']) > 2 && //talvez não precise
+                    row['hora_fim'] == innerRow['hora_inicio']  &&
+                    row['ministrantes'] == innerRow['ministrantes']&&
+                    row['dia'] == innerRow['dia'] &&
+                    row['turma'] == innerRow['turma']
+                    ){
+                        row['hora_fim'] = innerRow['hora_fim']
+                        innerRow.considerar = false
+                }   
+            })
+            if (row['alocado_chefia'].toString() == "t") {row.considerar=false}
+        })
+        return true
+    }
+
+    mapKeysTurmasSIGA(rowTurmas){
+        let dadosTratados = []
+        rowTurmas.map(row=>{
+            if(!row.hasOwnProperty('considerar')){
+                let turma = {
+                    'idTurma':row['horario_id'],
+                    'Campus':row['campus'],
+                    'Departamento Recomendado':row.departamentoTurma,
+                    'Código da Disciplina': row['cod_discip'],
+                    'Turma':row['turma'],
+                    'Nome da Disciplina':row['nome'],
+                    'Total de Alunos':row['solicitacoes_deferidas'],
+                    'Departamento de Oferta':row['departamento'],
+                    "Dia":row['dia'],
+                    'Horário de Ínicio':row['hora_inicio'],
+                    'Horário de Término':row['hora_fim'],
+                    'Créditos': parseInt(row['cred_aula']) + parseInt(row['cred_pratico']),
+                    'Docentes': row['ministrantes'],
+
+                }
+                dadosTratados.push(turma)
+            }
+        })
+        return dadosTratados
+    }
 
     mapColumnKeysTurmas(rowsTurmas,ano,semestre,user){
         let turmas = new Array()

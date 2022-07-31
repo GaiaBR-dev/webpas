@@ -1,12 +1,12 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import Select from "./select.component";
-import { Grid, Typography, IconButton, Button } from "@mui/material";
+import { Grid, Typography, IconButton, Button, Checkbox } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 import styled from "@emotion/styled";
 import { Box } from "@mui/system";
 import useForm from "./useForm";
-import { FormControl,FormLabel,RadioGroup,Radio,FormControlLabel } from "@mui/material";
+import { FormControl,FormLabel,RadioGroup,Radio,FormControlLabel, FormGroup } from "@mui/material";
 import * as XLSX from 'xlsx/xlsx.mjs';
 import TurmasDataService from "../../services/turmas"
 import ExcelValidator from "../../services/excel-validator";
@@ -55,9 +55,10 @@ const inicialValues ={
 }
 
 export default function FileFormTurma(props){
-    const{title, closeButton,anos,  config, handleResponse, horariosInicio, horariosFim,user } = props
+    const{title, closeButton,anos,  config, handleResponse, horariosInicio, horariosFim,user,setListaErros } = props
 
     const [working,setWorking] = useState(false)
+    const [dadosSiga,setDadosSiga] = useState(false)
 
     useEffect(()=>{
         setWorking(false)
@@ -80,18 +81,28 @@ export default function FileFormTurma(props){
                 }
             });
             if (temTurma){
-                let res = ExcelValidator.firstValidateTurmas(rowObject,config,horariosInicio,horariosFim)
-                if (!res.erro){
-                    const nturmas = ExcelValidator.mapColumnKeysTurmas(rowObject,values.ano,values.semestre,user._id)
-                    let data ={
-                        novasTurmas:nturmas
-                    }
-                    TurmasDataService.addManyTurmas(data)
-                        .then(res => handleResponse(res))
-                        .catch(err => handleResponse(err))
-                }else{
-                    handleResponse(res)
+                if (dadosSiga){
+                    ExcelValidator.tratarDadosTurmasSIGA(rowObject)
+                    rowObject = ExcelValidator.mapKeysTurmasSIGA(rowObject)
                 }
+                let validation = ExcelValidator.firstValidateTurmas(rowObject,config,horariosInicio,horariosFim)
+                setListaErros(validation.listaErros)
+                let cleanRowObject = rowObject.filter(row=>{
+                    return row.erro == false
+                })
+                const nturmas = ExcelValidator.mapColumnKeysTurmas(cleanRowObject,values.ano,values.semestre,user._id)
+                let data ={
+                    novasTurmas:nturmas
+                }
+                TurmasDataService.addManyTurmas(data)
+                    .then(res => {
+                        if (validation.erro){
+                            handleResponse(validation)
+                        }else{
+                            handleResponse(res)
+                        }
+                    })
+                    .catch(err => handleResponse(err))
             }else{
                 console.log('Não tem turma')
             }
@@ -103,6 +114,10 @@ export default function FileFormTurma(props){
         if (validate()){
             handleFileSubmit(e)
         }
+    }
+
+    const handleCBChange = e =>{
+        setDadosSiga(e.target.checked)
     }
 
     const validate = () =>{
@@ -174,6 +189,13 @@ export default function FileFormTurma(props){
                         </RadioGroup>
                     </FormControl>
             </Grid>
+            <Grid item xs={6}>
+                <FormGroup>
+                    <FormControlLabel control={<Checkbox checked={dadosSiga} onChange={handleCBChange} />} label="SIGA UFSCAR" />
+                </FormGroup>
+            </Grid>
+            
+            <Grid item xs={6}></Grid>
 
             <Grid item xs={6} alignContent='center'>
                 <Button variant='contained' onClick={validateAndSubmit}>Enviar</Button>
