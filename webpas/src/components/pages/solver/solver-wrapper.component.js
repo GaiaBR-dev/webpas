@@ -49,7 +49,7 @@ const SolverWrapper = props =>{
     return(
         <>
         <Navbar/>
-        <Box component="main" sx={{ flexGrow: 1, p: 3 , backgroundColor:'#F5F5F5' }}>
+        <Box component="main" sx={{ flexGrow: 1, p: 3}}>
             <DrawerHeader />
             <Container sx={containerStyle}>
               <Solver config={config} user={user} logout={logout}/>

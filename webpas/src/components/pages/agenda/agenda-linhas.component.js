@@ -17,31 +17,18 @@ const tableRowCss = {
 
 
 const AgendaLinhas = props =>{
-    const {ano,semestre,dia,config,horariosInicio,state,filterFn,formatoAgenda} = props
+    const {horariosInicio,state,filterFn,formatoAgenda,resultados} = props
 
-    const [resultados,setResultados] = useState([]);
     const [alocacoes,setAlocacoes] = useState([]);
     const [tableObj,setTableObj] = useState([]);
 
     useEffect(()=>{
-        retornaResultados(ano,semestre,dia)
-    },[ano,semestre,dia,formatoAgenda])
-
-    useEffect(()=>{
         retornaAlocacoes()
-    },[resultados])
+    },[resultados,formatoAgenda])
 
     useEffect(()=>{
         retornaTableObjs()
     },[alocacoes])
-
-    const retornaResultados = (ano,semestre,dia) =>{
-        ResultadosDataService.getByAnoSemestreDia(ano,semestre,dia)
-            .then(res=>{
-                console.log(res.data)
-                setResultados(res.data)
-            }).catch(err=>console.log(err))
-    }
 
     const sortAlocacoes = array =>{
         let sortedArray = array.sort((a,b)=>{
@@ -84,6 +71,8 @@ const AgendaLinhas = props =>{
                 })
             })
             setAlocacoes(alocacoesTemp)
+        }else{
+            setAlocacoes([])
         }
     }
 

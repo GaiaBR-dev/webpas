@@ -43,7 +43,6 @@ const DistanciaForm = props =>{
                 tableObj.departamento == value
             ))
         }
-        console.table(findDistancia)
         
         if (findDistancia != ""){
             setValues({

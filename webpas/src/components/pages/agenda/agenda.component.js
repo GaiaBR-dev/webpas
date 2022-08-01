@@ -18,6 +18,9 @@ import CalendarViewMonthIcon from '@mui/icons-material/CalendarViewMonth';
 import CalendarViewWeekIcon from '@mui/icons-material/CalendarViewWeek';
 import Popover from '@mui/material/Popover';
 import AgendaCampos from "./agenda-campos.component";
+import TrocaSalaForm from "../../forms/trocaSalaForm.component";
+import {Dialog, DialogContent} from "@mui/material";
+import ResultadosDataService from '../../../services/resultados';
 
 const inputCss = {
     width:'100%',
@@ -75,11 +78,13 @@ const Agenda = props =>{
 
     const [ano,setAno] = useState(thisYear);
     const [anos,setAnos] = useState([]);
+    const [resultados,setResultados] = useState([]);
     const [horariosInicio,setHorariosInicio] = useState([]);
     const [periodo,setPeriodo]= useState('');
     const [semestre,setSemestre] = useState(1);
     const [dia,setDia] = useState('Segunda');
     const [horario,setHorario] = useState(0);
+    const [openTrocaSalaForm,setOpenTrocaSalaForm] = useState(false);
     const [tabValue, setTabValue] = useState(0);
     const [formatoAgenda,setFormatoAgenda] = useState('colunas');
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -108,6 +113,10 @@ const Agenda = props =>{
     }, [])
 
     useEffect(()=>{
+        retornaResultados(ano,semestre,dia)
+    },[ano,semestre,dia])
+
+    useEffect(()=>{
         retornaHorariosInicio()
     },[config])
 
@@ -119,6 +128,14 @@ const Agenda = props =>{
         getPeriodoByHorario(horario)
     },[horario])
 
+    const retornaResultados = (ano,semestre,dia) =>{
+        ResultadosDataService.getByAnoSemestreDia(ano,semestre,dia)
+            .then(res=>{
+                console.log(res.data)
+                setResultados(res.data)
+            }).catch(err=>console.log(err))
+    }
+
     const handleTabChange = (event, newValue) => {
         setTabValue(newValue);
         setDia(config.dias[newValue])
@@ -127,6 +144,14 @@ const Agenda = props =>{
     const handleFormato = (event, novoFormato) => {
         setFormatoAgenda(novoFormato);
     };
+
+    const handleCloseTrocaSala = () =>{
+        setOpenTrocaSalaForm(false)
+    }
+
+    const handleOpenTrocaSala = () =>{
+        setOpenTrocaSalaForm(true)
+    }
 
     const getPeriodoByHorario = horario =>{
         let periodo = ''
@@ -221,6 +246,13 @@ const Agenda = props =>{
                                             result = true
                                         }
                                 }
+                                if(alocacao[alocacaoKey].departamentoOferta){
+                                    if (alocacao[alocacaoKey].departamentoOferta
+                                        .toLowerCase()
+                                        .includes(target.value.toLowerCase())){
+                                            result = true
+                                        }
+                                }
                                 if(alocacaoKey == 'predio'){
                                     if (alocacao[alocacaoKey]
                                         .toLowerCase()
@@ -278,7 +310,8 @@ const Agenda = props =>{
                         {/* Rotulos acima devem somar 31 */}
                         <Grid item xs={6} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}} sm={3}>
                             <Button 
-                                startIcon={<CachedTwoToneIcon/>} 
+                                startIcon={<CachedTwoToneIcon/>}
+                                onClick={handleOpenTrocaSala}
                                 variant="contained"  
                                 sx={{fontSize:'12px',paddingTop:'13px',paddingBottom:'12px'}} >Trocar
                             </Button>
@@ -391,24 +424,19 @@ const Agenda = props =>{
                     {
                         formatoAgenda == 'colunas' ? (
                             <AgendaColunas
-                                ano={ano}
-                                semestre={semestre}
-                                periodo={periodo}
-                                dia={dia}
                                 state={state}
                                 horariosInicio={horariosInicio}
                                 filterFn={filterFn}
+                                resultados={resultados}
+                                formatoAgenda={formatoAgenda}
                             />
                         ):( 
                             <AgendaLinhas
-                                ano={ano}
-                                semestre={semestre}
-                                periodo={periodo}
-                                dia={dia}
                                 state={state}
                                 horariosInicio={horariosInicio}
                                 filterFn={filterFn}
                                 formatoAgenda={formatoAgenda}
+                                resultados={resultados}
                             />
                         )
                     }
@@ -416,7 +444,24 @@ const Agenda = props =>{
                 </Box>
             </TableContainer>
 
-
+            <Dialog maxWidth="md"
+                    id='modalForm'
+                    scroll='body'
+                    open={openTrocaSalaForm}
+                    onClose={handleCloseTrocaSala}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
+                ><DialogContent >
+                       <TrocaSalaForm 
+                            ano={ano}
+                            semestre={semestre}
+                            dia={dia}
+                            horariosInicio={horariosInicio}
+                            config={config}
+                            closeModalForm={handleCloseTrocaSala}
+                       /> 
+            </DialogContent>
+            </Dialog>
 
         
         </>

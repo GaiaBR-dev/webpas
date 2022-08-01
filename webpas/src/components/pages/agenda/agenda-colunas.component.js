@@ -18,21 +18,14 @@ const tableRowCss = {
 
 
 const AgendaColunas = props =>{
-    const {ano,semestre,dia,config,horariosInicio,state,filterFn} = props
+    const {horariosInicio,state,filterFn,resultados,formatoAgenda} = props
 
-    const [resultados,setResultados] = useState([]);
     const [alocacoes,setAlocacoes] = useState([]);
     const [numCampos,setNumCampos] = useState(0);
     
-
-    useEffect(()=>{
-        console.log(filterFn)
-        retornaResultados(ano,semestre,dia)
-    },[ano,semestre,dia])
-
     useEffect(()=>{
         retornaAlocacoes()
-    },[resultados])
+    },[resultados,formatoAgenda])
 
     useEffect(()=>{
         retornaNumCampos()
@@ -46,14 +39,6 @@ const AgendaColunas = props =>{
             }
         })
         setNumCampos(nCampos)
-    }
-
-    const retornaResultados = (ano,semestre,dia) =>{
-        ResultadosDataService.getByAnoSemestreDia(ano,semestre,dia)
-            .then(res=>{
-                console.log(res.data)
-                setResultados(res.data)
-            }).catch(err=>console.log(err))
     }
 
     const getHorarioByPeriodo = (periodo,slot) =>{
@@ -99,6 +84,8 @@ const AgendaColunas = props =>{
             })
             let sortedAlocacoes = sortAlocacoes(alocacoesTemp)
             setAlocacoes(sortedAlocacoes)
+        }else{
+            setAlocacoes([])
         }
     }
 
