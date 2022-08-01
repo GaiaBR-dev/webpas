@@ -309,7 +309,7 @@ const Salas = props=>{
                         deleteSelected={()=>{
                             setConfirmDialog({
                                 isOpen:true,
-                                title:'Deletar Turmas',
+                                title:'Deletar Salas',
                                 subtitle:'Tem certeza que deseja deletar? Você não pode desfazer esta operação.',
                                 onConfirm: () =>{onDelete(selected)}
                             })

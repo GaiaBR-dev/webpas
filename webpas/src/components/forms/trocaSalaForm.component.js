@@ -8,7 +8,8 @@ import { IconButton } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 import Select from "./select.component";
 import SalasDataService from '../../services/salas';
-import ResultadosDataService from '../../services/resultados'
+import ResultadosDataService from '../../services/resultados';
+import ConfirmDialog from "../re-usable/confirmDialog.component";
 
 const inicialValues ={
     dia:"Segunda",
@@ -20,7 +21,13 @@ const inicialValues ={
     turma1:"",
     turma2:"",
     horarioFim1:"",
-    horarioFim2:""
+    horarioFim2:"",
+    horarioInicio1:"",
+    horarioInicio2:"",
+    capacidade1:"",
+    capacidade2:"",
+    alunos1:"",
+    alunos2:"",
 }
 
 const formCssClass ={
@@ -41,6 +48,7 @@ const TrocaSalaForm = props =>{
     const [predioDestino,setPredioDestino] = useState("");
     const [alocacoes,setAlocacoes] = useState([]);
     const [resultados,setResultados] = useState([]);
+    const [confirmDialog,setConfirmDialog] = useState({isOpen:false,title:'',subtitle:''});
 
     useEffect(()=>{
         retornaResultados(ano,semestre)
@@ -156,7 +164,6 @@ const TrocaSalaForm = props =>{
                     alocacoesTemp.push(alocacaoTemp)
                 })
             })
-            console.log(alocacoesTemp)
             setAlocacoes(alocacoesTemp)
         }else{
             setAlocacoes([])
@@ -165,6 +172,81 @@ const TrocaSalaForm = props =>{
 
     const validate = () =>{
         let temp ={}
+
+        temp.dia = values.dia ? "" : "O dia é obrigatório"
+        temp.horarioInicio = values.horarioInicio ? "" : "O horário é obrigatório"
+        temp.predio1 = values.predio1 ? "" : "O predio é obrigatório"
+        temp.predio2 = values.predio2 ? "" : "O predio é obrigatório"
+        temp.sala1 = values.sala1 ? "" : "A sala é obrigatória"
+        temp.sala2 = values.sala2 ? "" : "A sala é obrigatória"
+
+        temp.erroSala = ""
+        let buscaSalaTemp = {turma:""}
+        if (values.horarioFim1 == values.horarioFim2 && values.horarioFim1 == ""){
+            temp.erroSala = "Ambas as salas estão vazias no horário escolhido"
+        }else{
+            if (values.horarioFim1 == values.horarioFim2){
+                if (values.horarioInicio1 != values.horarioInicio2){
+                    if (parseInt(values.horarioInicio1) > parseInt(values.horarioInicio2)){
+                        buscaSalaTemp = turmaSearch(dia,values.horarioInicio2,values.predio1,values.sala1)
+                        if (buscaSalaTemp.turma != "Sala Vazia"){
+                            temp.erroSala = `A ${values.sala1} do prédio ${values.predio1} está ocupada com a turma ${buscaSalaTemp.turma} no horário das ${values.horarioInicio2}`
+                            setConfirmDialog({
+                                isOpen:true,
+                                title:'Trocar Salas',
+                                subtitle: `A ${values.sala1} do prédio ${values.predio1} está ocupada com a turma ${buscaSalaTemp.turma} no horário das ${values.horarioInicio2}.
+                                           Deseja trocar ambas as turmas ?`,
+                                onConfirm: () =>{temp.erroSala= ""}
+                            })
+                        }
+                    }else{
+                        buscaSalaTemp = turmaSearch(dia,values.horarioInicio1,values.predio2,values.sala2)
+                        if (buscaSalaTemp.turma != "Sala Vazia"){
+                            temp.erroSala = `A ${values.sala2} do prédio ${values.predio2} está ocupada com a turma ${buscaSalaTemp.turma} no horário das ${values.horarioInicio1}`
+                            setConfirmDialog({
+                                isOpen:true,
+                                title:'Trocar Salas',
+                                subtitle: `A ${values.sala2} do prédio ${values.predio2} está ocupada com a turma ${buscaSalaTemp.turma} no horário das ${values.horarioInicio1}.
+                                           Deseja trocar ambas as turmas ?`,
+                                onConfirm: () =>{temp.erroSala= ""}
+                            })
+                        }
+                    }
+                }
+            }else{
+                if (values.horarioInicio1 == values.horarioInicio2){
+                    if (parseInt(values.horarioFim1) < parseInt(values.horarioFim2)){
+                        buscaSalaTemp = turmaSearch(dia,values.horarioFim1,values.predio1,values.sala1)
+                        if (buscaSalaTemp.turma != "Sala Vazia"){
+                            temp.erroSala = `A ${values.sala1} do prédio ${values.predio1} está ocupada com a turma ${buscaSalaTemp.turma} no horário das ${values.horarioFim1}`
+                            setConfirmDialog({
+                                isOpen:true,
+                                title:'Trocar Salas',
+                                subtitle: `A ${values.sala1} do prédio ${values.predio1} está ocupada com a turma ${buscaSalaTemp.turma} no horário das ${values.horarioFim1}.
+                                           Deseja trocar ambas as turmas ?`,
+                                onConfirm: () =>{temp.erroSala= ""}
+                            })
+                        }
+                    }else{
+                        buscaSalaTemp = turmaSearch(dia,values.horarioFim2,values.predio2,values.sala2)
+                        if (buscaSalaTemp.turma != "Sala Vazia"){
+                            temp.erroSala = `A ${values.sala2} do prédio ${values.predio2} está ocupada com a turma ${buscaSalaTemp.turma} no horário das ${values.horarioFim2}`
+                            setConfirmDialog({
+                                isOpen:true,
+                                title:'Trocar Salas',
+                                subtitle: `A ${values.sala2} do prédio ${values.predio2} está ocupada com a turma ${buscaSalaTemp.turma} no horário das ${values.horarioFim2}.
+                                           Deseja trocar ambas as turmas ?`,
+                                onConfirm: () =>{temp.erroSala= ""}
+                            })
+                        }
+                    }
+                }
+            }
+        }
+
+        console.log(temp)
+        
+
         setErros({
             ...temp
         })
@@ -180,7 +262,10 @@ const TrocaSalaForm = props =>{
         })
         let result = {
             turma: alocacao?.turma? alocacao.turma.idTurma + " - " + alocacao.turma.nomeDisciplina + " - " + alocacao.turma.turma : "Sala Vazia",
-            horarioFim: alocacao?.turma?.horarioFim? alocacao.turma.horarioFim : ""
+            horarioInicio: alocacao?.turma?.horarioInicio? alocacao.turma.horarioInicio : "",
+            horarioFim: alocacao?.turma?.horarioFim? alocacao.turma.horarioFim : "",
+            capacidade: alocacao?.sala?.capacidade? alocacao.sala.capacidade : "",
+            alunos: alocacao?.turma?.totalTurma? alocacao.turma.totalTurma : ""
         }
         return result
     }
@@ -220,6 +305,9 @@ const TrocaSalaForm = props =>{
                 [name]:value,
                 turma1: findTurma[0]?.turma? findTurma[0].turma : "",
                 horarioFim1: findTurma[0]?.horarioFim? findTurma[0].horarioFim : "",
+                horarioInicio1: findTurma[0]?.horarioInicio? findTurma[0].horarioInicio : "",
+                capacidade1: findTurma[0]?.capacidade? findTurma[0].capacidade : "",
+                alunos1: findTurma[0]?.alunos? findTurma[0].alunos : ""
             })
         }else if (case2){
             setValues({
@@ -227,6 +315,9 @@ const TrocaSalaForm = props =>{
                 [name]:value,
                 turma2: findTurma[1]?.turma? findTurma[1].turma : "",
                 horarioFim2: findTurma[1]?.horarioFim? findTurma[1].horarioFim : "",
+                horarioInicio2: findTurma[1]?.horarioInicio? findTurma[1].horarioInicio : "",
+                capacidade2: findTurma[1]?.capacidade? findTurma[1].capacidade : "",
+                alunos2: findTurma[1]?.alunos? findTurma[1].alunos : ""
             })
         }else{
             setValues({
@@ -234,8 +325,14 @@ const TrocaSalaForm = props =>{
                 [name]:value,
                 turma1: findTurma[0]?.turma? findTurma[0].turma : "",
                 horarioFim1: findTurma[0]?.horarioFim? findTurma[0].horarioFim : "",
+                horarioInicio1: findTurma[0]?.horarioInicio? findTurma[0].horarioInicio : "",
+                capacidade1: findTurma[0]?.capacidade? findTurma[0].capacidade : "",
+                alunos1: findTurma[0]?.alunos? findTurma[0].alunos : "",
                 turma2: findTurma[1]?.turma? findTurma[1].turma : "",
                 horarioFim2: findTurma[1]?.horarioFim? findTurma[1].horarioFim : "",
+                horarioInicio2: findTurma[1]?.horarioInicio? findTurma[1].horarioInicio : "",
+                capacidade2: findTurma[1]?.capacidade? findTurma[1].capacidade : "",
+                alunos2: findTurma[1]?.alunos? findTurma[1].alunos : ""
             })
         }
     }
@@ -291,8 +388,6 @@ const TrocaSalaForm = props =>{
                 <Grid item xs={12}>
                 </Grid>
                 <Grid item xs={12}>
-                </Grid>
-                <Grid item xs={12}>
                     <Typography>Sala 1</Typography>
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -323,6 +418,10 @@ const TrocaSalaForm = props =>{
                         onChange={handleInputChange}
                         label="Turma"
                         value ={values.turma1}
+                        {...(erros.erroSala != "" && erros.erroSala!= null && {
+                            error:true,
+                            helperText:erros.erroSala 
+                        })}
                     />
                 </Grid>
                 <Grid item xs={12} sm={3}>
@@ -333,9 +432,8 @@ const TrocaSalaForm = props =>{
                         onChange={handleInputChange}
                         label="Horário de Término"
                         value ={values.horarioFim1}
+                        
                     />
-                </Grid>
-                <Grid item xs={12}>
                 </Grid>
                 <Grid item xs={12}>
                 </Grid>
@@ -370,6 +468,10 @@ const TrocaSalaForm = props =>{
                         onChange={handleInputChange}
                         label="Turma"
                         value ={values.turma2}
+                        {...(erros.erroSala != "" && erros.erroSala!= null && {
+                            error:true,
+                            helperText:erros.erroSala 
+                        })}
                     />
                 </Grid>
                 <Grid item xs={12} sm={3}>
@@ -390,6 +492,11 @@ const TrocaSalaForm = props =>{
                     <Button variant='contained' type="submit"size="large" color='secondary'>Trocar</Button>
                 </Grid>
             </Grid>
+
+            <ConfirmDialog
+                confirmDialog={confirmDialog}
+                setConfirmDialog={setConfirmDialog}
+            />
         </Box>
         </>
     )
