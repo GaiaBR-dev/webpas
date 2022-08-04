@@ -80,6 +80,7 @@ const Agenda = props =>{
     const [anos,setAnos] = useState([]);
     const [resultados,setResultados] = useState([]);
     const [horariosInicio,setHorariosInicio] = useState([]);
+    const [horariosFim,setHorariosFim] = useState([]);
     const [periodo,setPeriodo]= useState('');
     const [semestre,setSemestre] = useState(1);
     const [dia,setDia] = useState('Segunda');
@@ -188,11 +189,15 @@ const Agenda = props =>{
         let periodos = config.periodos ? config.periodos : []
         if(config.horarios){
             let horariosI = []
+            let horariosF = []
             periodos.map((periodo)=>{
                 horariosI.push(config.horarios[periodo]['Ínicio'].slot1)
                 horariosI.push(config.horarios[periodo]['Ínicio'].slot2)
+                horariosF.push(config.horarios[periodo]['Fim'].slot1)
+                horariosF.push(config.horarios[periodo]['Fim'].slot2)
             })
             setHorariosInicio(horariosI)
+            setHorariosFim(horariosF) 
         }
     }
 
@@ -457,6 +462,7 @@ const Agenda = props =>{
                             semestre={semestre}
                             dia={dia}
                             horariosInicio={horariosInicio}
+                            horariosFim={horariosFim}
                             config={config}
                             closeModalForm={handleCloseTrocaSala}
                        /> 

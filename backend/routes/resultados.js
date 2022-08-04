@@ -156,24 +156,31 @@ router.route('/:id').delete((req,res)=>{
 })
 
 router.route('/update/:id').post((req,res)=>{
-    const {alocacaoOrigem,alocacaoDestino,alocacaoAux} = req.body
-    console.log(alocacaoDestino)
+    const {alocacaoOrigem,alocacaoDestino,alocacaoAux,salaOrigem,salaDestino} = req.body
 
     
+
     Resultado.findById(req.params.id)
         .then(resultado=>{
             let turmaTemp = {}
             let aux = {}
+            let origem = []
+            let destino = []
 
-            let origem = resultado.alocacoes.filter(alocacao=>{
-                return alocacao.sala._id == alocacaoOrigem.sala._id &&
-                       alocacao.turma._id == alocacaoOrigem.turma._id
-            }).sort(alocationSort)
+            if (alocacaoOrigem){
+                origem = resultado.alocacoes.filter(alocacao=>{
+                    return alocacao.sala._id == alocacaoOrigem.sala._id &&
+                           alocacao.turma._id == alocacaoOrigem.turma._id
+                }).sort(alocationSort)
+            }
             
-            let destino = resultado.alocacoes.filter(alocacao=>{
-                return alocacao.sala._id == alocacaoDestino.sala._id &&
-                       alocacao.turma._id == alocacaoDestino.turma._id
-            }).sort(alocationSort)
+            if (alocacaoDestino){
+                destino = resultado.alocacoes.filter(alocacao=>{
+                    return alocacao.sala._id == alocacaoDestino.sala._id &&
+                           alocacao.turma._id == alocacaoDestino.turma._id
+                }).sort(alocationSort)
+            }
+                
             let removeArray = origem.concat(destino)
 
             if (alocacaoAux.sala && alocacaoAux.turma){
@@ -183,12 +190,26 @@ router.route('/update/:id').post((req,res)=>{
                 })
                 removeArray = removeArray.push(aux)
             }
+            console.log(removeArray)
 
             let newAlocation = alocationRemove(resultado.alocacoes,removeArray)
-            //let resposta = {origem,destino,aux,removeArray}
-            //res.json(resposta)
 
-            if(origem.length > destino.length){
+            let resposta = {origem,destino,aux,salaOrigem,salaDestino}
+            res.json(resposta)
+
+
+            if(origem.length == 0){
+                origem = new Array(destino.length)
+                destino.map((alocacao,index) =>{
+                    origem[index].turma = destino[index].turma
+                    origem[index].horarioSlot = destino[index].horarioSlot
+                    origem[index].sala = salaOrigem
+                })
+                destino = []
+            }else if (destino.length == 0){
+
+
+            }else if (origem.length > destino.length){
                 turmaTemp = origem[0].turma
                 origem[aux.horarioSlot - 1].turma = aux.turma
                 origem[destino[0].horarioSlot - 1].turma = destino[0].turma
@@ -219,16 +240,11 @@ router.route('/update/:id').post((req,res)=>{
             
             newAlocation = alocationInsert(newAlocation,insertArray)
             resultado.alocacoes = newAlocation
-
             
-            //let resposta2 = {koko,origem,destino,aux,insertArray,removeArray}
-
-            //res.json(resposta2)
-            
-            resultado.save()
-               .then(()=>{
-                   res.json("Troca Realizada")
-                }).catch(err=>console.log(err))
+            //resultado.save()
+            //   .then(()=>{
+            //       res.json("Troca Realizada")
+            //    }).catch(err=>console.log(err))
         })
         .catch(err=>console.log(err))
 })
