@@ -180,7 +180,6 @@ const Salas = props=>{
             .then(res =>handleServerResponses('salas',res,setNotify))
             .catch(err=>handleServerResponses('salas',err,setNotify))
         getSalas(params.predio)
-
     }
 
     const fileHandleResponse = res =>{

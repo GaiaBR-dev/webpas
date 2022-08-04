@@ -4,6 +4,41 @@ const { dbtomodel } = require('../solver-logic/dbtomodel')
 const { resolve } = require('../solver-logic/gerasalahorarioglpk')
 const { trataresultado } = require('../solver-logic/trataresultado')
 
+const alocationRemove = (arr,removeArray) => { 
+    let arrayTemp = []
+    
+    arr.map(element=>{
+        let remove = false
+        removeArray.map(removeObj=>{
+            if (removeObj.sala == element.sala && removeObj.turma == element.turma){
+                remove = true
+            }
+        })
+        if (!remove){
+            arrayTemp.push(element)
+        }
+    })
+    return arrayTemp
+}
+
+const alocationInsert = (arr,insertArray)=>{
+    let arrayTemp = arr
+    insertArray.map(element=>{
+        arr.push(element)
+    })
+    return arrayTemp
+}
+
+const alocationSort = (a,b) =>{
+    if (a.horarioSlot < b.horarioSlot){
+        return -1
+    }
+    if (a.horarioSlot > b.horarioSlot){
+        return 1
+    }
+    return 0
+}
+
 router.route('/').get((req,res)=>{
     const {user} = req
     Resultado.find({user:user._id})
@@ -115,13 +150,87 @@ router.route('/id/:id').get((req,res)=>{
 
 
 router.route('/:id').delete((req,res)=>{
-    Distancia.findByIdAndDelete(req.params.id)
+    Resultado.findByIdAndDelete(req.params.id)
         .then(()=> res.json('Resultado deletado'))
         .catch(err => res.status(400).json('Error: '+ err))
 })
 
 router.route('/update/:id').post((req,res)=>{
+    const {alocacaoOrigem,alocacaoDestino,alocacaoAux} = req.body
+    console.log(alocacaoDestino)
 
+    
+    Resultado.findById(req.params.id)
+        .then(resultado=>{
+            let turmaTemp = {}
+            let aux = {}
+
+            let origem = resultado.alocacoes.filter(alocacao=>{
+                return alocacao.sala._id == alocacaoOrigem.sala._id &&
+                       alocacao.turma._id == alocacaoOrigem.turma._id
+            }).sort(alocationSort)
+            
+            let destino = resultado.alocacoes.filter(alocacao=>{
+                return alocacao.sala._id == alocacaoDestino.sala._id &&
+                       alocacao.turma._id == alocacaoDestino.turma._id
+            }).sort(alocationSort)
+            let removeArray = origem.concat(destino)
+
+            if (alocacaoAux.sala && alocacaoAux.turma){
+                aux = resultado.alocacoes.find(alocacao=>{
+                    return alocacao.sala._id == alocacaoAux.sala._id &&
+                           alocacao.turma._id == alocacaoAux.turma._id
+                })
+                removeArray = removeArray.push(aux)
+            }
+
+            let newAlocation = alocationRemove(resultado.alocacoes,removeArray)
+            //let resposta = {origem,destino,aux,removeArray}
+            //res.json(resposta)
+
+            if(origem.length > destino.length){
+                turmaTemp = origem[0].turma
+                origem[aux.horarioSlot - 1].turma = aux.turma
+                origem[destino[0].horarioSlot - 1].turma = destino[0].turma
+                aux.turma = turmaTemp
+                destino[0].turma = turmaTemp
+
+            }else if (destino.length > origem.length){
+                turmaTemp = destino[0].turma
+                destino[aux.horarioSlot - 1].turma = aux.turma
+                destino[origem[0].horarioSlot - 1].turma = origem[0].turma
+                aux.turma = turmaTemp
+                origem[0].turma = turmaTemp
+            }else{
+                turmaTemp = destino[0].turma
+                destino[0].turma = origem[0].turma
+                origem[0].turma = turmaTemp
+                if (origem.length == 2){
+                    origem[1].turma = origem[0].turma
+                    destino[1].turma = destino[0].turma
+                }
+            }
+
+            let insertArray = origem.concat(destino)
+            if (alocacaoAux.sala && alocacaoAux.turma){
+                insertArray = insertArray.push(aux)
+            }
+
+            
+            newAlocation = alocationInsert(newAlocation,insertArray)
+            resultado.alocacoes = newAlocation
+
+            
+            //let resposta2 = {koko,origem,destino,aux,insertArray,removeArray}
+
+            //res.json(resposta2)
+            
+            resultado.save()
+               .then(()=>{
+                   res.json("Troca Realizada")
+                }).catch(err=>console.log(err))
+        })
+        .catch(err=>console.log(err))
 })
 
 module.exports = router

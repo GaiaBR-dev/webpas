@@ -21,6 +21,10 @@ class ResultadosDataService {
         return http.post('resultados/calculalista',data)
     }
 
+    trocaSala(data,id){
+        return http.post(`resultados/update/${id}`,data)
+    }
+
 
 }
 

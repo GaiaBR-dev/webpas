@@ -42,6 +42,7 @@ const TrocaSalaForm = props =>{
     const {ano,semestre,dia,horariosInicio,config,closeModalForm} = props
 
     const [predios,setPredios] = useState([]);
+    const [salas,setSalas] = useState([]);
     const [salasOrigem,setSalasOrigem] = useState([]);
     const [salasDestino,setSalasDestino] = useState([]);
     const [predioOrigem,setPredioOrigem] = useState("");
@@ -51,7 +52,12 @@ const TrocaSalaForm = props =>{
     const [confirmDialog,setConfirmDialog] = useState({isOpen:false,title:'',subtitle:''});
 
     useEffect(()=>{
+        setValues({...values,dia:dia})
+    },[dia])
+
+    useEffect(()=>{
         retornaResultados(ano,semestre)
+        retornaSalas()
     },[ano,semestre])
 
     useEffect(()=>{
@@ -59,22 +65,8 @@ const TrocaSalaForm = props =>{
     },[resultados])
 
     useEffect(()=>{
-        let teste = alocacoes.find(search=>{
-            return search.horario == '1000' &&
-                   search.turma.diaDaSemana == 'Segunda' &&
-                   search.sala.numeroSala == 'Sala 02' &&
-                   search.sala.predio == 'AT01'
-        })
-        console.log(teste)
-    },[alocacoes])
-
-    useEffect(()=>{
-        setValues({...values,dia:dia})
-    },[dia])
-
-    useEffect(()=>{
         retornaPredios()
-    },[])
+    },[salas])
 
     useEffect(()=>{
         if(predioOrigem != ""){
@@ -104,37 +96,62 @@ const TrocaSalaForm = props =>{
             }).catch(err=>console.log(err))
     }
 
+    const retornaSalas = () =>{
+        SalasDataService.getAll()
+            .then(res=>{
+                setSalas(res.data)
+            }).catch(err=>console.log(err))
+    }
+
     const retornaPredios = () =>{
-        SalasDataService.getPredios()
-            .then(response =>{
-                setPredios(response.data)
-            }).catch(err =>{
-                console.log(err)
-            })
+        const unique = [...new Set(salas.map(item => item.predio))].sort()
+        setPredios(unique)
+    }
+
+    const getResultadoId =(ano,semestre,dia,horario) =>{
+        let result = resultados.find(resultado =>{
+            return resultado.ano == ano &&
+                   resultado.semestre == semestre &&
+                   resultado.diaDaSemana == dia &&
+                   resultado.periodo == getPeriodoByHorario(horario)
+        })
+        return result?._id? result._id : "xxx"
+    }
+
+    const getPeriodoByHorario = horario =>{
+        let periodo = ''
+        if(config.horarios){
+            if(horario == config.horarios['Manhã']['Ínicio'].slot1 ||
+                horario == config.horarios['Manhã']['Ínicio'].slot2
+            ){
+                periodo = 'Manhã'
+            }else if(horario == config.horarios['Tarde']['Ínicio'].slot1 ||
+            horario == config.horarios['Tarde']['Ínicio'].slot2
+            ){
+                periodo = 'Tarde'
+            }else if(horario == config.horarios['Noite']['Ínicio'].slot1 ||
+            horario == config.horarios['Noite']['Ínicio'].slot2
+            ){
+                periodo = 'Noite'
+            }
+        }
+        return periodo
     }
 
     const retornaSalasOrigem = predio =>{
-        SalasDataService.getSalas(predio)
-            .then(response =>{
-                let salasObj = response.data.map(sala=>{
-                    return sala.numeroSala
-                })
-                setSalasOrigem(salasObj)
-            }).catch(err =>{
-                console.log(err)
-            })
+        let salasOrigem = salas.filter(sala=>{
+            return sala.predio == predio
+        })
+        const unique = [...new Set(salasOrigem.map(item => item.numeroSala))].sort()
+        setSalasOrigem(unique)
     }
 
     const retornaSalasDestino = predio =>{
-        SalasDataService.getSalas(predio)
-            .then(response =>{
-                let salasObj = response.data.map(sala=>{
-                    return sala.numeroSala
-                })
-                setSalasDestino(salasObj)
-            }).catch(err =>{
-                console.log(err)
-            })
+        let salasDestino = salas.filter(sala=>{
+            return sala.predio == predio
+        })
+        const unique = [...new Set(salasDestino.map(item => item.numeroSala))].sort()
+        setSalasDestino(unique)
     }
 
     const getHorarioByPeriodo = (periodo,slot) =>{
@@ -182,13 +199,18 @@ const TrocaSalaForm = props =>{
 
         temp.erroSala = ""
         let buscaSalaTemp = {turma:""}
-        if (values.horarioFim1 == values.horarioFim2 && values.horarioFim1 == ""){
+        if ( values.alunos1 > values.capacidade2){
+            temp.capacidade2 = `A sala não tem capacidade suficiente para a troca`
+        }else if (values.alunos2 > values.capacidade1){
+            temp.capacidade1 = `A sala não tem capacidade suficiente para a troca`
+        }else if (values.horarioFim1 == values.horarioFim2 && values.horarioFim1 == ""){
             temp.erroSala = "Ambas as salas estão vazias no horário escolhido"
         }else{
             if (values.horarioFim1 == values.horarioFim2){
                 if (values.horarioInicio1 != values.horarioInicio2){
                     if (parseInt(values.horarioInicio1) > parseInt(values.horarioInicio2)){
-                        buscaSalaTemp = turmaSearch(dia,values.horarioInicio2,values.predio1,values.sala1)
+                        buscaSalaTemp = turmaSearch(values.dia,values.horarioInicio2,values.predio1,values.sala1)
+                        let alocacaoTemp = alocacaoSearch(values.dia,values.horarioInicio2,values.predio1,values.sala1)
                         if (buscaSalaTemp.turma != "Sala Vazia"){
                             temp.erroSala = `A ${values.sala1} do prédio ${values.predio1} está ocupada com a turma ${buscaSalaTemp.turma} no horário das ${values.horarioInicio2}`
                             setConfirmDialog({
@@ -196,11 +218,21 @@ const TrocaSalaForm = props =>{
                                 title:'Trocar Salas',
                                 subtitle: `A ${values.sala1} do prédio ${values.predio1} está ocupada com a turma ${buscaSalaTemp.turma} no horário das ${values.horarioInicio2}.
                                            Deseja trocar ambas as turmas ?`,
-                                onConfirm: () =>{temp.erroSala= ""}
+                                onConfirm: () =>{
+                                    if(buscaSalaTemp.alunos > values.capacidade2 ){
+                                        temp.capacidade2 = `Não há capacidade suficiente para a turma do horário das ${buscaSalaTemp.horarioInicio}`
+                                    }else{
+                                        temp.erroSala= ""
+                                        if (Object.values(temp).every(errorValues => errorValues == "")){
+                                            trueSubmit(alocacaoTemp)
+                                        }
+                                    }
+                                }
                             })
                         }
                     }else{
-                        buscaSalaTemp = turmaSearch(dia,values.horarioInicio1,values.predio2,values.sala2)
+                        buscaSalaTemp = turmaSearch(values.dia,values.horarioInicio1,values.predio2,values.sala2)
+                        let alocacaoTemp = alocacaoSearch(values.dia,values.horarioInicio1,values.predio2,values.sala2)
                         if (buscaSalaTemp.turma != "Sala Vazia"){
                             temp.erroSala = `A ${values.sala2} do prédio ${values.predio2} está ocupada com a turma ${buscaSalaTemp.turma} no horário das ${values.horarioInicio1}`
                             setConfirmDialog({
@@ -208,7 +240,16 @@ const TrocaSalaForm = props =>{
                                 title:'Trocar Salas',
                                 subtitle: `A ${values.sala2} do prédio ${values.predio2} está ocupada com a turma ${buscaSalaTemp.turma} no horário das ${values.horarioInicio1}.
                                            Deseja trocar ambas as turmas ?`,
-                                onConfirm: () =>{temp.erroSala= ""}
+                                onConfirm: () =>{
+                                    if(buscaSalaTemp.alunos > values.capacidade1 ){
+                                        temp.capacidade2 = `Não há capacidade suficiente para a turma do horário das ${buscaSalaTemp.horarioInicio}`
+                                    }else{
+                                        temp.erroSala= ""
+                                        if (Object.values(temp).every(errorValues => errorValues == "")){
+                                            trueSubmit(alocacaoTemp)
+                                        }
+                                    }
+                                }
                             })
                         }
                     }
@@ -216,7 +257,8 @@ const TrocaSalaForm = props =>{
             }else{
                 if (values.horarioInicio1 == values.horarioInicio2){
                     if (parseInt(values.horarioFim1) < parseInt(values.horarioFim2)){
-                        buscaSalaTemp = turmaSearch(dia,values.horarioFim1,values.predio1,values.sala1)
+                        buscaSalaTemp = turmaSearch(values.dia,values.horarioFim1,values.predio1,values.sala1)
+                        let alocacaoTemp = alocacaoSearch(values.dia,values.horarioFim1,values.predio1,values.sala1)
                         if (buscaSalaTemp.turma != "Sala Vazia"){
                             temp.erroSala = `A ${values.sala1} do prédio ${values.predio1} está ocupada com a turma ${buscaSalaTemp.turma} no horário das ${values.horarioFim1}`
                             setConfirmDialog({
@@ -224,11 +266,21 @@ const TrocaSalaForm = props =>{
                                 title:'Trocar Salas',
                                 subtitle: `A ${values.sala1} do prédio ${values.predio1} está ocupada com a turma ${buscaSalaTemp.turma} no horário das ${values.horarioFim1}.
                                            Deseja trocar ambas as turmas ?`,
-                                onConfirm: () =>{temp.erroSala= ""}
+                                onConfirm: () =>{
+                                    if(buscaSalaTemp.alunos > values.capacidade2 ){
+                                        temp.capacidade2 = `Não há capacidade suficiente para a turma do horário das ${buscaSalaTemp.horarioInicio}`
+                                    }else{
+                                        temp.erroSala= ""
+                                        if (Object.values(temp).every(errorValues => errorValues == "")){
+                                            trueSubmit(alocacaoTemp)
+                                        }
+                                    }
+                                }
                             })
                         }
                     }else{
-                        buscaSalaTemp = turmaSearch(dia,values.horarioFim2,values.predio2,values.sala2)
+                        buscaSalaTemp = turmaSearch(values.dia,values.horarioFim2,values.predio2,values.sala2)
+                        let alocacaoTemp = alocacaoSearch(values.dia,values.horarioFim2,values.predio2,values.sala2)
                         if (buscaSalaTemp.turma != "Sala Vazia"){
                             temp.erroSala = `A ${values.sala2} do prédio ${values.predio2} está ocupada com a turma ${buscaSalaTemp.turma} no horário das ${values.horarioFim2}`
                             setConfirmDialog({
@@ -236,7 +288,16 @@ const TrocaSalaForm = props =>{
                                 title:'Trocar Salas',
                                 subtitle: `A ${values.sala2} do prédio ${values.predio2} está ocupada com a turma ${buscaSalaTemp.turma} no horário das ${values.horarioFim2}.
                                            Deseja trocar ambas as turmas ?`,
-                                onConfirm: () =>{temp.erroSala= ""}
+                                onConfirm: () =>{
+                                    if(buscaSalaTemp.alunos > values.capacidade1 ){
+                                        temp.capacidade2 = `Não há capacidade suficiente para a turma do horário das ${buscaSalaTemp.horarioInicio}`
+                                    }else{
+                                        temp.erroSala= ""
+                                        if (Object.values(temp).every(errorValues => errorValues == "")){
+                                            trueSubmit(alocacaoTemp)
+                                        }
+                                    }
+                                }
                             })
                         }
                     }
@@ -244,27 +305,31 @@ const TrocaSalaForm = props =>{
             }
         }
 
-        console.log(temp)
-        
-
         setErros({
             ...temp
         })
         return Object.values(temp).every(errorValues => errorValues == "")
     }
 
-    const turmaSearch = (dia,horarioInicio,predio,sala) =>{
+    const alocacaoSearch = (dia,horarioInicio,predio,sala) =>{
         let alocacao  = alocacoes.find(search=>{
             return search.horario == horarioInicio &&
                    search.turma.diaDaSemana == dia &&
                    search.sala.numeroSala == sala &&
                    search.sala.predio == predio
         })
+        return alocacao
+    }
+
+    const turmaSearch = (dia,horarioInicio,predio,sala) =>{
+        let alocacao  = alocacaoSearch(dia,horarioInicio,predio,sala)
+        let salaTemp = salas.find(search => search.numeroSala == sala && search.predio == predio)
+        let capacidadeSala = salaTemp?.capacidade? salaTemp.capacidade : ""
         let result = {
             turma: alocacao?.turma? alocacao.turma.idTurma + " - " + alocacao.turma.nomeDisciplina + " - " + alocacao.turma.turma : "Sala Vazia",
             horarioInicio: alocacao?.turma?.horarioInicio? alocacao.turma.horarioInicio : "",
             horarioFim: alocacao?.turma?.horarioFim? alocacao.turma.horarioFim : "",
-            capacidade: alocacao?.sala?.capacidade? alocacao.sala.capacidade : "",
+            capacidade: alocacao?.sala?.capacidade? alocacao.sala.capacidade : capacidadeSala,
             alunos: alocacao?.turma?.totalTurma? alocacao.turma.totalTurma : ""
         }
         return result
@@ -337,11 +402,31 @@ const TrocaSalaForm = props =>{
         }
     }
 
+    const trueSubmit = (auxParams = {}) =>{
+        setConfirmDialog({...confirmDialog,isOpen:false})
+        let updateId = getResultadoId(ano,semestre,dia,values.horarioInicio)
+        let data = {
+            alocacaoOrigem: alocacaoSearch(values.dia,values.horarioInicio,values.predio1,values.sala1),
+            alocacaoDestino: alocacaoSearch(values.dia,values.horarioInicio,values.predio2,values.sala2),
+            alocacaoAux: auxParams? auxParams : {}
+        }
+        ResultadosDataService.trocaSala(data,updateId)
+            .then(res=>{
+                console.log(res.data)
+
+            })
+            .catch(err=>{console.log(err)})
+        setErros({})
+        closeModalForm()
+    }
+
 
     const handleSubmit = e =>{
         e.preventDefault()
         if (validate()){
-
+            trueSubmit()
+        }else{
+            console.log("não validou")
         }
     }
 
@@ -410,7 +495,7 @@ const TrocaSalaForm = props =>{
                         error={erros.sala1}
                     />
                 </Grid>
-                <Grid item xs={12} sm={9}>
+                <Grid item xs={12} sm={12}>
                     <TextField 
                         disabled
                         variant="outlined"
@@ -428,11 +513,44 @@ const TrocaSalaForm = props =>{
                     <TextField 
                         disabled
                         variant="outlined"
+                        name = "horarioInicio1"
+                        onChange={handleInputChange}
+                        label="Horário de Ínicio"
+                        value ={values.horarioInicio1}    
+                    />
+                </Grid>
+                <Grid item xs={12} sm={3}>
+                    <TextField 
+                        disabled
+                        variant="outlined"
                         name = "horarioFim1"
                         onChange={handleInputChange}
                         label="Horário de Término"
-                        value ={values.horarioFim1}
-                        
+                        value ={values.horarioFim1}    
+                    />
+                </Grid>
+                <Grid item xs={12} sm={3}>
+                    <TextField 
+                        disabled
+                        variant="outlined"
+                        name = "capacidade1"
+                        onChange={handleInputChange}
+                        label="Capacidade da Sala"
+                        value ={values.capacidade1} 
+                        {...(erros.capacidade1 != "" && erros.capacidade1!= null && {
+                            error:true,
+                            helperText:erros.capacidade1 
+                        })}  
+                    />
+                </Grid>
+                <Grid item xs={12} sm={3}>
+                    <TextField 
+                        disabled
+                        variant="outlined"
+                        name = "alunos1"
+                        onChange={handleInputChange}
+                        label="Número de Alunos"
+                        value ={values.alunos1}    
                     />
                 </Grid>
                 <Grid item xs={12}>
@@ -460,7 +578,7 @@ const TrocaSalaForm = props =>{
                         error={erros.sala2}
                     />
                 </Grid>
-                <Grid item xs={12} sm={9}>
+                <Grid item xs={12} sm={12}>
                     <TextField 
                         disabled
                         variant="outlined"
@@ -478,10 +596,44 @@ const TrocaSalaForm = props =>{
                     <TextField 
                         disabled
                         variant="outlined"
+                        name = "horarioInicio2"
+                        onChange={handleInputChange}
+                        label="Horário de Ínicio"
+                        value ={values.horarioInicio2}    
+                    />
+                </Grid>
+                <Grid item xs={12} sm={3}>
+                    <TextField 
+                        disabled
+                        variant="outlined"
                         name = "horarioFim2"
                         onChange={handleInputChange}
                         label="Horário de Término"
-                        value ={values.horarioFim2}
+                        value ={values.horarioFim2}    
+                    />
+                </Grid>
+                <Grid item xs={12} sm={3}>
+                    <TextField 
+                        disabled
+                        variant="outlined"
+                        name = "capacidade2"
+                        onChange={handleInputChange}
+                        label="Capacidade da Sala"
+                        value ={values.capacidade2}
+                        {...(erros.capacidade2 != "" && erros.capacidade2!= null && {
+                            error:true,
+                            helperText:erros.capacidade2
+                        })}   
+                    />
+                </Grid>
+                <Grid item xs={12} sm={3}>
+                    <TextField 
+                        disabled
+                        variant="outlined"
+                        name = "alunos2"
+                        onChange={handleInputChange}
+                        label="Número de Alunos"
+                        value ={values.alunos2}    
                     />
                 </Grid>
                 <Grid item xs={12}>
