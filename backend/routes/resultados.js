@@ -158,11 +158,8 @@ router.route('/:id').delete((req,res)=>{
 router.route('/update/:id').post((req,res)=>{
     const {alocacaoOrigem,alocacaoDestino,alocacaoAux,salaOrigem,salaDestino} = req.body
 
-    
-
     Resultado.findById(req.params.id)
         .then(resultado=>{
-            let turmaTemp = {}
             let aux = {}
             let origem = []
             let destino = []
@@ -180,73 +177,47 @@ router.route('/update/:id').post((req,res)=>{
                            alocacao.turma._id == alocacaoDestino.turma._id
                 }).sort(alocationSort)
             }
-                
+            
             let removeArray = origem.concat(destino)
-
-            if (alocacaoAux.sala && alocacaoAux.turma){
+            
+            if (alocacaoAux.sala){
                 aux = resultado.alocacoes.find(alocacao=>{
                     return alocacao.sala._id == alocacaoAux.sala._id &&
                            alocacao.turma._id == alocacaoAux.turma._id
                 })
-                removeArray = removeArray.push(aux)
+                removeArray.push(aux)
             }
-            console.log(removeArray)
-
             let newAlocation = alocationRemove(resultado.alocacoes,removeArray)
 
-            let resposta = {origem,destino,aux,salaOrigem,salaDestino}
-            res.json(resposta)
+            origem.map(aloc=>{
+                aloc.sala = salaDestino
+            })
 
-
-            if(origem.length == 0){
-                origem = new Array(destino.length)
-                destino.map((alocacao,index) =>{
-                    origem[index].turma = destino[index].turma
-                    origem[index].horarioSlot = destino[index].horarioSlot
-                    origem[index].sala = salaOrigem
-                })
-                destino = []
-            }else if (destino.length == 0){
-
-
-            }else if (origem.length > destino.length){
-                turmaTemp = origem[0].turma
-                origem[aux.horarioSlot - 1].turma = aux.turma
-                origem[destino[0].horarioSlot - 1].turma = destino[0].turma
-                aux.turma = turmaTemp
-                destino[0].turma = turmaTemp
-
-            }else if (destino.length > origem.length){
-                turmaTemp = destino[0].turma
-                destino[aux.horarioSlot - 1].turma = aux.turma
-                destino[origem[0].horarioSlot - 1].turma = origem[0].turma
-                aux.turma = turmaTemp
-                origem[0].turma = turmaTemp
-            }else{
-                turmaTemp = destino[0].turma
-                destino[0].turma = origem[0].turma
-                origem[0].turma = turmaTemp
-                if (origem.length == 2){
-                    origem[1].turma = origem[0].turma
-                    destino[1].turma = destino[0].turma
-                }
-            }
-
+            destino.map(aloc=>{
+                aloc.sala = salaOrigem
+            })
             let insertArray = origem.concat(destino)
-            if (alocacaoAux.sala && alocacaoAux.turma){
-                insertArray = insertArray.push(aux)
-            }
 
-            
+            if (alocacaoAux.sala && origem.length > destino.length){
+                aux.sala = salaOrigem
+                insertArray.push(aux)
+            }else if (alocacaoAux.sala && origem.length < destino.length){
+                aux.sala = salaDestino
+                insertArray.push(aux)
+            }
             newAlocation = alocationInsert(newAlocation,insertArray)
             resultado.alocacoes = newAlocation
-            
-            //resultado.save()
-            //   .then(()=>{
-            //       res.json("Troca Realizada")
-            //    }).catch(err=>console.log(err))
+
+            resultado.save()
+               .then(()=>{
+                  res.json("Troca Realizada")
+               }).catch(err=>{
+                  console.log(err)
+                    res.status(400).json(err)})
         })
-        .catch(err=>console.log(err))
+        .catch(err=>{
+            console.log(err)
+            res.status(400).json(err)})
 })
 
 module.exports = router

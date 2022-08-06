@@ -21,6 +21,7 @@ import AgendaCampos from "./agenda-campos.component";
 import TrocaSalaForm from "../../forms/trocaSalaForm.component";
 import {Dialog, DialogContent} from "@mui/material";
 import ResultadosDataService from '../../../services/resultados';
+import * as XLSX from 'xlsx/xlsx.mjs';
 
 const inputCss = {
     width:'100%',
@@ -30,6 +31,14 @@ const inputCss = {
         paddingRight: '12px',
     }
 }
+
+const testeArray = [
+    {a: "bananas" , b : "2"},
+    
+    {a: "apples" , b : "3"},
+    {a: "demons" , b : "5"},
+    {a: "Time paradoxes" , b : "1"},
+]
 
 const selectCss = {
     '& .MuiSelect-select':{
@@ -286,8 +295,19 @@ const Agenda = props =>{
         setAnchorEl(event.currentTarget)
     }
     
-      const handleCloseCampos = () => {
+    const handleCloseCampos = () => {
         setAnchorEl(null)
+    }
+
+    const createExcelFile = () =>{
+        var workbook = XLSX.utils.book_new();
+        console.log(workbook)
+        var worksheet = XLSX.utils.json_to_sheet(testeArray);
+        console.log(worksheet)
+
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Example");
+        
+        XLSX.writeFile(workbook, 'Example.xlsx');
     }
 
     return(
@@ -324,7 +344,8 @@ const Agenda = props =>{
                         <Grid item xs={6} sx={{fontSize:'14px',fontWeight:'500',color:"#666"}} sm={3}>
                             <Button 
                                 startIcon={<FileDownloadTwoToneIcon/>} 
-                                variant="contained"  
+                                variant="contained" 
+                                onClick={createExcelFile}
                                 sx={{fontSize:'12px',paddingTop:'13px',paddingBottom:'12px'}} >Baixar
                             </Button>
                         </Grid>

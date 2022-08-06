@@ -245,7 +245,7 @@ const TrocaSalaForm = props =>{
                         capacidadeAux = values.capacidade1
                         usaAux = true
                     }
-                }else if (values.horarioInicio1 == ""){
+                }else if (values.horarioInicio1 == "" && horariosInicio.indexOf(values.horarioInicio2) != horariosFim.indexOf(values.horarioFim2)){
                     if (horariosInicio.indexOf(values.horarioInicio) % 2 == 0){
                         predioAux = values.predio1
                         salaAux = values.sala1
@@ -259,7 +259,7 @@ const TrocaSalaForm = props =>{
                         horarioAux = horariosInicio[horariosInicio.indexOf(values.horarioInicio) - 1]
                         usaAux = true
                     } 
-                }else if (values.horarioInicio2 == "") {
+                }else if (values.horarioInicio2 == "" && horariosInicio.indexOf(values.horarioInicio1) != horariosFim.indexOf(values.horarioFim1)) {
                     if (horariosInicio.indexOf(values.horarioInicio) % 2 == 0){
                         predioAux = values.predio2
                         salaAux = values.sala2
@@ -418,6 +418,7 @@ const TrocaSalaForm = props =>{
             alocacaoDestino: alocacaoSearch(values.dia,values.horarioInicio,values.predio2,values.sala2),
             alocacaoAux: auxParams? auxParams : {}
         }
+        console.log(data)
         ResultadosDataService.trocaSala(data,updateId)
             .then(res=>{
                 console.log(res.data)
