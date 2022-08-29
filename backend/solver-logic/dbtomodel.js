@@ -15,11 +15,11 @@ async function dbtomodel(ano,semestre,periodo,diaDaSemana,user){
 
     const config = await Config.find({user:user._id}) 
 
-    let horarioInicioF1 = config[0].horarios[periodo]['Ínicio'].slot1
+    let horarioInicioF1 = config[0].horarios[periodo]['Início'].slot1
     let horarioFimF1 = config[0].horarios[periodo]['Fim'].slot1
-    let horarioInicioF12 = config[0].horarios[periodo]['Ínicio'].slot1
+    let horarioInicioF12 = config[0].horarios[periodo]['Início'].slot1
     let horarioFimF12 = config[0].horarios[periodo]['Fim'].slot2
-    let horarioInicioF2 = config[0].horarios[periodo]['Ínicio'].slot2
+    let horarioInicioF2 = config[0].horarios[periodo]['Início'].slot2
     let horarioFimF2 = config[0].horarios[periodo]['Fim'].slot2
 
     modelo.turmasf1 = await Turma.find({

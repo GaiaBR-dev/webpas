@@ -17,7 +17,7 @@ const ConfigForm = props =>{
     const [horariosObj,setHorariosObj] = useState(()=>{
         let horarios = {
             "Manhã":{
-                    "Ínicio":{
+                    "Início":{
                         slot1:'',
                         slot2:'',
                     },
@@ -27,7 +27,7 @@ const ConfigForm = props =>{
                     }
             },
             "Tarde":{
-                    "Ínicio":{
+                    "Início":{
                         slot1:'',
                         slot2:'',
                     },
@@ -37,7 +37,7 @@ const ConfigForm = props =>{
                     }
             },
             "Noite":{
-                    "Ínicio":{
+                    "Início":{
                         slot1:'',
                         slot2:'',
                     },
@@ -93,7 +93,7 @@ const ConfigForm = props =>{
         let horario = name.slice(name.search("-")+1,name.search("_"))
         let slot = name.slice(name.search("_")+1)
         
-        if(horario == "Ínicio" && slot == "slot2"){
+        if(horario == "Início" && slot == "slot2"){
             setHorariosObj({
                 ...horariosObj,
                 [periodo]:{
@@ -214,24 +214,24 @@ const ConfigForm = props =>{
                                     <Typography fontSize={'1rem'} fontWeight={'450'}>Manhã</Typography>
                                 </Grid>
                                 <Grid item xs={3}>
-                                    <Typography marginLeft={5}>Horários de Ínicio</Typography>
+                                    <Typography marginLeft={5}>Horários de Início</Typography>
                                 </Grid>
                                 <Grid item xs={3}>
                                     <TextField
                                         variant="outlined"
                                         label="Slot1"
-                                        name = "Manhã-Ínicio_slot1"
+                                        name = "Manhã-Início_slot1"
                                         onChange={handleHorariosChange}
-                                        value ={horariosObj['Manhã']['Ínicio'].slot1}
+                                        value ={horariosObj['Manhã']['Início'].slot1}
                                     />
                                 </Grid>
                                 <Grid item xs={3}>
                                     <TextField
                                         variant="outlined"
                                         label="Slot2"
-                                        name = "Manhã-Ínicio_slot2"
+                                        name = "Manhã-Início_slot2"
                                         onChange={handleHorariosChange}
-                                        value ={horariosObj['Manhã']['Ínicio'].slot2}
+                                        value ={horariosObj['Manhã']['Início'].slot2}
                                     />
                                 </Grid>
                                 <Grid item xs={11}></Grid>
@@ -266,24 +266,24 @@ const ConfigForm = props =>{
                                     <Typography fontSize={'1rem'} fontWeight={'450'}>Tarde</Typography>
                                 </Grid>
                                 <Grid item xs={3}>
-                                    <Typography marginLeft={5}>Horários de Ínicio</Typography>
+                                    <Typography marginLeft={5}>Horários de Início</Typography>
                                 </Grid>
                                 <Grid item xs={3}>
                                     <TextField
                                         variant="outlined"
                                         label="Slot1"
-                                        name = "Tarde-Ínicio_slot1"
+                                        name = "Tarde-Início_slot1"
                                         onChange={handleHorariosChange}
-                                        value ={horariosObj['Tarde']['Ínicio'].slot1}
+                                        value ={horariosObj['Tarde']['Início'].slot1}
                                     />
                                 </Grid>
                                 <Grid item xs={3}>
                                     <TextField
                                         variant="outlined"
                                         label="Slot2"
-                                        name = "Tarde-Ínicio_slot2"
+                                        name = "Tarde-Início_slot2"
                                         onChange={handleHorariosChange}
-                                        value ={horariosObj['Tarde']['Ínicio'].slot2}
+                                        value ={horariosObj['Tarde']['Início'].slot2}
                                     />
                                 </Grid>
                                 <Grid item xs={11}></Grid>
@@ -318,24 +318,24 @@ const ConfigForm = props =>{
                                     <Typography fontSize={'1rem'} fontWeight={'450'}>Noite</Typography>
                                 </Grid>
                                 <Grid item xs={3}>
-                                    <Typography marginLeft={5}>Horários de Ínicio</Typography>
+                                    <Typography marginLeft={5}>Horários de Início</Typography>
                                 </Grid>
                                 <Grid item xs={3}>
                                     <TextField
                                         variant="outlined"
                                         label="Slot1"
-                                        name = "Noite-Ínicio_slot1"
+                                        name = "Noite-Início_slot1"
                                         onChange={handleHorariosChange}
-                                        value ={horariosObj['Noite']['Ínicio'].slot1}
+                                        value ={horariosObj['Noite']['Início'].slot1}
                                     />
                                 </Grid>
                                 <Grid item xs={3}>
                                     <TextField
                                         variant="outlined"
                                         label="Slot2"
-                                        name = "Noite-Ínicio_slot2"
+                                        name = "Noite-Início_slot2"
                                         onChange={handleHorariosChange}
-                                        value ={horariosObj['Noite']['Ínicio'].slot2}
+                                        value ={horariosObj['Noite']['Início'].slot2}
                                     />
                                 </Grid>
                                 <Grid item xs={11}></Grid>
@@ -349,7 +349,7 @@ const ConfigForm = props =>{
                                         label="Slot1"
                                         name = "Noite-Fim_slot1"
                                         onChange={handleHorariosChange}
-                                        value ={horariosObj['Noite']['Ínicio'].slot2}
+                                        value ={horariosObj['Noite']['Início'].slot2}
                                     />
                                 </Grid>
                                 <Grid item xs={3}>

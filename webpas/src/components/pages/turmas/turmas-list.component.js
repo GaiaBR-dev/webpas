@@ -45,7 +45,7 @@ const headCells =[
     {id:'turma', label:'Turma'},
     {id:'totalTurma', label:'Total de Alunos'},
     {id:'diaDaSemana', label:'Dia'},
-    {id:'horarioInicio', label:'Horário de Ínicio'},
+    {id:'horarioInicio', label:'Horário de Início'},
     {id:'horarioFim', label:'Horário de Término'},
     {id:'creditosAula', label:'Creditos'},
     {id:'departamentoOferta', label:'Departamento de Oferta'},
@@ -85,6 +85,7 @@ const TurmasList = props =>{
 
     useEffect(()=>{
         retornaHorarios()
+        
     },[config])
 
     useEffect(()=>{
@@ -129,8 +130,8 @@ const TurmasList = props =>{
             let horariosI = []
             let horariosF = []
             periodos.map((periodo)=>{
-                horariosI.push(config.horarios[periodo]['Ínicio'].slot1)
-                horariosI.push(config.horarios[periodo]['Ínicio'].slot2)
+                horariosI.push(config.horarios[periodo]['Início'].slot1)
+                horariosI.push(config.horarios[periodo]['Início'].slot2)
                 horariosF.push(config.horarios[periodo]['Fim'].slot1)
                 horariosF.push(config.horarios[periodo]['Fim'].slot2)
             })

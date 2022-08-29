@@ -74,7 +74,7 @@ const TurmaForm = props =>{
         temp.turma = values.turma ? "" : "O identificador da turma é obrigatório"
         temp.departamentoOferta = values.departamentoOferta ? "" : "O departamento de oferta é obrigatório"
         temp.diaDaSemana = values.diaDaSemana ? "" : "O dia em que a turma é ministrada é obrigatório"
-        temp.horarioInicio = values.horarioInicio? "" : "O horário de ínicio da turma é obrigatório"
+        temp.horarioInicio = values.horarioInicio? "" : "O horário de início da turma é obrigatório"
         temp.horarioFim = values.horarioFim? "" : "O horário de término da turma é obrigatório"
         temp.ano = values.ano? "" : "O ano da turma é obrigatório"
         temp.semestre = values.semestre? "" : "O semestre da turma é obrigatório"
@@ -223,7 +223,7 @@ const TurmaForm = props =>{
                 <Grid item xs={12} sm={6}>
                     <Select 
                         name="horarioInicio"
-                        label="Horário de Ínicio*"
+                        label="Horário de Início*"
                         value={values.horarioInicio}
                         onChange={handleInputChange}
                         options ={horariosInicio}

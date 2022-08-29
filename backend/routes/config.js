@@ -5,7 +5,7 @@ const {protect} = require("../middleware/auth")
 const StandartConfig = {
     horarios:{
         "Manhã":{
-            "Ínicio":{
+            "Início":{
                 slot1:"800",
                 slot2:"1000"
             },
@@ -15,7 +15,7 @@ const StandartConfig = {
             }
         },
         "Tarde":{
-            "Ínicio":{
+            "Início":{
                 slot1:"1400",
                 slot2:"1600"
             },
@@ -25,7 +25,7 @@ const StandartConfig = {
             }
         },
         "Noite":{
-            "Ínicio":{
+            "Início":{
                 slot1:"1900",
                 slot2:"2100"
             },

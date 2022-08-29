@@ -10,10 +10,18 @@ Software web para resolução do problema de alocação de salas
 
 #### Frontend
 - Escrever textos da homepage e ajuda para cada página.
-- implementar troca de salas (edição de resultados) -> condições para troca -> capacidade e horário
-- Implementar filtro e tratamento de dados para UFSCar (prédios, salas e distâncias precisa ?)
+- Implementar filtro e tratamento de dados para UFSCar - departamento recomendado precisa ajustar
 - Criar aba mostrando linhas que não foram lidas e o motivo, na entrada de arquivos (para prédios, salas e distâncias)
 - Verificar tratamento de erros de todas as requests
 - conferir se todas as buscas estão 100% implementadas
+
+
+#### Para TCC
+- 1 página de ajuda
+- home page
+- opções solver, só no front-end
+- css do login e registro
+- css de prédios, salas e distâncias
+- opções de prédio auxiliar (pensar num jeito)
 
 

@@ -18,15 +18,10 @@ const tableRowCss = {
 
 
 const AgendaColunas = props =>{
-    const {horariosInicio,state,filterFn,resultados,formatoAgenda} = props
+    const {state,filterFn,alocacoes} = props
 
-    const [alocacoes,setAlocacoes] = useState([]);
     const [numCampos,setNumCampos] = useState(0);
     
-    useEffect(()=>{
-        retornaAlocacoes()
-    },[resultados,formatoAgenda])
-
     useEffect(()=>{
         retornaNumCampos()
     },[state])
@@ -41,18 +36,6 @@ const AgendaColunas = props =>{
         setNumCampos(nCampos)
     }
 
-    const getHorarioByPeriodo = (periodo,slot) =>{
-        let periodoNum= 0
-        if (periodo === 'Manhã'){
-            periodoNum = 0
-        } else if ( periodo === 'Tarde'){
-            periodoNum = 1
-        } else if ( periodo === 'Noite'){
-            periodoNum = 2
-        }
-
-        return horariosInicio[periodoNum*2+slot - 1]
-    }
 
     const sortAlocacoes = array =>{
         let sortedArray = array.sort((a,b)=>{
@@ -67,43 +50,24 @@ const AgendaColunas = props =>{
         return sortedArray
     }
 
-    const retornaAlocacoes = () =>{
-        if(resultados.length > 0){
-            let alocacoesTemp = []
-            resultados.map(resultado=>{
-                resultado.alocacoes.map(alocacao=>{
-                    let alocacaoTemp = {
-                        horario: alocacao?.horarioSlot == 1 ? 
-                            getHorarioByPeriodo(resultado.periodo,1) : 
-                            getHorarioByPeriodo(resultado.periodo,2),
-                        turma : alocacao?.turma,
-                        sala: alocacao?.sala 
-                    }
-                    alocacoesTemp.push(alocacaoTemp)
-                })
-            })
-            let sortedAlocacoes = sortAlocacoes(alocacoesTemp)
-            setAlocacoes(sortedAlocacoes)
-        }else{
-            setAlocacoes([])
-        }
-    }
-
     return (
         <>
         <Box>
-            <Grid container spacing={1.5} alignItems="center" columns={26} padding={'20px 30px 0px 20px'}>
+            <Grid container spacing={1.5} alignItems="center" columns={28} padding={'20px 30px 0px 20px'}>
                 <Grid item xs={2}><Typography sx={tableHeadCss} >Prédio</Typography></Grid>
                 <Grid item xs={2}><Typography sx={tableHeadCss} >Sala</Typography></Grid>
-                <Grid item xs={2}><Typography sx={tableHeadCss} >Horário</Typography></Grid>
                 {state.capacidade?(
                     <Grid item xs={2}><Typography sx={tableHeadCss}>Capacidade</Typography></Grid>
+                ):(<></>)}
+                <Grid item xs={2}><Typography sx={tableHeadCss} >Horário Início</Typography></Grid>
+                {state.horarioFim?(
+                    <Grid item xs={2}><Typography sx={tableHeadCss}>Horário Fim</Typography></Grid>
                 ):(<></>)}
                 {state.idTurma?(
                     <Grid item xs={2}><Typography sx={tableHeadCss}>id da Turma</Typography></Grid>
                 ):(<></>)}
                 {state.nomeDisciplina?(
-                    <Grid item xs={22 - numCampos*2}><Typography sx={tableHeadCss}>Nome da Disciplina</Typography></Grid>
+                    <Grid item xs={24 - numCampos*2}><Typography sx={tableHeadCss}>Nome da Disciplina</Typography></Grid>
                 ):(<></>)}
                 {state.codDisciplina?(
                     <Grid item xs={2}><Typography sx={tableHeadCss}>Cod. da Disciplina</Typography></Grid>
@@ -130,30 +94,33 @@ const AgendaColunas = props =>{
                     state.nomeDisciplina ? (
                         <></>
                     ):(
-                        <Grid item xs={20 - numCampos*2}></Grid>
+                        <Grid item xs={22 - numCampos*2}></Grid>
                     )
                 }
-                 <Grid item xs={26}><Divider></Divider></Grid>
+                 <Grid item xs={28}><Divider></Divider></Grid>
             </Grid>
         </Box>
         <TableContainer component={Paper} sx={{boxShadow:"0"}}>
-            <Grid container  maxHeight={'550px'} spacing={1.5} alignItems="center" columns={26} padding={'10px 20px 10px 20px'}> 
+            <Grid container  maxHeight={'550px'} spacing={1.5} alignItems="center" columns={28} padding={'10px 20px 10px 20px'}> 
                 {
                     
-                    filterFn.fn(alocacoes).map((alocacao,index)=>{
+                    filterFn.fn(sortAlocacoes(alocacoes)).map((alocacao,index)=>{
                         return(
                         <React.Fragment key={index}>
                             <Grid item xs={2}><Typography sx={tableRowCss} >{alocacao.sala.predio}</Typography></Grid>
                             <Grid item xs={2}><Typography sx={tableRowCss} >{alocacao.sala.numeroSala}</Typography></Grid>
-                            <Grid item xs={2}><Typography sx={tableRowCss} >{alocacao.horario}</Typography></Grid>
                             {state.capacidade?(
                                 <Grid item xs={2}><Typography sx={tableRowCss}>{alocacao.sala.capacidade}</Typography></Grid>
+                            ):(<></>)}
+                            <Grid item xs={2}><Typography sx={tableRowCss} >{alocacao.horario}</Typography></Grid>
+                            {state.horarioFim?(
+                                <Grid item xs={2}><Typography sx={tableRowCss}>{alocacao.turma.horarioFim}</Typography></Grid>
                             ):(<></>)}
                             {state.idTurma?(
                                 <Grid item xs={2}><Typography sx={tableRowCss}>{alocacao.turma.idTurma}</Typography></Grid>
                             ):(<></>)}
                             {state.nomeDisciplina?(
-                                <Grid item xs={22 - numCampos*2}><Typography sx={tableRowCss}>{alocacao.turma.nomeDisciplina}</Typography></Grid>
+                                <Grid item xs={24 - numCampos*2}><Typography sx={tableRowCss}>{alocacao.turma.nomeDisciplina}</Typography></Grid>
                             ):(<></>)}
                             {state.codDisciplina?(
                                 <Grid item xs={2}><Typography sx={tableRowCss}>{alocacao.turma.codDisciplina}</Typography></Grid>
@@ -180,10 +147,10 @@ const AgendaColunas = props =>{
                                 state.nomeDisciplina ? (
                                     <></>
                                 ):(
-                                    <Grid item xs={20 - numCampos*2}></Grid>
+                                    <Grid item xs={22 - numCampos*2}></Grid>
                                 )
                             }
-                           
+                            <Grid item xs={28}><Divider></Divider></Grid>
                         </React.Fragment>
                         )   
                     })

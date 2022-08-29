@@ -6,7 +6,7 @@ const configSchema = new Schema({
     horarios:{
         "Manhã":{
             type:{
-                "Ínicio":{
+                "Início":{
                     slot1:{type:String,required:true},
                     slot2:{type:String,required:true},
                 },
@@ -18,7 +18,7 @@ const configSchema = new Schema({
             required:false
         },"Tarde":{
             type:{
-                "Ínicio":{
+                "Início":{
                     slot1:{type:String,required:true},
                     slot2:{type:String,required:true},
                 },
@@ -30,7 +30,7 @@ const configSchema = new Schema({
             required:false
         },"Noite":{
             type:{
-                "Ínicio":{
+                "Início":{
                     slot1:{type:String,required:true},
                     slot2:{type:String,required:true},
                 },

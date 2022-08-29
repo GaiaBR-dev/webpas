@@ -19,9 +19,11 @@ import CalendarViewWeekIcon from '@mui/icons-material/CalendarViewWeek';
 import Popover from '@mui/material/Popover';
 import AgendaCampos from "./agenda-campos.component";
 import TrocaSalaForm from "../../forms/trocaSalaForm.component";
+import ExportarResultadoForm from "../../forms/exportarResultadoForm.component";
 import {Dialog, DialogContent} from "@mui/material";
 import ResultadosDataService from '../../../services/resultados';
-import * as XLSX from 'xlsx/xlsx.mjs';
+
+
 
 const inputCss = {
     width:'100%',
@@ -88,6 +90,7 @@ const Agenda = props =>{
     const [ano,setAno] = useState(thisYear);
     const [anos,setAnos] = useState([]);
     const [resultados,setResultados] = useState([]);
+    const [alocacoes,setAlocacoes] = useState([]);
     const [horariosInicio,setHorariosInicio] = useState([]);
     const [horariosFim,setHorariosFim] = useState([]);
     const [periodo,setPeriodo]= useState('');
@@ -95,6 +98,7 @@ const Agenda = props =>{
     const [dia,setDia] = useState('Segunda');
     const [horario,setHorario] = useState(0);
     const [openTrocaSalaForm,setOpenTrocaSalaForm] = useState(false);
+    const [openExportarForm,setOpenExportarForm] = useState(false);
     const [tabValue, setTabValue] = useState(0);
     const [formatoAgenda,setFormatoAgenda] = useState('colunas');
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -110,6 +114,7 @@ const Agenda = props =>{
         totalTurma:false,
         docentes:false,
         creditosAula:false,
+        horarioFim:false,
     })
 
     const camposOpen = Boolean(anchorEl);
@@ -123,8 +128,12 @@ const Agenda = props =>{
     }, [])
 
     useEffect(()=>{
-        retornaResultados(ano,semestre,dia)
-    },[ano,semestre,dia])
+        retornaResultados(ano,semestre)
+    },[ano,semestre])
+
+    useEffect(()=>{
+        retornaAlocacoes()
+    },[resultados,formatoAgenda,dia])
 
     useEffect(()=>{
         retornaHorariosInicio()
@@ -138,12 +147,32 @@ const Agenda = props =>{
         getPeriodoByHorario(horario)
     },[horario])
 
-    const retornaResultados = (ano,semestre,dia) =>{
-        ResultadosDataService.getByAnoSemestreDia(ano,semestre,dia)
+    const retornaResultados = (ano,semestre) =>{
+        ResultadosDataService.getByAnoSemestre(ano,semestre)
             .then(res=>{
-                console.log(res.data)
                 setResultados(res.data)
             }).catch(err=>console.log(err))
+    }
+
+    const retornaAlocacoes = () =>{
+        if(resultados.length > 0){
+            let alocacoesTemp = []
+            resultados.filter(search=>{return search.diaDaSemana == dia}).map(resultado=>{
+                resultado.alocacoes.map(alocacao=>{
+                    let alocacaoTemp = {
+                        horario: alocacao?.horarioSlot == 1 ? 
+                            getHorarioByPeriodo(resultado.periodo,1) : 
+                            getHorarioByPeriodo(resultado.periodo,2),
+                        turma : alocacao?.turma,
+                        sala: alocacao?.sala 
+                    }
+                    alocacoesTemp.push(alocacaoTemp)
+                })
+            })
+            setAlocacoes(alocacoesTemp)
+        }else{
+            setAlocacoes([])
+        }
     }
 
     const handleTabChange = (event, newValue) => {
@@ -163,19 +192,27 @@ const Agenda = props =>{
         setOpenTrocaSalaForm(true)
     }
 
+    const handleCloseExportar = () =>{
+        setOpenExportarForm(false)
+    }
+
+    const handleOpenExportar = () =>{
+        setOpenExportarForm(true)
+    }
+
     const getPeriodoByHorario = horario =>{
         let periodo = ''
         if(config.horarios){
-            if(horario == config.horarios['Manhã']['Ínicio'].slot1 ||
-                horario == config.horarios['Manhã']['Ínicio'].slot2
+            if(horario == config.horarios['Manhã']['Início'].slot1 ||
+                horario == config.horarios['Manhã']['Início'].slot2
             ){
                 periodo = 'Manhã'
-            }else if(horario == config.horarios['Tarde']['Ínicio'].slot1 ||
-            horario == config.horarios['Tarde']['Ínicio'].slot2
+            }else if(horario == config.horarios['Tarde']['Início'].slot1 ||
+            horario == config.horarios['Tarde']['Início'].slot2
             ){
                 periodo = 'Tarde'
-            }else if(horario == config.horarios['Noite']['Ínicio'].slot1 ||
-            horario == config.horarios['Noite']['Ínicio'].slot2
+            }else if(horario == config.horarios['Noite']['Início'].slot1 ||
+            horario == config.horarios['Noite']['Início'].slot2
             ){
                 periodo = 'Noite'
             }
@@ -194,14 +231,26 @@ const Agenda = props =>{
         setAnos(anos)
     }
 
+    const getHorarioByPeriodo = (periodo,slot) =>{
+        let periodoNum= 0
+        if (periodo === 'Manhã'){
+            periodoNum = 0
+        } else if ( periodo === 'Tarde'){
+            periodoNum = 1
+        } else if ( periodo === 'Noite'){
+            periodoNum = 2
+        }
+        return horariosInicio[periodoNum*2+slot - 1]
+    }
+
     const retornaHorariosInicio = () =>{
         let periodos = config.periodos ? config.periodos : []
         if(config.horarios){
             let horariosI = []
             let horariosF = []
             periodos.map((periodo)=>{
-                horariosI.push(config.horarios[periodo]['Ínicio'].slot1)
-                horariosI.push(config.horarios[periodo]['Ínicio'].slot2)
+                horariosI.push(config.horarios[periodo]['Início'].slot1)
+                horariosI.push(config.horarios[periodo]['Início'].slot2)
                 horariosF.push(config.horarios[periodo]['Fim'].slot1)
                 horariosF.push(config.horarios[periodo]['Fim'].slot2)
             })
@@ -218,6 +267,7 @@ const Agenda = props =>{
                     return items
                 }else{
                     return items.filter(alocacao => {
+                        let docentes = alocacao?.turma?.docentes? alocacao.turma.docentes : ""
                         return (
                             alocacao.horario
                                 .toLowerCase()
@@ -233,7 +283,10 @@ const Agenda = props =>{
                                 .includes(target.value.toLowerCase()) 
                             || alocacao.sala.predio
                                 .toLowerCase()
-                                .includes(target.value.toLowerCase())               
+                                .includes(target.value.toLowerCase())
+                            || docentes
+                                .toLowerCase()
+                                .includes(target.value.toLowerCase())             
                         )
                     }) 
                 }
@@ -299,16 +352,7 @@ const Agenda = props =>{
         setAnchorEl(null)
     }
 
-    const createExcelFile = () =>{
-        var workbook = XLSX.utils.book_new();
-        console.log(workbook)
-        var worksheet = XLSX.utils.json_to_sheet(testeArray);
-        console.log(worksheet)
-
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Example");
-        
-        XLSX.writeFile(workbook, 'Example.xlsx');
-    }
+    
 
     return(
         <>
@@ -345,7 +389,7 @@ const Agenda = props =>{
                             <Button 
                                 startIcon={<FileDownloadTwoToneIcon/>} 
                                 variant="contained" 
-                                onClick={createExcelFile}
+                                onClick={handleOpenExportar}
                                 sx={{fontSize:'12px',paddingTop:'13px',paddingBottom:'12px'}} >Baixar
                             </Button>
                         </Grid>
@@ -453,16 +497,14 @@ const Agenda = props =>{
                                 state={state}
                                 horariosInicio={horariosInicio}
                                 filterFn={filterFn}
-                                resultados={resultados}
-                                formatoAgenda={formatoAgenda}
+                                alocacoes={alocacoes}
                             />
                         ):( 
                             <AgendaLinhas
                                 state={state}
                                 horariosInicio={horariosInicio}
                                 filterFn={filterFn}
-                                formatoAgenda={formatoAgenda}
-                                resultados={resultados}
+                                alocacoes={alocacoes}
                             />
                         )
                     }
@@ -471,7 +513,7 @@ const Agenda = props =>{
             </TableContainer>
 
             <Dialog maxWidth="md"
-                    id='modalForm'
+                    id='modalForm-troca'
                     scroll='body'
                     open={openTrocaSalaForm}
                     onClose={handleCloseTrocaSala}
@@ -487,6 +529,27 @@ const Agenda = props =>{
                             config={config}
                             closeModalForm={handleCloseTrocaSala}
                        /> 
+            </DialogContent>
+            </Dialog>
+
+            <Dialog maxWidth="sm"
+                    id='modalForm-exportar'
+                    scroll='body'
+                    open={openExportarForm}
+                    onClose={handleCloseExportar}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
+                ><DialogContent >
+                       <ExportarResultadoForm
+                            ano={ano}
+                            semestre={semestre}
+                            closeModalForm={handleCloseExportar}
+                            resultados={resultados}
+                            horariosInicio={horariosInicio}
+                            state={state}
+                            filterFn={filterFn}
+
+                            /> 
             </DialogContent>
             </Dialog>
 

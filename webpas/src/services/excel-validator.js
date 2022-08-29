@@ -94,10 +94,10 @@ class ExcelValidator{
                 erro.tipo = "O dia em que a turma é ministrada é um campo obrigátorio e deve ser preenchido"
                 res.listaErros.push(erro)
             }
-            if (row['Horário de Ínicio'] == null)  {
+            if (row['Horário de Início'] == null)  {
                 row.erro = true
                 erro.turma  = row
-                erro.tipo = "O horário de ínicio da disciplina é um campo obrigátorio e deve ser preenchido"
+                erro.tipo = "O horário de início da disciplina é um campo obrigátorio e deve ser preenchido"
                 res.listaErros.push(erro)
             
             }
@@ -107,10 +107,10 @@ class ExcelValidator{
                 erro.tipo = "O horário de término da disciplina é um campo obrigátorio e deve ser preenchido"
                 res.listaErros.push(erro)
             }
-            if (!horariosInicio.includes(row['Horário de Ínicio'].toString())) {
+            if (!horariosInicio.includes(row['Horário de Início'].toString())) {
                 row.erro = true
                 erro.turma  = row
-                erro.tipo = "O horário de ínicio fornecido está fora dos padrões da universidade"
+                erro.tipo = "O horário de início fornecido está fora dos padrões da universidade"
                 res.listaErros.push(erro)
             }
             if (!horariosFim.includes(row['Horário de Término'].toString())) {
@@ -132,7 +132,7 @@ class ExcelValidator{
             let contadorDup = 0
             rowsTurmas.map(innerRow =>{
                 if (row['Dia'] === innerRow['Dia'] &&
-                    row['Horário de Ínicio'] === innerRow['Horário de Ínicio'] &&
+                    row['Horário de Início'] === innerRow['Horário de Início'] &&
                     row['Turma'] === innerRow['Turma'] &&
                     row['Nome da Disciplina'] === innerRow['Nome da Disciplina']
                 ){
@@ -229,7 +229,7 @@ class ExcelValidator{
                     'Total de Alunos':row['solicitacoes_deferidas'],
                     'Departamento de Oferta':row['departamento'],
                     "Dia":row['dia'],
-                    'Horário de Ínicio':row['hora_inicio'],
+                    'Horário de Início':row['hora_inicio'],
                     'Horário de Término':row['hora_fim'],
                     'Créditos': parseInt(row['cred_aula']) + parseInt(row['cred_pratico']),
                     'Docentes': row['ministrantes'],
@@ -257,7 +257,7 @@ class ExcelValidator{
                 totalTurma:row['Total de Alunos'],
                 departamentoOferta:row['Departamento de Oferta'],
                 diaDaSemana:dia,
-                horarioInicio:row['Horário de Ínicio'],
+                horarioInicio:row['Horário de Início'],
                 horarioFim:row['Horário de Término'],
                 alocadoChefia: false,
                 creditosAula:row['Créditos'],

@@ -26,6 +26,7 @@ const ConfigWrapper = props =>{
     const {user,logout} = useAuth()
     const [config,setConfig] = useState({dias:[],periodos:[]})
     const [noUser,setNoUser] = useState(true)
+    const {nav,setNav} = props
   
     useEffect(()=>{
       if(user && noUser){
@@ -51,7 +52,7 @@ const ConfigWrapper = props =>{
 
     return(
         <>
-          <Navbar/>
+          <Navbar open={nav} setOpen={setNav}/>
           <Box component="main" sx={{ flexGrow: 1, p: 3}}>
               <DrawerHeader />
               <Container sx={containerStyle}>

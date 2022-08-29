@@ -17,14 +17,9 @@ const tableRowCss = {
 
 
 const AgendaLinhas = props =>{
-    const {horariosInicio,state,filterFn,formatoAgenda,resultados} = props
+    const {horariosInicio,state,filterFn,alocacoes} = props
 
-    const [alocacoes,setAlocacoes] = useState([]);
     const [tableObj,setTableObj] = useState([]);
-
-    useEffect(()=>{
-        retornaAlocacoes()
-    },[resultados,formatoAgenda])
 
     useEffect(()=>{
         retornaTableObjs()
@@ -43,38 +38,7 @@ const AgendaLinhas = props =>{
         return sortedArray
     }
 
-    const getHorarioByPeriodo = (periodo,slot) =>{
-        let periodoNum= 0
-        if (periodo === 'Manhã'){
-            periodoNum = 0
-        } else if ( periodo === 'Tarde'){
-            periodoNum = 1
-        } else if ( periodo === 'Noite'){
-            periodoNum = 2
-        }
-        return horariosInicio[periodoNum*2+slot - 1]
-    }
-
-    const retornaAlocacoes = () =>{
-        if(resultados.length > 0){
-            let alocacoesTemp = []
-            resultados.map(resultado=>{
-                resultado.alocacoes.map(alocacao=>{
-                    let alocacaoTemp = {
-                        horario: alocacao?.horarioSlot == 1 ? 
-                            getHorarioByPeriodo(resultado.periodo,1) : 
-                            getHorarioByPeriodo(resultado.periodo,2),
-                        turma : alocacao?.turma,
-                        sala: alocacao?.sala 
-                    }
-                    alocacoesTemp.push(alocacaoTemp)
-                })
-            })
-            setAlocacoes(alocacoesTemp)
-        }else{
-            setAlocacoes([])
-        }
-    }
+    
 
     const retornaTableObjs = () =>{
         const unique = alocacoes.reduce((acc, cur) => {
@@ -103,7 +67,6 @@ const AgendaLinhas = props =>{
             })
             return result
         })
-        console.log(tableObjs)
         setTableObj(sortAlocacoes(tableObjs))
     }
 

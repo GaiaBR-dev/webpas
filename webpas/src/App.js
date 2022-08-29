@@ -46,6 +46,7 @@ const theme = createTheme({
 
 
 function App() {
+    const [openNav,setOpenNav] = React.useState(true)
 
     return (
       <ThemeProvider theme={theme}>
@@ -53,18 +54,18 @@ function App() {
           <Box sx={{display:'flex'}}>
             <BrowserRouter>
               <Routes>
-                <Route exact path="/" element={<HomePage />}/>
-                <Route exact path="/login" element={<Login/>}/>
-                <Route exact path="/cadastro" element={<Cadastro/>}/>
-                <Route exact path="/lembrarsenha" element={<LembrarSenha/>}/>
-                <Route exact path="/redefinirsenha/:resetToken" element={<RedefinirSenha/>}/>
-                <Route path="/config" element={<ConfigWrapper/>}/>
-                <Route path="/turmas" element={<TurmasWrapper/>}/>
-                <Route path="/predios" element={<PrediosWrapper/>}/>
-                <Route path="/predios/:predio" element={<SalasWrapper/>}/>
-                <Route path="/distancias" element={<DistanciasWrapper/>}/>
-                <Route path="/solver" element={<SolverWrapper/>}/>
-                <Route path="/agenda" element={<AgendaWrapper/>}/>
+                <Route exact path="/" element={<HomePage nav={openNav} setNav={setOpenNav} />}/>
+                <Route exact path="/login" element={<Login nav={openNav} setNav={setOpenNav}/>}/>
+                <Route exact path="/cadastro" element={<Cadastro nav={openNav} setNav={setOpenNav}/>}/>
+                <Route exact path="/lembrarsenha" element={<LembrarSenha nav={openNav} setNav={setOpenNav} />}/>
+                <Route exact path="/redefinirsenha/:resetToken" element={<RedefinirSenha nav={openNav} setNav={setOpenNav}/>}/>
+                <Route path="/config" element={<ConfigWrapper nav={openNav} setNav={setOpenNav}/>}/>
+                <Route path="/turmas" element={<TurmasWrapper nav={openNav} setNav={setOpenNav}/>}/>
+                <Route path="/predios" element={<PrediosWrapper nav={openNav} setNav={setOpenNav}/>}/>
+                <Route path="/predios/:predio" element={<SalasWrapper nav={openNav} setNav={setOpenNav}/>}/>
+                <Route path="/distancias" element={<DistanciasWrapper nav={openNav} setNav={setOpenNav}/>}/>
+                <Route path="/solver" element={<SolverWrapper nav={openNav} setNav={setOpenNav}/>}/>
+                <Route path="/agenda" element={<AgendaWrapper nav={openNav} setNav={setOpenNav}/>}/>
               </Routes>
             </BrowserRouter>
           </Box>

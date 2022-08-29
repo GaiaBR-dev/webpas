@@ -26,7 +26,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
 const HomePage = props =>{
     const {logout,user} = useAuth()
-
+    const {nav,setNav} = props
 
     useEffect(()=>{
         UserDataService.getPrivate()
@@ -43,7 +43,7 @@ const HomePage = props =>{
 
     return(
         <>
-            <Navbar/>
+            <Navbar open={nav} setOpen={setNav}/>
             <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
                 <DrawerHeader />
                 <Container sx={containerStyle}>

@@ -4,17 +4,6 @@ import { Checkbox, FormControl, FormControlLabel, FormGroup, Typography, Box } f
 const AgendaCampos = props =>{
     const {state,setState} = props
 
-    const [capacidade,setCapacidade] = React.useState(false);
-    const [idTurma,setIdTurma] = React.useState(false);
-    const [departamentoOferta,setDepartamentoOferta] = React.useState(false);
-    const [departamentoTurma,setDepartamentoTurma] = React.useState(false);
-    const [codDisciplina,setCodDisciplina] = React.useState(false);
-    const [turma,setTurma] = React.useState(false);
-    const [nomeDisciplina,setNomeDisciplina] = React.useState(false);
-    const [totalTurma,setTotalTurma] = React.useState(false);
-    const [creditosAula,setCreditosAula] = React.useState(false);
-    const [docentes,setDocentes] = React.useState(false);
-    
     const handleChange = (event) =>{
         setState({
             ...state,
@@ -50,6 +39,14 @@ const AgendaCampos = props =>{
                             name="nomeDisciplina"
                         />}
                         label="Nome da Disciplina"
+                    />
+                    <FormControlLabel
+                        control={<Checkbox 
+                            checked={state.horarioFim} 
+                            onChange={handleChange}
+                            name="horarioFim"
+                        />}
+                        label="Horario de Término"
                     />
                     <FormControlLabel
                         control={<Checkbox 

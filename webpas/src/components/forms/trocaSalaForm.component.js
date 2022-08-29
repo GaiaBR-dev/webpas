@@ -123,16 +123,16 @@ const TrocaSalaForm = props =>{
     const getPeriodoByHorario = horario =>{
         let periodo = ''
         if(config.horarios){
-            if(horario == config.horarios['Manhã']['Ínicio'].slot1 ||
-                horario == config.horarios['Manhã']['Ínicio'].slot2
+            if(horario == config.horarios['Manhã']['Início'].slot1 ||
+                horario == config.horarios['Manhã']['Início'].slot2
             ){
                 periodo = 'Manhã'
-            }else if(horario == config.horarios['Tarde']['Ínicio'].slot1 ||
-            horario == config.horarios['Tarde']['Ínicio'].slot2
+            }else if(horario == config.horarios['Tarde']['Início'].slot1 ||
+            horario == config.horarios['Tarde']['Início'].slot2
             ){
                 periodo = 'Tarde'
-            }else if(horario == config.horarios['Noite']['Ínicio'].slot1 ||
-            horario == config.horarios['Noite']['Ínicio'].slot2
+            }else if(horario == config.horarios['Noite']['Início'].slot1 ||
+            horario == config.horarios['Noite']['Início'].slot2
             ){
                 periodo = 'Noite'
             }
@@ -524,7 +524,7 @@ const TrocaSalaForm = props =>{
                         variant="outlined"
                         name = "horarioInicio1"
                         onChange={handleInputChange}
-                        label="Horário de Ínicio"
+                        label="Horário de Início"
                         value ={values.horarioInicio1}    
                     />
                 </Grid>
@@ -607,7 +607,7 @@ const TrocaSalaForm = props =>{
                         variant="outlined"
                         name = "horarioInicio2"
                         onChange={handleInputChange}
-                        label="Horário de Ínicio"
+                        label="Horário de Início"
                         value ={values.horarioInicio2}    
                     />
                 </Grid>

@@ -26,6 +26,7 @@ const TurmasWrapper = props =>{
     const {user,logout} = useAuth()
     const [config,setConfig] = useState({dias:[],periodos:[]})
     const [noUser,setNoUser] = useState(true)
+    const {nav,setNav} = props
   
     useEffect(()=>{
       if(user && noUser){
@@ -38,6 +39,7 @@ const TurmasWrapper = props =>{
         let searchId = user? user._id : "10"
         ConfigsDataService.getConfigById(searchId) 
             .then(res=> {
+              console.log(res.data)
               setConfig(res.data)})
             .catch(err=>{
               let notAuthorized = err.response.data?.notAuth ? err.response.data.notAuth : false
@@ -48,7 +50,7 @@ const TurmasWrapper = props =>{
     }
     return(
         <>
-        <Navbar/>
+        <Navbar open={nav} setOpen={setNav}/>
         <Box component="main" sx={{ flexGrow: 1, p: 3}}>
             <DrawerHeader />
             <Container sx={containerStyle}>
