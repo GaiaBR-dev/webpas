@@ -14,7 +14,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { Dialog, DialogContent } from "@mui/material";
 import AjudaSolver from '../help/ajuda-solver.component'
 import ResultadosDataService from "../../../services/resultados"
-import { Button, FormControl, FormLabel, FormControlLabel, TextField} from "@mui/material";
+import { Button, FormControl, FormLabel, FormControlLabel, TextField, FormGroup} from "@mui/material";
 
 const thisYear = new Date().getFullYear()
 
@@ -33,6 +33,9 @@ const Solver = props =>{
     const [selectAll,setSelectAll] = useState(false);
     const [openHelp, setOpenHelp] = useState(false);
     const [delta,setDelta] = useState(0);
+    const [useAtx,setUseAtx] = useState(true);
+    const [tmLim,setTmLim] = useState(0);
+    const [mipGap,setMipGap] = useState(0);
     const [erroDelta,setErroDelta] = useState('')
     const [working,setWorking] = useState(false);
     const [executado,setExecutado] = useState(false);
@@ -81,6 +84,18 @@ const Solver = props =>{
         })
         setSelectAll(false)
         setExecutado(false)
+    }
+
+    const handleUseAtx = e =>{
+        setUseAtx(!useAtx)
+    }
+
+    const handleTLChange = e => {
+        setTmLim(e.target.value)
+    }
+
+    const handleMipGapChange = e =>{
+        setMipGap(e.target.value)
     }
 
     const handleSelectAll = e =>{
@@ -291,13 +306,13 @@ const Solver = props =>{
                 <Grid item xs={20}></Grid>
 
                 <Grid item xs={20}>
-                    <Typography fontSize={'1.1rem'} fontWeight={'405'}> Escolher delta</Typography>
+                    <Typography fontSize={'1.1rem'} fontWeight={'405'}> Escolher folga</Typography>
                 </Grid>
                 <Grid item xs={20}></Grid>
                 <Grid item xs={20}>
                     <TextField
                         variant="outlined"
-                        label="Delta*"
+                        label="Folga*"
                         name = "delta"
                         onChange={handleDeltaChange}
                         value ={delta}
@@ -308,6 +323,47 @@ const Solver = props =>{
                     />
                 </Grid>
                 <Grid item xs={20}></Grid>
+                <Grid item xs={20}>
+                    <Typography fontSize={'1.1rem'} fontWeight={'405'}> Prédio auxiliar</Typography>
+                </Grid>
+                
+                <Grid item xs={20}>
+                    <FormGroup>
+                        <FormControlLabel control={<Checkbox checked={useAtx} onChange={handleUseAtx} />} label="Usar prédio auxiliar" />
+                    </FormGroup>
+                </Grid>
+                <Grid item xs={20}></Grid>
+                <Grid item xs={20}>
+                    <Typography fontSize={'1.1rem'} fontWeight={'405'}> Opções do solver</Typography>
+                </Grid>
+                <Grid item xs={20}></Grid>
+                <Grid item xs={20}>
+                    <TextField
+                        variant="outlined"
+                        label="Tempo máximo de execução (s)"
+                        name = "tmLim"
+                        onChange={handleTLChange}
+                        value ={tmLim}
+                        {...(erroDelta != null && erroDelta != "" && {
+                            error:true,
+                            helperText:erroDelta
+                        })}
+                    />
+                </Grid>
+                <Grid item xs={20}>
+                    <TextField
+                        variant="outlined"
+                        label="MIP gap"
+                        name = "mipGap"
+                        onChange={handleMipGapChange}
+                        value ={mipGap}
+                        {...(erroDelta != null && erroDelta != "" && {
+                            error:true,
+                            helperText:erroDelta
+                        })}
+                    />
+                </Grid>
+
                 <Grid item xs={20}></Grid>
                 <Grid item xs={20}>
                         <Button variant="contained" onClick={handleExecute}> Executar</Button>

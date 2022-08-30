@@ -163,15 +163,15 @@ router.route('/update/:id').post((req,res)=>{
             let aux = {}
             let origem = []
             let destino = []
-
-            if (alocacaoOrigem){
+            
+            if (alocacaoOrigem != undefined){
                 origem = resultado.alocacoes.filter(alocacao=>{
                     return alocacao.sala._id == alocacaoOrigem.sala._id &&
                            alocacao.turma._id == alocacaoOrigem.turma._id
                 }).sort(alocationSort)
             }
             
-            if (alocacaoDestino){
+            if (alocacaoDestino != undefined){
                 destino = resultado.alocacoes.filter(alocacao=>{
                     return alocacao.sala._id == alocacaoDestino.sala._id &&
                            alocacao.turma._id == alocacaoDestino.turma._id

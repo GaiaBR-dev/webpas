@@ -357,7 +357,7 @@ const Agenda = props =>{
     return(
         <>
             <PageHeader 
-                title="Agenda"
+                title="Resultado"
                 subtitle="Visualização dos resultados"
                 icon={<DateRangeIcon />}
             />

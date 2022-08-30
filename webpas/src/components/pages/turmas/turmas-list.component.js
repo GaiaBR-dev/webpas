@@ -402,6 +402,7 @@ const TurmasList = props =>{
                     /></DialogContent>
                 </Dialog>
                 <Dialog
+                    maxWidth="md"
                     open={openHelp}
                     onClose={handleCloseHelp}
                 >

@@ -410,7 +410,7 @@ const TrocaSalaForm = props =>{
 
     const trueSubmit = (auxParams = {}) =>{
         setConfirmDialog({...confirmDialog,isOpen:false})
-        let updateId = getResultadoId(ano,semestre,dia,values.horarioInicio)
+        let updateId = getResultadoId(ano,semestre,values.dia,values.horarioInicio)
         let data = {
             salaOrigem,
             salaDestino,
@@ -422,7 +422,6 @@ const TrocaSalaForm = props =>{
         ResultadosDataService.trocaSala(data,updateId)
             .then(res=>{
                 console.log(res.data)
-
             })
             .catch(err=>{console.log(err)})
         setErros({})

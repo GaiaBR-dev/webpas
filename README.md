@@ -14,14 +14,14 @@ Software web para resolução do problema de alocação de salas
 - Criar aba mostrando linhas que não foram lidas e o motivo, na entrada de arquivos (para prédios, salas e distâncias)
 - Verificar tratamento de erros de todas as requests
 - conferir se todas as buscas estão 100% implementadas
+- Arquivo padrão
 
 
 #### Para TCC
-- 1 página de ajuda
 - home page
 - opções solver, só no front-end
 - css do login e registro
 - css de prédios, salas e distâncias
 - opções de prédio auxiliar (pensar num jeito)
-
+- botão de erros na barra princiapl para distancias, predios e salas
 
