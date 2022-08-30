@@ -113,13 +113,14 @@ class ExcelValidator{
                 erro.tipo = "O horário de início fornecido está fora dos padrões da universidade"
                 res.listaErros.push(erro)
             }
+            row['Horário de Término'] = row['Horário de Término'] ? row['Horário de Término'] : ""
             if (!horariosFim.includes(row['Horário de Término'].toString())) {
                 row.erro = true
                 erro.turma  = row
                 erro.tipo = "O horário de término fornecido está fora dos padrões da universidade"
                 res.listaErros.push(erro)
             }
-            let str = row['Dia']
+            let str = row['Dia'] ? row['Dia'] : ""
             let dia = str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
             
             if (!configProps.dias.includes(dia)) {
@@ -158,6 +159,7 @@ class ExcelValidator{
     tratarDadosTurmasSIGA(rowsTurmas){
         rowsTurmas.map(row=>{
             // Padroniza os horários
+            row['hora_inicio'] = row['hora_inicio'] ? row['hora_inicio'] : "" 
             if (row['hora_inicio'].toString() != ""){
                 if (parseInt(row['hora_inicio']) >= 700 && parseInt(row['hora_inicio']) <= 900){
                     row['hora_inicio'] = "800"
@@ -179,27 +181,28 @@ class ExcelValidator{
             row['cursos_indicados'] = row['cursos_indicados'] ? row['cursos_indicados'] : "" 
             if(row['cursos_indicados'].toString() != ""){
                 let depString = row['cursos_indicados'].toString().trim()
-                let depIndicado = depString.slice(0,depString.indexOf("-"))
+                let depIndicado = depString.slice(0,depString.indexOf("-")-1)
                 if (depIndicado.includes("/")){
                     depIndicado = depIndicado.slice(0,depIndicado.indexOf("/"))
                 }
                 row.departamentoTurma = DEPARA_SIGA[depIndicado]
             }
 
-            row['juncao_id'] = row['juncao_id'] ? row['juncao_id'] : "" 
+            row['juncao_id'] = row['juncao_id'] ? row['juncao_id'] : ""
             rowsTurmas.map(innerRow=>{
+
                 //Verifica se as turmas precisam ser unificadas baseadas na coluna juncao_id
-                if (row['cod discip'] == innerRow['cod discip'] && 
+                if (row['cod_discip'] == innerRow['cod_discip'] && 
                     row['juncao_id'] == innerRow['juncao_id'] && 
-                    row['juncao_id'].toString() != "" && 
+                    row['juncao_id'] != "" && 
                     row['horario_id'] != innerRow['horario_id'] &&
-                    !'considerar' in row
+                    !row.hasOwnProperty('considerar')                          
                     ){
                         row['solicitacoes_deferidas'] = row['solicitacoes_deferidas'] + innerRow['solicitacoes_deferidas']
                         innerRow.considerar = false 
                 }
                 //Verifica se as turmas precisam ser unificadas baseadas no horário em sequencia
-                if (row['cod discip'] == innerRow['cod discip'] &&
+                if (row['cod_discip'] == innerRow['cod_discip'] &&
                     parseInt(row['cred_aula']) + parseInt(row['cred_pratico']) > 2 && //talvez não precise
                     row['hora_fim'] == innerRow['hora_inicio']  &&
                     row['ministrantes'] == innerRow['ministrantes']&&
@@ -210,6 +213,7 @@ class ExcelValidator{
                         innerRow.considerar = false
                 }   
             })
+            row['alocado_chefia'] = row['alocado_chefia'] ? row['alocado_chefia'] : "" 
             if (row['alocado_chefia'].toString() == "t") {row.considerar=false}
         })
         return true

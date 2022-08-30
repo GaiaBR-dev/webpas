@@ -50,7 +50,13 @@ const ExportarResultadoForm = props =>{
                     alocacoesTemp.push(alocacaoTemp)
                 })
             })
-            setAlocacoes(alocacoesTemp)
+
+            let resposta = alocacoesTemp.filter(aloc=>{
+                return aloc.horario == aloc.turma.horarioInicio
+            })
+            console.log(resposta)
+
+            setAlocacoes(resposta)
         }else{
             setAlocacoes([])
         }
@@ -123,7 +129,6 @@ const ExportarResultadoForm = props =>{
                     result = ExcelExporter.colunasComFiltroComCampos(alocacoes,filterFn,state)
                 }
             }
-            console.log(result)
             setExportColunas(result)
             createExcelFile(result)
         }
@@ -153,11 +158,9 @@ const ExportarResultadoForm = props =>{
     const handleSubmit = e =>{
         e.preventDefault()
         if (values.formato == 1){
-            if (values.extensao == 1){
-                retornaExportObjColunas()
-            }else if (values.extensao == 2){
+            retornaExportObjColunas()
+        }else if (values.formato == 2){
 
-            }
         }
 
     }
