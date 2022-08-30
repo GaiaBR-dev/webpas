@@ -9,45 +9,48 @@ import handleServerResponses from "../../../services/response-handler";
 const dias = ['Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo']
 const periodos = ['Manhã','Tarde','Noite']
 
+const emptyHorarios = {
+    "Manhã":{
+            "Início":{
+                slot1:'',
+                slot2:'',
+            },
+            "Fim":{
+                slot1:'',
+                slot2:'',
+            }
+    },
+    "Tarde":{
+            "Início":{
+                slot1:'',
+                slot2:'',
+            },
+            "Fim":{
+                slot1:'',
+                slot2:'',
+            }
+    },
+    "Noite":{
+            "Início":{
+                slot1:'',
+                slot2:'',
+            },
+            "Fim":{
+                slot1:'',
+                slot2:'',
+            }
+    }
+}
+
 const ConfigForm = props =>{
     const {config,user,logout} = props
     const [notify,setNotify] = useState({isOpen:false,message:'',type:''})
     const [diasCBList,setDiasCBList] = useState(new Array(dias.length).fill(false))
+    const [numSalasAux,setNumSalasAux] = useState(20);
+    const [capSalasAux,setCapSalasAux] = useState(200);
     const [periodosCBList,setPeriodosCBList] = useState(new Array(periodos.length).fill(false))
     const [horariosObj,setHorariosObj] = useState(()=>{
-        let horarios = {
-            "Manhã":{
-                    "Início":{
-                        slot1:'',
-                        slot2:'',
-                    },
-                    "Fim":{
-                        slot1:'',
-                        slot2:'',
-                    }
-            },
-            "Tarde":{
-                    "Início":{
-                        slot1:'',
-                        slot2:'',
-                    },
-                    "Fim":{
-                        slot1:'',
-                        slot2:'',
-                    }
-            },
-            "Noite":{
-                    "Início":{
-                        slot1:'',
-                        slot2:'',
-                    },
-                    "Fim":{
-                        slot1:'',
-                        slot2:'',
-                    }
-            }
-        }
-        return horarios
+        return emptyHorarios
     })
 
     useEffect(()=>{
@@ -56,6 +59,7 @@ const ConfigForm = props =>{
 
     const setFormByConfig = () =>{
         if (config){
+            console.log(config)
             let tempArrayDias = new Array(dias.length).fill(false)
             config.dias.map(dia=>{
                 tempArrayDias[dias.indexOf(dia)] = true
@@ -67,8 +71,46 @@ const ConfigForm = props =>{
                 tempArrayPeriodos[periodos.indexOf(periodo)] = true
             })
             setPeriodosCBList(tempArrayPeriodos)
+            config.horarios = config?.horarios? config.horarios : {}
+            let horariosTemp = {...emptyHorarios}
 
-            setHorariosObj(config.horarios)
+            if(config.horarios["Manhã"]){
+                horariosTemp["Manhã"]["Início"].slot1 = config.horarios['Manhã']['Início'].slot1
+                horariosTemp["Manhã"]["Início"].slot2 = config.horarios['Manhã']['Início'].slot2
+                horariosTemp["Manhã"]["Fim"].slot1 = config.horarios['Manhã']['Fim'].slot1
+                horariosTemp["Manhã"]["Fim"].slot2 = config.horarios['Manhã']['Fim'].slot2
+            }else{
+                horariosTemp["Manhã"]["Início"].slot1 = ""
+                horariosTemp["Manhã"]["Início"].slot2 = ""
+                horariosTemp["Manhã"]["Fim"].slot1 = ""
+                horariosTemp["Manhã"]["Fim"].slot2 = ""
+            }
+
+            if(config.horarios["Tarde"]){
+                horariosTemp["Tarde"]["Início"].slot1 = config.horarios['Tarde']['Início'].slot1
+                horariosTemp["Tarde"]["Início"].slot2 = config.horarios['Tarde']['Início'].slot2
+                horariosTemp["Tarde"]["Fim"].slot1 = config.horarios['Tarde']['Fim'].slot1
+                horariosTemp["Tarde"]["Fim"].slot2 = config.horarios['Tarde']['Fim'].slot2
+            }else{
+                horariosTemp["Tarde"]["Início"].slot1 = ""
+                horariosTemp["Tarde"]["Início"].slot2 = ""
+                horariosTemp["Tarde"]["Fim"].slot1 = ""
+                horariosTemp["Tarde"]["Fim"].slot2 = ""
+            }
+
+            if(config.horarios["Noite"]){
+                horariosTemp["Noite"]["Início"].slot1 = config.horarios['Noite']['Início'].slot1
+                horariosTemp["Noite"]["Início"].slot2 = config.horarios['Noite']['Início'].slot2
+                horariosTemp["Noite"]["Fim"].slot1 = config.horarios['Noite']['Fim'].slot1
+                horariosTemp["Noite"]["Fim"].slot2 = config.horarios['Noite']['Fim'].slot2
+            }else{
+                horariosTemp["Noite"]["Início"].slot1 = ""
+                horariosTemp["Noite"]["Início"].slot2 = ""
+                horariosTemp["Noite"]["Fim"].slot1 = ""
+                horariosTemp["Noite"]["Fim"].slot2 = ""
+            }
+
+            setHorariosObj(horariosTemp)
         }
     }
 
@@ -363,7 +405,29 @@ const ConfigForm = props =>{
                                 </Grid>
                             </>
                         ):(<></>)}
-                        
+
+                    <Grid item xs={20} marginY="15px">
+                            <Divider/>
+                    </Grid>
+                    <Grid item xs={20}>
+                            <Typography fontSize={'1.1rem'} fontWeight={'405'}> Configurações do prédio auxiliar</Typography>
+                    </Grid>
+                    <Grid item xs={20}>
+                        <TextField
+                            variant="outlined"
+                            label="Número de Salas"
+                            name = "numSalasAux"
+                            value ={numSalasAux}
+                        />
+                    </Grid>
+                    <Grid item xs={20}>
+                        <TextField
+                            variant="outlined"
+                            label="Capacidade das Salas"
+                            name = "capSalasAux"
+                            value ={capSalasAux}
+                        />
+                    </Grid>
                     </Grid>
                     <br/>
                     <br/>

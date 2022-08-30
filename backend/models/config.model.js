@@ -44,6 +44,8 @@ const configSchema = new Schema({
     },
     dias:[String],
     periodos:[String],
+    numSalasAux:Number,
+    capSalasAux:Number,
     user:{type:mongoose.Types.ObjectId,ref:'User',required:true,index:true,unique:true}
 
 })

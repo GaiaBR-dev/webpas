@@ -12,7 +12,6 @@ import * as XLSX from 'xlsx/xlsx.mjs';
 
 const inicialValues ={
     formato: 1,
-    extensao:1,
     filtro: 1,
     camposSelecionados: 1,
 }
@@ -195,18 +194,6 @@ const ExportarResultadoForm = props =>{
                     </FormControl>
                 </Grid>
 
-                <Grid item xs={12} >
-                    <FormControl>
-                        <FormLabel>Extensão</FormLabel>
-                        <RadioGroup row
-                        name="extensao"
-                        value={values.extensao}
-                        onChange={handleInputChange}>
-                            <FormControlLabel value={1} control={<Radio />} label=".xlsx" />
-                            <FormControlLabel value={2} control={<Radio />} label=".pdf" />
-                        </RadioGroup>
-                    </FormControl>
-                </Grid>
 
                 <Grid item xs={12} >
                     <FormControl>

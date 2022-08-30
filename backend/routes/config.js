@@ -36,7 +36,9 @@ const StandartConfig = {
         },
     },
     dias:["Segunda","Terça","Quarta","Quinta","Sexta"],
-    periodos:["Manhã","Tarde","Noite"]
+    periodos:["Manhã","Tarde","Noite"],
+    numSalasAux:20,
+    capSalasAux:200
 }
 
 router.route('/').get(protect,(req,res)=>{

@@ -19,9 +19,8 @@ Software web para resolução do problema de alocação de salas
 
 #### Para TCC
 - home page
-- opções solver, só no front-end
 - css do login e registro
 - css de prédios, salas e distâncias
-- opções de prédio auxiliar (pensar num jeito)
 - botão de erros na barra princiapl para distancias, predios e salas
+
 
