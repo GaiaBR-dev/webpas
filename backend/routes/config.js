@@ -63,10 +63,10 @@ router.route('/createStandartConfig/:id').post((req,res)=>{
 })
 
 router.route('/updateConfig/:id').post(protect,(req,res)=>{ //Procurar config por usuário, se existir impedir novas configs
-    const { horarios,dias,periodos} = req.body
+    const { horarios,dias,periodos,numSalasAux,capSalasAux} = req.body
     const id = req.params.id
 
-    Config.findByIdAndUpdate(id,{horarios,dias,periodos})
+    Config.findByIdAndUpdate(id,{horarios,dias,periodos,numSalasAux,capSalasAux})
         .then(()=>res.status(200).json("Configuração atualizada"))
         .catch(err=>{
             console.log(err)

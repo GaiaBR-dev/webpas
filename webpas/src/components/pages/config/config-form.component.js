@@ -111,6 +111,9 @@ const ConfigForm = props =>{
             }
 
             setHorariosObj(horariosTemp)
+
+            setCapSalasAux(config.capSalasAux)
+            setNumSalasAux(config.numSalasAux)
         }
     }
 
@@ -127,6 +130,14 @@ const ConfigForm = props =>{
             index === position ? !item : item
         );
         setPeriodosCBList(novoPeriodosCB)
+    }
+
+    const handleNumSalasChange = e =>{
+        setNumSalasAux(e.target.value)
+    }
+
+    const handleCapSalasChange = e =>{
+        setCapSalasAux(e.target.value)
     }
 
     const handleHorariosChange = (e) =>{
@@ -183,6 +194,8 @@ const ConfigForm = props =>{
                 configTemp.horarios[periodo] = horariosObj[periodo]
             }
         })
+        configTemp.numSalasAux = numSalasAux
+        configTemp.capSalasAux = capSalasAux
 
         let data = {...configTemp}
         ConfigsDataService.updateConfig(data,config._id)
@@ -417,6 +430,7 @@ const ConfigForm = props =>{
                             variant="outlined"
                             label="Número de Salas"
                             name = "numSalasAux"
+                            onChange={handleNumSalasChange}
                             value ={numSalasAux}
                         />
                     </Grid>
@@ -425,6 +439,7 @@ const ConfigForm = props =>{
                             variant="outlined"
                             label="Capacidade das Salas"
                             name = "capSalasAux"
+                            onChange={handleCapSalasChange}
                             value ={capSalasAux}
                         />
                     </Grid>

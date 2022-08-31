@@ -352,8 +352,6 @@ const Agenda = props =>{
         setAnchorEl(null)
     }
 
-    
-
     return(
         <>
             <PageHeader 
@@ -523,6 +521,7 @@ const Agenda = props =>{
                        <TrocaSalaForm 
                             ano={ano}
                             semestre={semestre}
+                            resultados={resultados}
                             dia={dia}
                             horariosInicio={horariosInicio}
                             horariosFim={horariosFim}

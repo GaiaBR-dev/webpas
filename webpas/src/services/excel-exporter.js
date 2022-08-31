@@ -6,12 +6,13 @@ class ExcelExporter{
             let resultObj = {
                 "Predio":alocacao.sala.predio,
                 "Sala":alocacao.sala.numeroSala,
-                "Dia": alocacao.turma.diaDaSemana
+                "Dia": alocacao.turma.diaDaSemana,
+                "Horário Alocação": alocacao.horario
             }
             if(state.capacidade){
                 resultObj["Capacidade"] = alocacao.sala.capacidade
             }
-            resultObj["Horário de Início"] = alocacao.horario
+            resultObj["Horário de Início"] = alocacao.turma.horarioInicio
             if(state.horarioFim){
                 resultObj["Horário de Término"] = alocacao.turma.horarioFim
             }
@@ -54,10 +55,11 @@ class ExcelExporter{
             let resultObj = {
                 "Predio":alocacao.sala.predio,
                 "Sala":alocacao.sala.numeroSala,
-                "Dia": alocacao.turma.diaDaSemana
+                "Dia": alocacao.turma.diaDaSemana,
+                "Horário Alocação": alocacao.horario
             }
             resultObj["Capacidade"] = alocacao.sala.capacidade
-            resultObj["Horário de Início"] = alocacao.horario
+            resultObj["Horário de Início"] = alocacao.turma.horarioInicio
             resultObj["Horário de Término"] = alocacao.turma.horarioFim
             resultObj["idTurma"] = alocacao.turma.idTurma
             resultObj["Nome da Disciplina"] = alocacao.turma.nomeDisciplina
@@ -80,12 +82,13 @@ class ExcelExporter{
             let resultObj = {
                 "Predio":alocacao.sala.predio,
                 "Sala":alocacao.sala.numeroSala,
-                "Dia": alocacao.turma.diaDaSemana
+                "Dia": alocacao.turma.diaDaSemana,
+                "Horário Alocação": alocacao.horario
             }
             if(state.capacidade){
                 resultObj["Capacidade"] = alocacao.sala.capacidade
             }
-            resultObj["Horário de Início"] = alocacao.horario
+            resultObj["Horário de Início"] = alocacao.turma.horarioInicio
             if(state.horarioFim){
                 resultObj["Horário de Término"] = alocacao.turma.horarioFim
             }
@@ -128,10 +131,11 @@ class ExcelExporter{
             let resultObj = {
                 "Predio":alocacao.sala.predio,
                 "Sala":alocacao.sala.numeroSala,
-                "Dia": alocacao.turma.diaDaSemana
+                "Dia": alocacao.turma.diaDaSemana,
+                "Horário Alocação": alocacao.horario
             }
             resultObj["Capacidade"] = alocacao.sala.capacidade
-            resultObj["Horário de Início"] = alocacao.horario
+            resultObj["Horário de Início"] = alocacao.turma.horarioInicio
             resultObj["Horário de Término"] = alocacao.turma.horarioFim
             resultObj["idTurma"] = alocacao.turma.idTurma
             resultObj["Nome da Disciplina"] = alocacao.turma.nomeDisciplina

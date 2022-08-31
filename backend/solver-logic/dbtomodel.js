@@ -3,7 +3,7 @@ let Turma = require('../models/turma.model')
 let Distancia = require('../models/distancia.model')
 let Config = require('../models/config.model')
 
-async function dbtomodel(ano,semestre,periodo,diaDaSemana,user){
+async function dbtomodel(ano,semestre,periodo,diaDaSemana,user,predioAux,minAlunos){
     
     let modelo = {
         turmasf1: [],
@@ -28,7 +28,8 @@ async function dbtomodel(ano,semestre,periodo,diaDaSemana,user){
         diaDaSemana:diaDaSemana,
         horarioInicio:horarioInicioF1,
         horarioFim:horarioFimF1,
-        user:user._id
+        user:user._id,
+        totalTurma: {$gte:minAlunos}
     })
     modelo.turmasf12 = await Turma.find({
         ano:ano,
@@ -36,7 +37,8 @@ async function dbtomodel(ano,semestre,periodo,diaDaSemana,user){
         diaDaSemana:diaDaSemana,
         horarioInicio:horarioInicioF12,
         horarioFim:horarioFimF12,
-        user:user._id
+        user:user._id,
+        totalTurma: {$gte:minAlunos}
     })
     modelo.turmasf2 = await Turma.find({
         ano:ano,
@@ -44,7 +46,8 @@ async function dbtomodel(ano,semestre,periodo,diaDaSemana,user){
         diaDaSemana:diaDaSemana,
         horarioInicio:horarioInicioF2,
         horarioFim:horarioFimF2,
-        user:user._id
+        user:user._id,
+        totalTurma: {$gte:minAlunos}
     })
 
     const salasDB = await Sala.find({user:user._id})
@@ -57,6 +60,18 @@ async function dbtomodel(ano,semestre,periodo,diaDaSemana,user){
         })
     })
 
+    if (predioAux){
+        for (let i = 0;i < config[0].numSalasAux ;i++){
+            let salaAux = new Sala({
+                predio:"predioAux",
+                numeroSala: "Sala A" + i.toString(),
+                capacidade: config[0].capSalasAux,
+                user:user._id
+            })
+            modelo.salas.push(salaAux)
+        }
+    }
+
     const distanciasDb = await Distancia.find({user:user._id})
     modelo.distancias= distanciasDb.reduce((acc, cur) => {
         acc[cur.predio] = acc[cur.predio] ? acc[cur.predio] : {}
@@ -66,6 +81,8 @@ async function dbtomodel(ano,semestre,periodo,diaDaSemana,user){
         }
         return acc
     }, {})
+
+    if(predioAux) modelo.distancias = {...modelo.distancias,"predioAux":{}}
 
     return modelo
 

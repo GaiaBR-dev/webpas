@@ -28,6 +28,10 @@ class TurmasDataService {
     deleteTurmas(turmas){
         return http.post(`turmas/deleteMany`,turmas)
     }
+
+    deleteAnoSemestre(ano,semestre){
+        return http.delete(`turmas/delete/${ano}/${semestre}`)
+    }
 }
 
 export default new TurmasDataService();

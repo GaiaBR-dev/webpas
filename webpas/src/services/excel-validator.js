@@ -215,6 +215,9 @@ class ExcelValidator{
             })
             row['alocado_chefia'] = row['alocado_chefia'] ? row['alocado_chefia'] : "" 
             if (row['alocado_chefia'].toString() == "t") {row.considerar=false}
+
+            row['cred_aula'] = row['cred_aula'] ? row['cred_aula'] : 0
+            if (row['cred_aula'] == 0) {row.considerar=false}
         })
         return true
     }

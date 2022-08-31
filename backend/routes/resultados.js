@@ -103,14 +103,18 @@ router.route('/calculalista').post(async (req, res) => {
     const semestre = req.body.semestre
     const delta = parseInt(req.body.delta)
     const lista = req.body.lista
+    const predioAux = req.body.predioAux
+    const minAlunos = req.body.minAlunos
+    const mipGap = req.body.mipGap
+    const tmLim = req.body.tmLim
     const {user} = req
     
     let resultObj = {}
 
     const listaDePromises = lista.map(async (unidade)=>{
         try {
-            const modelo = await dbtomodel(ano,semestre,unidade.periodo,unidade.dia,user)
-            const produto = await resolve(modelo,delta)
+            const modelo = await dbtomodel(ano,semestre,unidade.periodo,unidade.dia,user,predioAux,minAlunos)
+            const produto = await resolve(modelo,delta,mipGap,tmLim)
             const alocacoes = await trataresultado(modelo,produto)
 
             resultObj[unidade.dia] = resultObj[unidade.dia]? resultObj[unidade.dia]: {}

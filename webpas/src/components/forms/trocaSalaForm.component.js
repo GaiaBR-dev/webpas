@@ -39,7 +39,7 @@ const formCssClass ={
 }
 
 const TrocaSalaForm = props =>{
-    const {ano,semestre,dia,horariosInicio,horariosFim,config,closeModalForm} = props
+    const {ano,semestre,dia,horariosInicio,horariosFim,config,closeModalForm,resultados} = props
 
     const [predios,setPredios] = useState([]);
     const [salas,setSalas] = useState([]);
@@ -50,7 +50,6 @@ const TrocaSalaForm = props =>{
     const [predioOrigem,setPredioOrigem] = useState("");
     const [predioDestino,setPredioDestino] = useState("");
     const [alocacoes,setAlocacoes] = useState([]);
-    const [resultados,setResultados] = useState([]);
     const [confirmDialog,setConfirmDialog] = useState({isOpen:false,title:'',subtitle:''});
 
     useEffect(()=>{
@@ -58,7 +57,6 @@ const TrocaSalaForm = props =>{
     },[dia])
 
     useEffect(()=>{
-        retornaResultados(ano,semestre)
         retornaSalas()
     },[ano,semestre])
 
@@ -91,13 +89,6 @@ const TrocaSalaForm = props =>{
         resetForm,
     }=useForm(inicialValues)
 
-    const retornaResultados = (ano,semestre) =>{
-        ResultadosDataService.getByAnoSemestre(ano,semestre)
-            .then(res=>{
-                setResultados(res.data)
-            }).catch(err=>console.log(err))
-    }
-
     const retornaSalas = () =>{
         SalasDataService.getAll()
             .then(res=>{
@@ -107,7 +98,8 @@ const TrocaSalaForm = props =>{
 
     const retornaPredios = () =>{
         const unique = [...new Set(salas.map(item => item.predio))].sort()
-        setPredios(unique)
+        const listaPredios = unique.concat(["predioAux"])
+        setPredios(listaPredios)
     }
 
     const getResultadoId =(ano,semestre,dia,horario) =>{
@@ -145,7 +137,17 @@ const TrocaSalaForm = props =>{
             return sala.predio == predio
         })
         const unique = [...new Set(salasOrigem.map(item => item.numeroSala))].sort()
-        setSalasOrigem(unique)
+
+        if (predio === "predioAux"){
+            let result = []
+            for (let i =0; i< config.numSalasAux;i++){
+                result.push("Sala A"+i.toString())
+            }
+            setSalasOrigem(result)
+        }else{
+            setSalasOrigem(unique)
+        }
+        
     }
 
     const retornaSalasDestino = predio =>{
@@ -153,7 +155,16 @@ const TrocaSalaForm = props =>{
             return sala.predio == predio
         })
         const unique = [...new Set(salasDestino.map(item => item.numeroSala))].sort()
-        setSalasDestino(unique)
+        
+        if (predio === "predioAux"){
+            let result = []
+            for (let i =0; i< config.numSalasAux;i++){
+                result.push("Sala A"+i.toString())
+            }
+            setSalasDestino(result)
+        }else{
+            setSalasDestino(unique)
+        }
     }
 
     const getHorarioByPeriodo = (periodo,slot) =>{

@@ -33,10 +33,11 @@ const Solver = props =>{
     const [selectAll,setSelectAll] = useState(false);
     const [openHelp, setOpenHelp] = useState(false);
     const [delta,setDelta] = useState(0);
+    const [minAlunos,setMinAlunos] = useState(1);
     const [useAtx,setUseAtx] = useState(true);
     const [tmLim,setTmLim] = useState(0);
     const [mipGap,setMipGap] = useState(0);
-    const [erroDelta,setErroDelta] = useState('')
+    const [erros,setErros] = useState({delta:"",minAlunos:"",useAtx:"",tmLim:"",mipGap:""});
     const [working,setWorking] = useState(false);
     const [executado,setExecutado] = useState(false);
     const [resultObj,setResultObj] = useState({});
@@ -88,6 +89,10 @@ const Solver = props =>{
 
     const handleUseAtx = e =>{
         setUseAtx(!useAtx)
+    }
+
+    const handleMinAlunosChange = e =>{
+        setMinAlunos(e.target.value)
     }
 
     const handleTLChange = e => {
@@ -149,32 +154,57 @@ const Solver = props =>{
             }).catch(err => {console.log(err)})
     }
 
+    const validate = () =>{
+        let validated = true
+        let tempErro = erros
+        if (isNaN(delta)) {
+            validated = false
+            tempErro = {...tempErro,delta:"Este campo deve conter um número"}
+        }else{tempErro = {...tempErro,delta:""}}
+
+        if (isNaN(minAlunos)) {
+            validated = false
+            tempErro = {...tempErro,minAlunos:"Este campo deve conter um número"}
+        }else{tempErro = {...tempErro,minAlunos:""}}
+
+        if (isNaN(tmLim)) {
+            validated = false
+            tempErro = {...tempErro,tmLim:"Este campo deve conter um número"}
+        }else{tempErro = {...tempErro,tmLim:""}}
+
+        if (isNaN(mipGap)) {
+            validated = false
+            tempErro = {...tempErro,mipGap:"Este campo deve conter um número"}
+        }else{tempErro = {...tempErro,mipGap:""}}
+
+        setErros(tempErro)
+
+        return validated
+    }
+
     const handleExecute = () =>{
         setExecutado(false)
-        if(isNaN(delta)){
-            setErroDelta("Este campo deve conter um número")
-        }else{
-            if (!temTodos){
-
-            }else{
-                setErroDelta('')
-                setWorking(true)
-                const lista = criarLista()
-                let data = {
-                    ano: ano,
-                    semestre:semestre,
-                    delta:delta,
-                    lista:lista
-                }
-                ResultadosDataService.calculaLista(data)
-                    .then(res=>{
-                        setWorking(false)
-                        setExecutado(true)
-                        setResultObj(res.data)
-                        console.log(resultObj)
-                    })
-                    .catch(err=>console.log(err))
+        if(validate() && temTodos){
+            console.log('ola')
+            setErros({delta:"",minAlunos:"",useAtx:"",tmLim:"",mipGap:""})
+            setWorking(true)
+            const lista = criarLista()
+            let data = {
+                ano: ano,
+                semestre:semestre,
+                delta:delta,
+                lista:lista,
+                predioAux:useAtx,
+                minAlunos:minAlunos
             }
+            ResultadosDataService.calculaLista(data)
+                .then(res=>{
+                    setWorking(false)
+                    setExecutado(true)
+                    setResultObj(res.data)
+                    console.log(resultObj)
+                })
+                .catch(err=>console.log(err))
         }
     }
 
@@ -306,21 +336,35 @@ const Solver = props =>{
                 <Grid item xs={20}></Grid>
 
                 <Grid item xs={20}>
-                    <Typography fontSize={'1.1rem'} fontWeight={'405'}> Escolher folga</Typography>
+                    <Typography fontSize={'1.1rem'} fontWeight={'405'}> Escolher folga e número de alunos mínimo</Typography>
                 </Grid>
                 <Grid item xs={20}></Grid>
-                <Grid item xs={20}>
+                <Grid item xs={3}>
                     <TextField
                         variant="outlined"
                         label="Folga*"
                         name = "delta"
                         onChange={handleDeltaChange}
                         value ={delta}
-                        {...(erroDelta != null && erroDelta != "" && {
+                        {...(erros.delta != null && erros.delta != "" && {
                             error:true,
-                            helperText:erroDelta
+                            helperText:erros.delta
                         })}
                     />
+                </Grid>
+                <Grid item xs={3}>
+                    <TextField
+                        variant="outlined"
+                        label="Nro mínimo de alunos*"
+                        name = "minAlunos"
+                        onChange={handleMinAlunosChange}
+                        value ={minAlunos}
+                        {...(erros.minAlunos != null && erros.minAlunos != "" && {
+                            error:true,
+                            helperText:erros.minAlunos
+                        })}
+                    />
+                    
                 </Grid>
                 <Grid item xs={20}></Grid>
                 <Grid item xs={20}>
@@ -337,29 +381,29 @@ const Solver = props =>{
                     <Typography fontSize={'1.1rem'} fontWeight={'405'}> Opções do solver</Typography>
                 </Grid>
                 <Grid item xs={20}></Grid>
-                <Grid item xs={20}>
+                <Grid item xs={3}>
                     <TextField
                         variant="outlined"
                         label="Tempo máximo de execução (s)"
                         name = "tmLim"
                         onChange={handleTLChange}
                         value ={tmLim}
-                        {...(erroDelta != null && erroDelta != "" && {
+                        {...(erros.tmLim != null && erros.tmLim != "" && {
                             error:true,
-                            helperText:erroDelta
+                            helperText:erros.tmLim
                         })}
                     />
                 </Grid>
-                <Grid item xs={20}>
+                <Grid item xs={3}>
                     <TextField
                         variant="outlined"
                         label="MIP gap"
                         name = "mipGap"
                         onChange={handleMipGapChange}
                         value ={mipGap}
-                        {...(erroDelta != null && erroDelta != "" && {
+                        {...(erros.mipGap != null && erros.mipGap != "" && {
                             error:true,
-                            helperText:erroDelta
+                            helperText:erros.mipGap
                         })}
                     />
                 </Grid>

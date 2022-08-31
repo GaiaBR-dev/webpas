@@ -161,44 +161,5 @@ router.route('/arquivosala').post((req, res) => {
         })
 })
 
-router.route('/inseresalas321').post((req, res) => { // Hard Coded -> deletar depois
-    const result = xlstojson()
-    novasSalas = result.Salas
-
-    const novasSalasTratado = novasSalas.map(sala=>{
-        let ns = {
-            predio: sala.predio,
-            numeroSala: sala.numeroSala,
-            capacidade: sala.capacidade
-        }
-        let disponibilidade = []
-        diasTemp.map(dia=>{
-            let dispUnitM = {
-                dia: dia,
-                periodo: 'Manhã',
-                disponivel: sala.disponivelManha == 1 
-            }
-            disponibilidade.push(dispUnitM)
-            let dispUnitT = {
-                dia: dia,
-                periodo: 'Tarde',
-                disponivel: sala.disponivelTarde == 1
-            }
-            disponibilidade.push(dispUnitT)
-            let dispUnitN = {
-                dia: dia,
-                periodo: 'Noite',
-                disponivel: sala.disponivelNoite == 1
-            }
-            disponibilidade.push(dispUnitN)
-        })
-        ns.disponibilidade  = disponibilidade
-        return ns
-    })
-
-    Sala.insertMany(novasSalasTratado)
-        .then(()=> res.json(novasSalasTratado))
-        .catch(err =>res.status(400).json('Error: '+ err))
-})
 
 module.exports = router

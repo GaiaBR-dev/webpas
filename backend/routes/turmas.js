@@ -130,6 +130,15 @@ router.route('/deleteMany').post(protect,(req,res)=>{
         .catch(err => res.status(400).json(err))
 })
 
+router.route('/delete/:ano/:semestre').delete(protect,(req,res)=>{
+    const user = req.user
+    const {ano,semestre} = req.params
+    Turma.deleteMany({user:user._id,ano:ano,semestre:semestre})
+        .then(()=>res.json('Turmas deletadas'))
+        .catch(err=> res.status(400).json(err))
+
+})
+
 router.route('/update/:id').post(protect,(req,res)=>{
     const turma = req.body.turma
     const nomeDisciplina = req.body.nomeDisciplina

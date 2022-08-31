@@ -1,21 +1,21 @@
 const GLPK = require('glpk.js');
 const glpk = GLPK();
 
-async function resolve(modelo,delta) {
+async function resolve(modelo,delta,mipGap,tmLim) {
 
     const turmasF1 = modelo.turmasf1 
     const turmasF12 = modelo.turmasf12
     const turmasF2 =  modelo.turmasf2
     const salas = modelo.salas
     const delta1 = delta
-    const placeholder = 5000;
+    const placeholder = 99999;
 
     const turmas = new Array().concat(turmasF1, turmasF12, turmasF2)
     console.log("Delta",delta1)
     const indiceDistancias = modelo.distancias
+    
     const distanciasCalculadas = turmas.map((turma) => {
         return salas.map((sala) => {
-
             let departamentoUsado = turma.departamentoOferta
             if ((turmasF1.includes(turma)||turmasF2.includes(turma)) && turma.departamentoTurma){
                 departamentoUsado = turma.departamentoTurma
@@ -23,7 +23,6 @@ async function resolve(modelo,delta) {
             return  indiceDistancias[sala.predio][departamentoUsado] ? indiceDistancias[sala.predio][departamentoUsado] : placeholder 
         })
     })
-
 
     const options = {
         msglev: glpk.GLP_MSG_ALL,
@@ -33,6 +32,15 @@ async function resolve(modelo,delta) {
             each: 1
         }
     }
+
+    if (tmLim != 0 && tmLim <= 3600){
+        options.tmlim = tmLim
+    }
+
+    if(mipGap !=0){
+        options.mipgap = mipGap
+    }
+
 
     function getVariables() {
         let result = new Array

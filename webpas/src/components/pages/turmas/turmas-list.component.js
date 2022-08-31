@@ -240,6 +240,16 @@ const TurmasList = props =>{
         setSelected([]);
     }
 
+    const deletarTurmasAnoSemestre = () =>{
+        setConfirmDialog({
+            ...confirmDialog,
+            isOpen:false
+        })
+        TurmasDataService.deleteAnoSemestre(anoTable,semestreTable)
+            .then(res =>handleServerResponses('turmas',res,setNotify))
+            .catch(err=>handleServerResponses('turmas',err,setNotify))
+    }
+
     const{
         TblContainer,
         TblHead,
@@ -440,10 +450,18 @@ const TurmasList = props =>{
                         setConfirmDialog({
                             isOpen:true,
                             title:'Deletar Turmas',
-                            subtitle:'Tem certeza que deseja deletar? Você não pode desfazer esta operação.',
+                            subtitle:'Tem certeza que deseja deletar as turmas selecionadas? Você não pode desfazer esta operação.',
                             onConfirm: () =>{onDelete(selected)}
                         })
                     }}
+                    deleteAll={()=>{
+                        setConfirmDialog({
+                            isOpen:true,
+                            title:'Deletar Turmas',
+                            subtitle:'Tem certeza que deseja deletar TODAS as turmas deste ano e semestre? Você não pode desfazer esta operação.',
+                            onConfirm: () =>{deletarTurmasAnoSemestre()}
+                        })
+                    }}         
                 >
                     <TblHead
                         onSelectAllClick={handleSelectAllClick}

@@ -1,4 +1,4 @@
-import { Table, TableCell, TableHead, TablePagination, TableRow, TableSortLabel } from "@mui/material";
+import { Button, Table, TableCell, TableHead, TablePagination, TableRow, TableSortLabel } from "@mui/material";
 import { Checkbox, Typography, Toolbar, Tooltip, IconButton } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete'
 import React, { useState } from "react";
@@ -25,7 +25,7 @@ export default function useTable(records, headCells,filterFn){
     const [orderBy,setOrderBy] = useState()
 
     const TblContainer = props =>{
-        const {style, numSelected, tableTitle, deleteSelected} = props
+        const {style, numSelected, tableTitle, deleteSelected, deleteAll} = props
         let tStyle ={
             ...style,
             ...tableStyle
@@ -63,6 +63,9 @@ export default function useTable(records, headCells,filterFn){
                         >
                             {tableTitle}
                         </Typography>
+                        <IconButton  onClick={deleteAll}>
+                            <DeleteIcon />
+                        </IconButton>
                         
                     </>)}
                 </Toolbar>

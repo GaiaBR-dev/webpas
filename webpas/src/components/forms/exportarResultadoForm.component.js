@@ -51,12 +51,7 @@ const ExportarResultadoForm = props =>{
                 })
             })
 
-            let resposta = alocacoesTemp.filter(aloc=>{
-                return aloc.horario == aloc.turma.horarioInicio
-            })
-            console.log(resposta)
-
-            setAlocacoes(resposta)
+            setAlocacoes(alocacoesTemp)
         }else{
             setAlocacoes([])
         }
@@ -139,7 +134,7 @@ const ExportarResultadoForm = props =>{
         var workbook = XLSX.utils.book_new();
         var worksheet = XLSX.utils.json_to_sheet(exportArray);
         XLSX.utils.book_append_sheet(workbook, worksheet, "Resultados");
-        XLSX.writeFile(workbook, 'Resultado.xlsx');
+        XLSX.writeFile(workbook, 'Resultado_'+ano+'_'+semestre+'.xlsx');
     }
 
     const{
